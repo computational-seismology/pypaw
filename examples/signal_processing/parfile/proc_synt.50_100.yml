@@ -1,0 +1,30 @@
+# remove response flag to remove the instrument response from the
+# seismogram. For observed seismogram, you probably want to set this 
+# flag to True to get real gound displacement. For synthetic data,
+# please set this flag to False
+remove_response_flag: False
+
+# filtering the seismogram. If you set both remove_response_flag to True
+# and filter_flag to True, the filtering will happen at the same time
+# when you remove the instrument response(to make sure the taper is applied
+# only once)
+filter_flag: True
+
+# frequency band of filtering, unit in Hz
+pre_filt: [0.0067, 0.01, 0.02, 0.025]
+
+# cut time relative to CMT time. The final seismogram will be at
+# time range: [cmt_time+relative_time, cmt_time+relative_time]
+relative_starttime: 0
+relative_endtime: 6000
+
+# resample the seismogram. Sampling_rate in unit Hz.
+resample_flag: True
+sampling_rate: 5
+
+# taper
+taper_type: "hann"
+taper_percentage: 0.05
+
+# rotate flag
+rotate_flag: True

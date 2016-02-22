@@ -1,0 +1,7 @@
+{
+  "filetype": "sac", 
+  "output_file": "/path/to/asdf/output", 
+  "tag": "sythetic", 
+  "quakeml_file": "/path/to/quakeml", 
+  "waveform_dir": "/path/to/input/waveform/dir"
+}

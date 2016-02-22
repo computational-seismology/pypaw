@@ -1,0 +1,8 @@
+{
+  "filetype": "mseed", 
+  "output_file": "/path/to/output/asdf", 
+  "tag": "observed", 
+  "quakeml_file": "/path/to/quakeml", 
+  "staxml_dir": "/path/to/stationxml/dir"
+  "waveform_dir": "/path/to/input/waveform/dir"
+}
