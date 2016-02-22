@@ -17,8 +17,6 @@ def adjoint_wrapper(obsd_station_group, synt_station_group, config=None,
     """
     Wrapper for asdf I/O
     """
-    print("obsd:", obsd_station_group)
-    print("synt:", synt_station_group)
     # Make sure everything thats required is there.
     if not hasattr(obsd_station_group, obsd_tag):
         print("Missing tag '%s' from obsd_station_group %s" %
@@ -49,7 +47,7 @@ def adjoint_wrapper(obsd_station_group, synt_station_group, config=None,
     adj_starttime = observed[0].stats.starttime
     interp_starttime = adj_starttime - 5.0
     interp_delta = 0.1475
-    interp_npts = 10000
+    interp_npts = 42000
     new_adjsrcs = postprocess_adjsrc(
         adjsrcs, adj_starttime, interp_starttime, interp_delta,
         interp_npts, rotate_flag=True, inventory=synt_staxml,
