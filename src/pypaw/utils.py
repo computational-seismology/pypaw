@@ -95,8 +95,21 @@ def smart_read_yaml(yaml_file, mpi_mode=False):
     return yaml_dict
 
 
+def smart_check_file(filename, mpi_mode=False, comm=None):
+    if not mpi_mode:
+        file_exists = os.path.exists(filename)
+    else:
+        rank = comm. rank
+        if rank == 0:
+            file_exists = os.path.exists(filename)
+        else:
+            file_exists = None
+        file_exists = comm.bcast(file_exists, root=0)
+    return file_exists
+
+
 def smart_remove_file(filename, mpi_mode=False, comm=None):
-    if not os.path.exists(filename):
+    if not smart_check_file(filename, mpi_mode=mpi_mode, comm=comm):
         return
     if mpi_mode:
         rank = comm.rank

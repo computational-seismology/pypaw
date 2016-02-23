@@ -55,11 +55,12 @@ class ProcASDFBase(object):
         for key, value in dict_obj.iteritems():
             print("%s:%s" % (key, value))
 
-    def load_asdf(self, filename):
+    def load_asdf(self, filename, mode="a"):
         if self.mpi_mode:
-            return ASDFDataSet(filename, compression=None, debug=False)
+            return ASDFDataSet(filename, compression=None, debug=False,
+                               mode=mode)
         else:
-            return ASDFDataSet(filename)
+            return ASDFDataSet(filename, mode=mode)
 
     @staticmethod
     def clean_memory(asdf_ds):

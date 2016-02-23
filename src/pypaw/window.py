@@ -3,7 +3,7 @@ from functools import partial
 from .procbase import ProcASDFBase
 from pytomo3d.window.window import window_on_stream
 import pyflex
-from .utils import smart_read_yaml, smart_mkdir
+from .utils import smart_read_yaml, smart_mkdir, smart_check_file
 from .write_window import write_window_json
 
 
@@ -98,8 +98,16 @@ class WindowASDF(ProcASDFBase):
         self._validate_path(path)
         self._validate_param(param)
 
-        obsd_ds = self.load_asdf(path["obsd_asdf"])
-        synt_ds = self.load_asdf(path["synt_asdf"])
+        obsd_file = path["obsd_asdf"]
+        synt_file = path["synt_asdf"]
+        if not smart_check_file(obsd_file, mpi_mode=self.mpi_mode,
+                                comm=self.comm):
+            raise ValueError("Input obsd file not exists: %s" % obsd_file)
+        if not smart_check_file(synt_file, mpi_mode=self.mpi_mode,
+                                comm=self.comm):
+            raise ValueError("Input obsd file not exists: %s" % synt_file)
+        obsd_ds = self.load_asdf(obsd_file)
+        synt_ds = self.load_asdf(synt_file)
         obsd_tag = path["obsd_tag"]
         synt_tag = path["synt_tag"]
         figure_mode = path["figure_mode"]
