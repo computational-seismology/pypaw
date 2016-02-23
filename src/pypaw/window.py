@@ -110,6 +110,9 @@ class WindowASDF(ProcASDFBase):
         self._validate_path(path)
         self._validate_param(param)
 
+        self.print_info(path, "Path Info")
+        self.print_info(param, "Param Info")
+
         obsd_file = path["obsd_asdf"]
         synt_file = path["synt_asdf"]
         if not smart_check_file(obsd_file, mpi_mode=self.mpi_mode,

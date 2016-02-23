@@ -93,20 +93,21 @@ class ProcASDFBase(object):
         :param extra_info:
         :return:
         """
-        def _print_subs(_dict):
+        def _print_subs(_dict, extra_info=""):
             print("-"*10 + extra_info + "-"*10)
-            for key, value in _dict.iteritems():
-                print("%s:%s" % (key, value))
+            sorted_dict = sorted(((v, k) for v, k in _dict.iteritems()))
+            for key, value in sorted_dict:
+                print("%s:  %s" % (key, value))
 
-        if not isinstance(dict_obj):
+        if not isinstance(dict_obj, dict):
             raise ValueError("Input dict_obj should be type of dict")
 
         if not self.mpi_mode:
-            _print_subs(dict_obj)
+            _print_subs(dict_obj, extra_info)
         else:
             if self.rank != 0:
                 return
-            _print_subs(dict_obj)
+            _print_subs(dict_obj, extra_info)
 
     def load_asdf(self, filename, mode="a"):
         """

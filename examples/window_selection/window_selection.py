@@ -2,7 +2,7 @@
 import matplotlib as mpl
 mpl.use('Agg')
 import argparse
-from pypaw.window import WindowASDF
+from pypaw import WindowASDF
 
 if __name__ == '__main__':
 

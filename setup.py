@@ -49,7 +49,7 @@ setup(
     ],
     install_requires=[
         "numpy", "obspy", "flake8", "pytest", "nose", "future>=0.14.1",
-        "pytomo3d"
+        "pytomo3d", "pyasdf"
     ],
     extras_require={
         "docs": ["sphinx", "ipython", "runipy"]

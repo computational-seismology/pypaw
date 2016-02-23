@@ -54,6 +54,9 @@ class ProcASDF(ProcASDFBase):
         self._validate_path(path)
         self._validate_param(param)
 
+        self.print_info(path, extra_info="Path Info")
+        self.print_info(param, extra_info="Param Info")
+
         input_asdf = path["input_asdf"]
         input_tag = path["input_tag"]
         output_asdf = path["output_asdf"]

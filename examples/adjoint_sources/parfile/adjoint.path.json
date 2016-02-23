@@ -5,6 +5,6 @@
   "synt_tag": "proc_synt_50_100",
   "window_file": "../../tests/data/asdf/window/C200912240023A/windows.json",
   "output_file": "../../tests/data/asdf/adjoint/C200912240023A.adjoint.50_100.h5",
-  "figure_mode": "False",
+  "figure_mode": false,
   "figure_dir": "None"
 } 

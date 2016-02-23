@@ -2,7 +2,7 @@
 import matplotlib as mpl
 mpl.use('Agg')
 import argparse
-from pypaw.adjoint import AdjointASDF
+from pypaw import AdjointASDF
 
 if __name__ == '__main__':
 

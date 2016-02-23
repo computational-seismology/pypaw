@@ -23,7 +23,7 @@ from .utils import smart_read_json, smart_remove_file, smart_check_file
 def adjoint_wrapper(obsd_station_group, synt_station_group, config=None,
                     obsd_tag=None, synt_tag=None, windows=None, event=None,
                     adj_src_type="multitaper_misfit", figure_mode=False,
-                    figure_dir=False, adjoint_src_flag=False):
+                    figure_dir=False, adjoint_src_flag=True):
 
     """
     Function wrapper for pyasdf.
@@ -176,6 +176,9 @@ class AdjointASDF(ProcASDFBase):
         self._validate_path(path)
         self._validate_param(param)
 
+        self.print_info(path, extra_info="Path information")
+        self.print_info(param, extra_info="Param information")
+
         obsd_file = path["obsd_asdf"]
         synt_file = path["synt_asdf"]
         window_file = path["window_file"]
@@ -189,9 +192,9 @@ class AdjointASDF(ProcASDFBase):
                                 comm=self.comm):
             raise ValueError("Input window_file not exists: %s" % window_file)
 
-        obsd_ds = self.load_asdf(obsd_file)
+        obsd_ds = self.load_asdf(obsd_file, mode="r")
         obsd_tag = path["obsd_tag"]
-        synt_ds = self.load_asdf(synt_file)
+        synt_ds = self.load_asdf(synt_file, mode="r")
         synt_tag = path["synt_tag"]
         output_filename = path["output_file"]
         figure_mode = path["figure_mode"]

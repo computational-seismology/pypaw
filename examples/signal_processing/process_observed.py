@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
-from pypaw.process import ProcASDF
+from pypaw import ProcASDF
 
 if __name__ == '__main__':
 
