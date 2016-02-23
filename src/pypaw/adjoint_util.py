@@ -1,3 +1,14 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Methods that contains utils for adjoint sources
+
+:copyright:
+    Wenjie Lei (lei@princeton.edu), 2016
+:license:
+    GNU General Public License, Version 3
+    (http://www.gnu.org/copyleft/gpl.html)
+"""
 from __future__ import (absolute_import, division, print_function)
 from pyadjoint import AdjointSource
 from pytomo3d.window.write_window import get_json_content
@@ -5,6 +16,12 @@ from pyflex.window import Window
 
 
 def smart_transform_window(windows):
+    """
+    Smart tranfer window object to dict if it is type of pyflex.Window
+
+    :param windows:
+    :return:
+    """
     if isinstance(windows[0][0], dict):
         all_windows = windows
     elif isinstance(windows[0][0], Window):
@@ -106,6 +123,13 @@ def _stats_channel_window(adjsrcs, windows):
 
 
 def calculate_chan_weight(adjsrcs, windows_sta):
+    """
+    Calcualte window weights based on adjoint sources and windows
+
+    :param adjsrcs:
+    :param windows_sta:
+    :return:
+    """
 
     _, adj_win_dict = _stats_channel_window(adjsrcs, windows_sta)
 

@@ -1,27 +1,20 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Parent class for singal processing asdf file and
+handles parallel I/O so they are invisible to users.
+
+:copyright:
+    Wenjie Lei (lei@princeton.edu), 2016
+:license:
+    GNU General Public License, Version 3
+    (http://www.gnu.org/copyleft/gpl.html)
+"""
 import sys
 import json
 import os
 import time
 import yaml
-
-
-class JSONObject(object):
-    def __init__(self, d):
-        self.__dict__ = d
-
-
-def read_json_file(parfile, obj_hook=True):
-    """
-    Hook json to an JSONObject instance
-    """
-    if not os.path.exists(parfile):
-        raise ValueError("parfile not exists:%s" % parfile)
-    with open(parfile, 'r') as f:
-        if obj_hook:
-            data = json.load(f, object_hook=JSONObject)
-        else:
-            data = json.load(f)
-    return data
 
 
 def is_mpi_env():
@@ -44,7 +37,31 @@ def is_mpi_env():
     return True
 
 
-def smart_read_json(json_file, mpi_mode=False, object_hook=False):
+def _get_mpi_comm():
+    from mpi4py import MPI
+    return MPI.COMM_WORLD
+
+
+class JSONObject(object):
+    def __init__(self, d):
+        self.__dict__ = d
+
+
+def read_json_file(parfile, obj_hook=True):
+    """
+    Hook json to an JSONObject instance
+    """
+    if not os.path.exists(parfile):
+        raise ValueError("parfile not exists:%s" % parfile)
+    with open(parfile, 'r') as f:
+        if obj_hook:
+            data = json.load(f, object_hook=JSONObject)
+        else:
+            data = json.load(f)
+    return data
+
+
+def smart_read_json(json_file, mpi_mode=False, comm=None, object_hook=False):
     """
     read json file under mpi and multi-processing environment.
     Hook it to an JSONObject(not the conventional way to
@@ -53,8 +70,8 @@ def smart_read_json(json_file, mpi_mode=False, object_hook=False):
     if not mpi_mode:
         json_obj = read_json_file(json_file, obj_hook=object_hook)
     else:
-        from mpi4py import MPI
-        comm = MPI.COMM_WORLD
+        if comm is None:
+            comm = _get_mpi_comm()
         rank = comm.Get_rank()
         if rank == 0:
             try:
@@ -73,15 +90,15 @@ def read_yaml_file(filename):
         return yaml.load(fh)
 
 
-def smart_read_yaml(yaml_file, mpi_mode=False):
+def smart_read_yaml(yaml_file, mpi_mode=False, comm=None):
     """
     Read yaml file into python dict, in mpi_mode or not
     """
     if not mpi_mode:
         yaml_dict = read_yaml_file(yaml_file)
     else:
-        from mpi4py import MPI
-        comm = MPI.COMM_WORLD
+        if comm is None:
+            comm = _get_mpi_comm()
         rank = comm.rank
         if rank == 0:
             try:
@@ -99,7 +116,9 @@ def smart_check_file(filename, mpi_mode=False, comm=None):
     if not mpi_mode:
         file_exists = os.path.exists(filename)
     else:
-        rank = comm. rank
+        if comm is None:
+            comm = _get_mpi_comm()
+        rank = comm.rank
         if rank == 0:
             file_exists = os.path.exists(filename)
         else:
@@ -112,6 +131,8 @@ def smart_remove_file(filename, mpi_mode=False, comm=None):
     if not smart_check_file(filename, mpi_mode=mpi_mode, comm=comm):
         return
     if mpi_mode:
+        if comm is None:
+            comm = _get_mpi_comm()
         rank = comm.rank
         comm.Barrier()
         if rank == 0:
@@ -125,6 +146,8 @@ def smart_mkdir(dirname, mpi_mode=False, comm=None):
     if os.path.exists(dirname):
         return
     if mpi_mode:
+        if comm is None:
+            comm = _get_mpi_comm()
         rank = comm.rank
         comm.Barrier()
         if rank == 0:

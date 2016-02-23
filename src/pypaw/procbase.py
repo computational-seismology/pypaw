@@ -1,8 +1,19 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Parent class for general asdf processing. Wraps things like MPI
+and parallel I/O so they are invisible to users.
+
+:copyright:
+    Wenjie Lei (lei@princeton.edu), 2016
+:license:
+    GNU General Public License, Version 3
+    (http://www.gnu.org/copyleft/gpl.html)
+"""
 from __future__ import (absolute_import, division, print_function)
 from pyasdf import ASDFDataSet
 from mpi4py import MPI
-from .utils import smart_read_yaml, is_mpi_env
+from .utils import smart_read_yaml, smart_read_json, is_mpi_env
 
 
 class ProcASDFBase(object):
@@ -17,18 +28,41 @@ class ProcASDFBase(object):
         self._verbose = verbose
 
     def _parse_yaml(self, content):
+        """
+        Parse yaml file
+
+        :param content:
+        :return:
+        """
         if isinstance(content, dict) or isinstance(content, list):
             return content
         elif isinstance(content, str):
-            return smart_read_yaml(content, mpi_mode=self.mpi_mode)
+            return smart_read_yaml(content, mpi_mode=self.mpi_mode,
+                                   comm=self.comm)
         else:
             raise ValueError("Not recogonized input: %s" % content)
+
+    def _parse_json(self, content):
+        """
+        Parse json file
+
+        :param content:
+        :return:
+        """
+        if isinstance(content, dict) or isinstance(content, list):
+            return content
+        elif isinstance(content, str):
+            return smart_read_json(content, mpi_mode=self.mpi_mode,
+                                   comm=self.comm)
+        else:
+            raise ValueError("Not recogonized input: %s" % content)
+
 
     def _parse_path(self):
         """
         How you parse the path arugment to fit your requirements
         """
-        return self._parse_yaml(self.path)
+        return self._parse_json(self.path)
 
     def _parse_param(self):
         """
@@ -37,7 +71,11 @@ class ProcASDFBase(object):
         return self._parse_yaml(self.param)
 
     def detect_env(self):
-        # detect environment
+        """
+        Detect environment, mpi or not
+
+        :return:
+        """
         self.mpi_mode = is_mpi_env()
         if not self.mpi_mode:
             raise EnvironmentError(
@@ -47,15 +85,37 @@ class ProcASDFBase(object):
         self.rank = self.comm.Get_rank()
 
     def print_info(self, dict_obj, extra_info=""):
-        print("-"*10 + extra_info + "-"*10)
+        """
+        Print dict. You can use it to print out information
+        for path and param
+
+        :param dict_obj:
+        :param extra_info:
+        :return:
+        """
+        def _print_subs(_dict):
+            print("-"*10 + extra_info + "-"*10)
+            for key, value in _dict.iteritems():
+                print("%s:%s" % (key, value))
+
         if not isinstance(dict_obj):
             raise ValueError("Input dict_obj should be type of dict")
-        if self.rank != 0:
-            return
-        for key, value in dict_obj.iteritems():
-            print("%s:%s" % (key, value))
+
+        if not self.mpi_mode:
+            _print_subs(dict_obj)
+        else:
+            if self.rank != 0:
+                return
+            _print_subs(dict_obj)
 
     def load_asdf(self, filename, mode="a"):
+        """
+        Load asdf file
+
+        :param filename:
+        :param mode:
+        :return:
+        """
         if self.mpi_mode:
             return ASDFDataSet(filename, compression=None, debug=False,
                                mode=mode)
@@ -64,10 +124,20 @@ class ProcASDFBase(object):
 
     @staticmethod
     def clean_memory(asdf_ds):
+        """
+        Delete asdf dataset
+        """
         del asdf_ds
 
     @staticmethod
     def _missing_keys(necessary_keys, _dict):
+        """
+        Check if necessary_keys exists in _dict
+
+        :param necessary_keys:
+        :param _dict:
+        :return:
+        """
         if not isinstance(_dict, dict):
             raise ValueError("Input _dict must be type of dict")
         error_code = 0
@@ -80,12 +150,16 @@ class ProcASDFBase(object):
 
     def _core(self, par_obj, file_obj):
         """
-        Dump example
+        Dummy here. Core function to fit different purpose.
         """
         pass
 
     def smart_run(self):
+        """
+        Job launch method
 
+        :return:
+        """
         self.detect_env()
 
         path = self._parse_path()

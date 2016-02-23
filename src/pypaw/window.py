@@ -1,3 +1,15 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Class for window selection on asdf file and handles parallel I/O
+so they are invisible to users.
+
+:copyright:
+    Wenjie Lei (lei@princeton.edu), 2016
+:license:
+    GNU General Public License, Version 3
+    (http://www.gnu.org/copyleft/gpl.html)
+"""
 from __future__ import (absolute_import, division, print_function)
 from functools import partial
 from .procbase import ProcASDFBase

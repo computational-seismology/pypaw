@@ -1,4 +1,15 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Parent class for singal processing asdf file and
+handles parallel I/O so they are invisible to users.
+
+:copyright:
+    Wenjie Lei (lei@princeton.edu), 2016
+:license:
+    GNU General Public License, Version 3
+    (http://www.gnu.org/copyleft/gpl.html)
+"""
 from __future__ import (print_function, division, absolute_import)
 from functools import partial
 from pytomo3d.signal.process import process
@@ -7,7 +18,14 @@ from .utils import smart_remove_file, smart_check_file
 
 
 def process_wrapper(stream, inv, param=None):
+    """
+    Process function wrapper for pyasdf
 
+    :param stream:
+    :param inv:
+    :param param:
+    :return:
+    """
     param["inventory"] = inv
 
     return process(stream, **param)
