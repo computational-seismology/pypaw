@@ -2,10 +2,11 @@
 from __future__ import (absolute_import, division, print_function)
 from functools import partial
 import pyadjoint
-from pytomo3d.adjoint.adjsrc import adjsrc_function
+from pytomo3d.adjoint.adjsrc import calculate_adjsrc_on_stream
 from pytomo3d.adjoint.adjsrc import postprocess_adjsrc
 from .procbase import ProcASDFBase
 from .adjoint_util import reshape_adj, calculate_chan_weight
+from .adjoint_util import smart_transform_window
 from .utils import smart_read_json, smart_remove_file
 
 
@@ -38,21 +39,22 @@ def adjoint_wrapper(obsd_station_group, synt_station_group, config=None,
     except:
         return
 
-    adjsrcs, nwins_dict = adjsrc_function(
+    window_sta = smart_transform_window(window_sta)
+
+    adjsrcs = calculate_adjsrc_on_stream(
         observed, synthetic, window_sta, config, adj_src_type,
         figure_mode=figure_mode)
 
-    chan_weight_dict = calculate_chan_weight(nwins_dict)
+    chan_weight_dict = calculate_chan_weight(adjsrcs, window_sta)
 
-    adj_starttime = observed[0].stats.starttime
-    interp_starttime = adj_starttime - 5.0
+    interp_starttime = adjsrcs[0].starttime - 5.0
     interp_delta = 0.1475
     interp_npts = 42000
     new_adjsrcs = postprocess_adjsrc(
-        adjsrcs, adj_starttime, interp_starttime, interp_delta,
+        adjsrcs, interp_starttime, interp_delta,
         interp_npts, rotate_flag=True, inventory=synt_staxml,
         event=event, sum_over_comp_flag=True, weight_flag=True,
-        weight_dict=chan_weight_dict)
+        weight_dict=chan_weight_dict, filter_flag=False)
 
     _final = reshape_adj(new_adjsrcs, 0.0)
 

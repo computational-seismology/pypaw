@@ -19,7 +19,7 @@ def get_json_content(window):
         "dlnA":  window.dlnA,
         "dt": window.dt,
         "min_period": window.min_period,
-        #"phase_arrivals": window.phase_arrivals,
+        # "phase_arrivals": window.phase_arrivals,
         "absolute_starttime": window.absolute_starttime,
         "absolute_endtime": window.absolute_endtime,
         "relative_starttime": window.relative_starttime,
@@ -47,7 +47,7 @@ class WindowEncoder(json.JSONEncoder):
 
 
 def write_window_json(results, outputdir):
- 
+
     output_json = os.path.join(outputdir, "windows.json")
     print("Output window file: %s" % output_json)
     window_all = {}
@@ -57,13 +57,13 @@ def write_window_json(results, outputdir):
         window_all[key] = {}
         _window_comp = []
         for _comp in sta_win:
-            _window = [ get_json_content(_i) for _i in _comp]
+            _window = [get_json_content(_i) for _i in _comp]
             _window_comp.append(_window)
         window_all[key] = _window_comp
 
     with open(output_json, 'w') as fh:
-        j = json.dumps(window_all, cls=WindowEncoder, sort_keys=True, 
-                indent=2, separators=(',', ':'))
+        j = json.dumps(window_all, cls=WindowEncoder, sort_keys=True,
+                       indent=2, separators=(',', ':'))
         try:
             fh.write(j)
         except TypeError:

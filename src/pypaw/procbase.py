@@ -2,8 +2,7 @@
 from __future__ import (absolute_import, division, print_function)
 from pyasdf import ASDFDataSet
 from mpi4py import MPI
-from .utils import smart_read_json, smart_read_yaml, is_mpi_env
-import os
+from .utils import smart_read_yaml, is_mpi_env
 
 
 class ProcASDFBase(object):

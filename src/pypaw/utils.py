@@ -121,7 +121,6 @@ def smart_mkdir(dirname, mpi_mode=False, comm=None):
         os.makedirs(dirname)
 
 
-
 def drawProgressBar(percent, user_text="", barLen=20):
     """
     Draw status progress bars in terminal.

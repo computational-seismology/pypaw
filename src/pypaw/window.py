@@ -62,15 +62,15 @@ class WindowASDF(ProcASDFBase):
 
         if set(param.keys()) != set(self.components):
             raise ValueError("param should contains the same key(%s) as "
-                             "component keys(%s)" % (param.keys(), 
+                             "component keys(%s)" % (param.keys(),
                                                      self.components))
-        
+
         param_dict = {}
         for key, value in param.iteritems():
             param_dict[key] = self._parse_yaml(value)
 
         return param_dict
- 
+
     def _validate_path(self, path):
         necessary_keys = ["obsd_asdf", "obsd_tag", "synt_asdf", "synt_tag",
                           "output_dir", "figure_mode"]
@@ -107,7 +107,7 @@ class WindowASDF(ProcASDFBase):
         output_dir = path["output_dir"]
 
         smart_mkdir(output_dir, mpi_mode=self.mpi_mode,
-                       comm=self.comm)
+                    comm=self.comm)
 
         event = obsd_ds.events[0]
 

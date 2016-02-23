@@ -1,8 +1,21 @@
 from __future__ import (absolute_import, division, print_function)
-import os
-from functools import partial
-
 from pyadjoint import AdjointSource
+from pytomo3d.window.write_window import get_json_content
+from pyflex.window import Window
+
+
+def smart_transform_window(windows):
+    if isinstance(windows[0][0], dict):
+        all_windows = windows
+    elif isinstance(windows[0][0], Window):
+        all_windows = []
+        for chan_win in windows:
+            _chan_win_list = [get_json_content(i) for i in chan_win]
+            all_windows.append(_chan_win_list)
+    else:
+        raise ValueError("Not recgonized type of window")
+
+    return all_windows
 
 
 def ensemble_fake_adj(stream, time_offset=0.0):
@@ -51,7 +64,7 @@ def reshape_adj(adjsrcs, time_offset):
                       "station_id": station_id, "component": adj.component,
                       "units": "m"}
 
-        tag = "%s_%s_MX%s" % (adj.network, adj.station, adj.component)
+        tag = "%s_%s_%s" % (adj.network, adj.station, adj.component)
         tag_list.append(tag)
 
         dataset_path = "AdjointSources/%s" % tag
@@ -70,14 +83,38 @@ def reshape_adj(adjsrcs, time_offset):
     return reshape_list
 
 
-def calculate_chan_weight(nwins_dict):
+def _stats_channel_window(adjsrcs, windows):
+    """
+    Determine number of windows on each channel of each component.
+    """
+    adj_dict = {}
+    for idx, adj in enumerate(adjsrcs):
+        adj_id = "%s.%s.%s.%s" % (adj.network, adj.station, adj.location,
+                                  adj.component)
+        adj_dict[adj_id] = idx
+
+    adj_win_dict = {}
+    for chan_win in windows:
+        chan_id = chan_win[0]["channel_id"]
+        adj_win_dict[chan_id] = len(chan_win)
+
+    for key in adj_win_dict:
+        if key not in adj_dict:
+            adj_win_dict.pop(key, None)
+
+    return adj_dict, adj_win_dict
+
+
+def calculate_chan_weight(adjsrcs, windows_sta):
+
+    _, adj_win_dict = _stats_channel_window(adjsrcs, windows_sta)
 
     comp_dict = {}
-    for chan_id, nwins in nwins_dict.iteritems():
-        comp = chan_id.split(".")[-1][-1]
-        if comp not in comp_dict.keys():
+    for tr_id, nwins in adj_win_dict.iteritems():
+        comp = "MX%s" % tr_id.split(".")[-1][-1]
+        if comp not in comp_dict:
             comp_dict[comp] = {}
-        comp_dict[comp][chan_id] = nwins
+        comp_dict[comp][tr_id] = nwins
 
     for comp, comp_wins in comp_dict.iteritems():
         ntotal = 0
