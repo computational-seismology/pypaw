@@ -32,7 +32,7 @@ and check the result.
   ```
 
 #### Data Processing(as a whole)
-Run the whole preprocessing as a whole, which includes the signal processing, window selection and adjoint sources. The output is adjoint source in ASDF file.
+Run the whole preprocessing as a whole, which includes the signal processing, window selection and adjoint sources. The output is adjoint source in ASDF file. Remember to run the data conversion before this since this step takes asdf file as input.
 ```
 cd preproc_wf
 bash example_run.bash
