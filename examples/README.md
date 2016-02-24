@@ -32,9 +32,9 @@ and check the result.
   ```
 
 #### Data Processing(as a whole)
-1. Run the whole preprocessing as a whole, which includes the signal processing, window selection and adjoint sources. The output is adjoint source in ASDF file
-  ```
-  cd preproc_wf
-  bash example_run.bash
-  cd ..
-  ```
+Run the whole preprocessing as a whole, which includes the signal processing, window selection and adjoint sources. The output is adjoint source in ASDF file.
+```
+cd preproc_wf
+bash example_run.bash
+cd ..
+```
