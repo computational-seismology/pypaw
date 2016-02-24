@@ -1,0 +1,15 @@
+#!/usr/bin/env python
+
+import argparse
+from pypaw import ConvertASDF
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', action='store', dest='path_file', required=True)
+    parser.add_argument('-v', action='store_true', dest='verbose')
+    parser.add_argument('-s', action='store_true', dest='status_bar')
+    args = parser.parse_args()
+
+    converter = ConvertASDF(args.path_file, args.verbose, args.status_bar)
+    converter.run()

@@ -1,8 +1,0 @@
-{
-  "waveform_dir": "../../../test_data/obsd/C200912240023A",
-  "filetype": "mseed", 
-  "tag": "raw_observed", 
-  "quakeml_file": "../../../test_data/quakeml/C200912240023A.xml", 
-  "staxml_dir": "../../../test_data/stationxml/C200912240023A", 
-  "output_file": "../../../test_data/asdf/raw/C200912240023A.raw_observed.h5"
-}

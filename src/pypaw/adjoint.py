@@ -22,8 +22,10 @@ from .utils import smart_read_json, smart_remove_file, smart_check_file
 
 def adjoint_wrapper(obsd_station_group, synt_station_group, config=None,
                     obsd_tag=None, synt_tag=None, windows=None, event=None,
-                    adj_src_type="multitaper_misfit", figure_mode=False,
-                    figure_dir=False, adjoint_src_flag=True):
+                    adj_src_type="multitaper_misfit",
+                    interp_delta=None, interp_npts=None,
+                    figure_mode=False, figure_dir=False,
+                    adjoint_src_flag=True):
 
     """
     Function wrapper for pyasdf.
@@ -63,15 +65,16 @@ def adjoint_wrapper(obsd_station_group, synt_station_group, config=None,
     """
     # Make sure everything thats required is there.
     if not hasattr(obsd_station_group, obsd_tag):
-        print("Missing tag '%s' from obsd_station_group %s" %
+        print("Missing tag '%s' from obsd_station_group %s. Skipped." %
               (obsd_tag, obsd_station_group._station_name))
         return
     if not hasattr(synt_station_group, synt_tag):
-        print("Missing tag '%s' from synt_station_group" %
+        print("Missing tag '%s' from synt_station_group %s. Skipped." %
               (synt_tag, synt_station_group._station_name))
         return
     if not hasattr(synt_station_group, "StationXML"):
-        print("Missing tag 'STATIONXML' from synt_station_group")
+        print("Missing tag 'STATIONXML' from synt_station_group %s. Skipped" %
+              (synt_tag, synt_station_group._station_name))
 
     observed = getattr(obsd_station_group, obsd_tag)
     synthetic = getattr(synt_station_group, synt_tag)
@@ -91,9 +94,11 @@ def adjoint_wrapper(obsd_station_group, synt_station_group, config=None,
 
     chan_weight_dict = calculate_chan_weight(adjsrcs, window_sta)
 
-    interp_starttime = adjsrcs[0].starttime - 5.0
-    interp_delta = 0.1475
-    interp_npts = 42000
+    origin = event.preferred_origin() or event.origins[0]
+    focal = event.preferred_focal_mechanism()
+    hdr = focal.moment_tensor.source_time_function.duration
+    # according to SPECFEM starttime convention
+    interp_starttime = origin.time - 1.5 * hdr
     new_adjsrcs = postprocess_adjsrc(
         adjsrcs, interp_starttime, interp_delta,
         interp_npts, rotate_flag=True, inventory=synt_staxml,
@@ -207,7 +212,11 @@ class AdjointASDF(ProcASDFBase):
         windows = self.load_windows(window_file)
 
         adj_src_type = param["adj_src_type"]
-        del param["adj_src_type"]
+        interp_delta = param["interp_delta"]
+        interp_npts = param["interp_npts"]
+        param.pop("adj_src_type", None)
+        param.pop("interp_delta", None)
+        param.pop("interp_npts", None)
 
         config = self.load_adjoint_config(param)
 
@@ -216,6 +225,7 @@ class AdjointASDF(ProcASDFBase):
                     obsd_tag=obsd_tag, synt_tag=synt_tag,
                     windows=windows, event=event,
                     adj_src_type=adj_src_type,
+                    interp_delta=interp_delta, interp_npts=interp_npts,
                     figure_mode=figure_mode, figure_dir=figure_dir)
 
         results = obsd_ds.process_two_files(synt_ds, adjsrc_func,

@@ -12,9 +12,10 @@ Methods that contains utils for adjoint sources
 from __future__ import (absolute_import, division, print_function)
 import os
 import glob
-from .utils import JSONObject, smart_read_json, drawProgressBar, timing
+from .utils import smart_read_json, drawProgressBar, timing
 from pyasdf import ASDFDataSet
 import obspy
+from obspy.core.inventory import Channel, Station, Network, Inventory, Site
 
 
 def create_simple_inventory(network, station, latitude=None, longitude=None,
@@ -31,30 +32,30 @@ def create_simple_inventory(network, station, latitude=None, longitude=None,
         start_date = obspy.UTCDateTime(0)
 
     for _chan_code in ["MXZ", "MXE", "MXN"]:
-        chan = obspy.Channel(_chan_code, location_code, latitude=latitude,
-                             longitude=longitude, elevation=elevation,
-                             depth=depth, azimuth=azi_dict[_chan_code],
-                             dip=dip_dict[_chan_code], start_date=start_date,
-                             end_date=end_date)
+        chan = Channel(_chan_code, location_code, latitude=latitude,
+                       longitude=longitude, elevation=elevation,
+                       depth=depth, azimuth=azi_dict[_chan_code],
+                       dip=dip_dict[_chan_code], start_date=start_date,
+                       end_date=end_date)
         channel_list.append(chan)
 
-    site = obspy.Site("N/A")
-    sta = obspy.Station(station, latitude=latitude, longitude=longitude,
-                        elevation=elevation, channels=channel_list, site=site,
-                        creation_date=start_date, total_number_of_channels=3,
-                        selected_number_of_channels=3)
+    site = Site("N/A")
+    sta = Station(station, latitude=latitude, longitude=longitude,
+                  elevation=elevation, channels=channel_list, site=site,
+                  creation_date=start_date, total_number_of_channels=3,
+                  selected_number_of_channels=3)
 
-    nw = obspy.Network(network, stations=[sta, ], total_number_of_stations=1,
-                       selected_number_of_stations=1)
+    nw = Network(network, stations=[sta, ], total_number_of_stations=1,
+                 selected_number_of_stations=1)
 
-    inv = obspy.Inventory([nw, ], source="SPECFEM3D_GLOBE", sender="Princeton",
-                          created=start_date)
+    inv = Inventory([nw, ], source="SPECFEM3D_GLOBE", sender="Princeton",
+                    created=start_date)
 
     return inv
 
 
 @timing
-def convert_to_asdf(asdf_fn, waveform_filelist, tag, quakemlfile,
+def convert_to_asdf(asdf_fn, waveform_filelist, tag, quakemlfile=None,
                     staxml_filelist=None, verbose=False, status_bar=False,
                     create_simple_inv=False):
     """
@@ -74,7 +75,9 @@ def convert_to_asdf(asdf_fn, waveform_filelist, tag, quakemlfile,
     ds = ASDFDataSet(asdf_fn)
 
     # Add event
-    if quakemlfile is not None and os.path.exists(quakemlfile):
+    if quakemlfile:
+        if not os.path.exists(quakemlfile):
+            raise ValueError("Quakeml file not exists:%s" % quakemlfile)
         ds.add_quakeml(quakemlfile)
         event = ds.events[0]
         if status_bar:
@@ -144,9 +147,9 @@ def write_stream_to_sac(stream, outputdir, tag=""):
         tr.write(filename, format="SAC")
 
 
-def convert_asdf_to_other(asdf_fn, outputdir, tag=None, filetype="sac",
-                          output_staxml=True, output_quakeml=True,
-                          _verbose=True):
+def convert_from_asdf(asdf_fn, outputdir, tag=None, filetype="sac",
+                      output_staxml=True, output_quakeml=True,
+                      _verbose=True):
     """
     Convert asdf to different types of file
     """
@@ -157,7 +160,7 @@ def convert_asdf_to_other(asdf_fn, outputdir, tag=None, filetype="sac",
     if not os.path.exists(asdf_fn):
         raise ValueError("No asdf file: %s" % asdf_fn)
     if not os.path.exists(outputdir):
-        raise ValueError("No output dir: %s" % outputdir)
+        os.makedirs(outputdir)
 
     if isinstance(tag, str):
         tag_list = [tag]
@@ -182,7 +185,10 @@ def convert_asdf_to_other(asdf_fn, outputdir, tag=None, filetype="sac",
         if tag is None:
             tag_list = station.get_waveform_tags()
         for _tag in tag_list:
-            stream, inv = ds.get_data_for_tag(station_name2, _tag)
+            try:
+                stream, inv = ds.get_data_for_tag(station_name2, _tag)
+            except:
+                print("Error for station:", station_name2)
             if filetype == "SAC":
                 write_stream_to_sac(stream, outputdir, _tag)
             elif filetype == "MSEED":
@@ -192,15 +198,18 @@ def convert_asdf_to_other(asdf_fn, outputdir, tag=None, filetype="sac",
             if output_staxml:
                 filename = os.path.join(outputdir, "%s.%s.xml"
                                         % (station_name, _tag))
-                inv.write(filename, format="STATIONXML")
+                try:
+                    inv.write(filename, format="STATIONXML")
+                except:
+                    print("Error creating STATIONXML: %f" % filename)
 
     del ds
 
 
 class ConvertASDF(object):
 
-    def __init__(self, parfile, verbose, status_bar=False):
-        self.parfile = parfile
+    def __init__(self, path, verbose=False, status_bar=False):
+        self.path = path
         self._verbose = verbose
         self._status_bar = status_bar
 
@@ -221,7 +230,7 @@ class ConvertASDF(object):
         print("Output filename:", output_fn)
 
     @staticmethod
-    def clean_output_dir(output_fn):
+    def clean_output(output_fn):
         basepath = os.path.dirname(output_fn)
         if not os.path.exists(basepath):
             print("Output dir not exists so created: %s" % basepath)
@@ -231,57 +240,61 @@ class ConvertASDF(object):
             os.remove(output_fn)
 
     @staticmethod
-    def _parse_json(data):
+    def _parse_path(path):
 
-        if "waveform_files" in dir(data):
-            waveformfiles = data.waveform_files
-        elif "waveform_dir" in dir(data):
-            waveformdir = data.waveform_dir
-            filetype = data.filetype
+        if "waveform_files" in path:
+            waveformfiles = path["waveform_files"]
+            filetype = None
+        elif "waveform_dir" in path:
+            waveformdir = path["waveform_dir"]
+            filetype = path["filetype"].lower()
             waveform_pattern = os.path.join(waveformdir, "*"+filetype)
             waveformfiles = glob.glob(waveform_pattern)
         else:
             raise ValueError("missing keywords in json file, 'waveform_files'"
                              "or 'waveformdir'")
 
-        if "staxml_files" in dir(data):
-            staxmlfiles = data.staxml_files
+        if "staxml_files" in path:
+            staxmlfiles = path["staxml_files"]
             create_simple_inv = False
-        elif "staxml_dir" in dir(data):
-            staxmldir = data.staxml_dir
+        elif "staxml_dir" in path:
+            staxmldir = path["staxml_dir"]
             staxml_pattern = os.path.join(staxmldir, '*.xml')
             staxmlfiles = glob.glob(staxml_pattern)
             create_simple_inv = False
         else:
-            if "sac" not in data.filetype.lower():
-                raise ValueError("create_simple_inv only support sac format")
+            if filetype != "sac":
+                raise ValueError("create_simple_inv only supports sac")
             staxmlfiles = None
             create_simple_inv = True
 
-        tag = data.tag
-        quakemlfile = data.quakeml_file
-        outputfile = data.output_file
+        tag = path["tag"]
+        quakemlfile = path["quakeml_file"]
+        outputfile = path["output_file"]
 
         return waveformfiles, tag, staxmlfiles, quakemlfile, outputfile,\
             create_simple_inv
 
-    def _run_subs(self, _json_par, _verbose, _status_bar):
+    def _run_subs(self, path):
+
         waveformfiles, tag, staxmlfiles, quakemlfile, outputfile, \
-            create_simple_inv = self._parse_json(_json_par)
+            create_simple_inv = self._parse_path(path)
 
         self.print_info(waveformfiles, tag, staxmlfiles, quakemlfile,
                         outputfile, create_simple_inv)
-        self.clean_output_dir(outputfile)
 
-        convert_to_asdf(outputfile, waveformfiles, tag, quakemlfile,
+        self.clean_output(outputfile)
+
+        convert_to_asdf(outputfile, waveformfiles, tag, quakemlfile=quakemlfile,
                         staxml_filelist=staxmlfiles,
-                        verbose=_verbose, status_bar=_status_bar,
+                        verbose=self._verbose, status_bar=self._status_bar,
                         create_simple_inv=create_simple_inv)
 
-    def convert(self):
-        json_data = smart_read_json(self.parfile, False)
-        if isinstance(json_data, list):
-            for _json in json_data:
-                self._run_subs(_json, self._verbose, self._status_bar)
-        elif isinstance(json_data, JSONObject):
-            self._run_subs(json_data, self._verbose, self._status_bar)
+    def run(self):
+
+        path = smart_read_json(self.path, mpi_mode=False)
+        if isinstance(path, list):
+            for _path in path:
+                self._run_subs(_path)
+        else:
+            self._run_subs(path)

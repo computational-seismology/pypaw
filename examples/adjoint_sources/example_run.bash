@@ -7,7 +7,7 @@
 # Since the test file only contains 4 stream, please
 # the numproc=2 and do not change it.
 mpiexec -n 2 python adjoint.py \
-  -p ./parfile/multitaper.adjoint.config.yaml \
+  -p ./parfile/multitaper.adjoint.config.yml \
   -f ./parfile/adjoint.path.json \
   -v
 

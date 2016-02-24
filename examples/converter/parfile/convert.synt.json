@@ -1,7 +1,7 @@
 {
   "filetype": "sac", 
-  "output_file": "/path/to/asdf/output", 
-  "tag": "sythetic", 
-  "quakeml_file": "/path/to/quakeml", 
-  "waveform_dir": "/path/to/input/waveform/dir"
+  "output_file": "../../tests/data/asdf/raw/C200912240023A.synthetic.h5", 
+  "tag": "synthetic", 
+  "quakeml_file": "../../tests/data/sac/quakeml/C200912240023A.xml", 
+  "waveform_dir": "../../tests/data/sac/synt/C200912240023A"
 }

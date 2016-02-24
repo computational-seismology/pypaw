@@ -1,6 +1,6 @@
 {
-  "input_asdf": "../../tests/data/asdf/raw/C200912240023A.raw_synthetic.h5", 
-  "input_tag": "raw_synthetic",
+  "input_asdf": "../../tests/data/asdf/raw/C200912240023A.synthetic.h5", 
+  "input_tag": "synthetic",
   "output_asdf": "../../tests/data/asdf/proc/C200912240023A.proc_synt_50_100.h5",
   "output_tag": "proc_synt_50_100"
 }

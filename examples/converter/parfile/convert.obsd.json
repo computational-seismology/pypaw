@@ -1,8 +1,8 @@
 {
   "filetype": "mseed", 
-  "output_file": "/path/to/output/asdf", 
+  "output_file": "../../tests/data/asdf/raw/C200912240023A.observed.h5", 
   "tag": "observed", 
-  "quakeml_file": "/path/to/quakeml", 
-  "staxml_dir": "/path/to/stationxml/dir"
-  "waveform_dir": "/path/to/input/waveform/dir"
+  "quakeml_file": "../../tests/data/sac/quakeml/C200912240023A.xml", 
+  "staxml_dir": "../../tests/data/sac/stationxml/C200912240023A",
+  "waveform_dir": "../../tests/data/sac/obsd/C200912240023A"
 }

@@ -26,9 +26,7 @@ def process_wrapper(stream, inv, param=None):
     :param param:
     :return:
     """
-    param["inventory"] = inv
-
-    return process(stream, **param)
+    return process(stream, inventory=inv, **param)
 
 
 class ProcASDF(ProcASDFBase):
@@ -69,7 +67,7 @@ class ProcASDF(ProcASDFBase):
 
         # read in event
         event = ds.events[0]
-        origin = event.preferred_origin() or event.origins[0]
+        origin = event.preferred_origin()
         event_latitude = origin.latitude
         event_longitude = origin.longitude
         event_time = origin.time

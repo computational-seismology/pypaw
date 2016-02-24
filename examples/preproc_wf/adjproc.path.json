@@ -1,0 +1,9 @@
+{
+  "obsd_asdf": "../../tests/data/asdf/raw/C200912240023A.observed.h5",
+  "obsd_tag": "observed",
+  "synt_asdf": "../../tests/data/asdf/raw/C200912240023A.synthetic.h5",
+  "synt_tag": "synthetic",
+  "output_asdf": "../../tests/data/asdf/adjoint/C200912240023A.adjoint.50_100.h5",
+  "figure_mode": false,
+  "figure_dir": "None"
+} 

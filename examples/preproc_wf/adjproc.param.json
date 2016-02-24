@@ -1,0 +1,10 @@
+{
+  "proc_obsd_param": "./parfile/proc_obsd.50_100.yml",
+  "proc_synt_param": "./parfile/proc_synt.50_100.yml",
+  "window_param": {
+    "Z": "parfile/50_100.BHZ.config.yml",
+    "R": "parfile/50_100.BHZ.config.yml",
+    "T": "parfile/50_100.BHZ.config.yml"
+  },
+  "adjsrc_param": "parfile/multitaper.adjoint.config.yml"
+}

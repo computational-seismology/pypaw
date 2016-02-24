@@ -1,8 +1,0 @@
-{
-  "waveform_dir": "../../../test_data/synt/C200912240023A",
-  "quakeml_file": "../../../test_data/quakeml/C200912240023A.xml", 
-  "filetype": "sac", 
-  "tag": "raw_synthetic", 
-  "staxml_dir": "../../../test_data/stationxml/C200912240023A", 
-  "output_file": "../../../test_data/asdf/raw/C200912240023A.raw_synthetic.h5"
-}
