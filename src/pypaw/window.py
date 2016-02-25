@@ -15,7 +15,6 @@ from functools import partial
 from .procbase import ProcASDFBase
 from pytomo3d.window.window import window_on_stream
 import pyflex
-import pyadjoint
 from .utils import smart_read_yaml, smart_mkdir, smart_check_file
 from .write_window import write_window_json
 

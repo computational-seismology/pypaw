@@ -57,7 +57,6 @@ class ProcASDFBase(object):
         else:
             raise ValueError("Not recogonized input: %s" % content)
 
-
     def _parse_path(self):
         """
         How you parse the path arugment to fit your requirements

@@ -285,7 +285,8 @@ class ConvertASDF(object):
 
         self.clean_output(outputfile)
 
-        convert_to_asdf(outputfile, waveformfiles, tag, quakemlfile=quakemlfile,
+        convert_to_asdf(outputfile, waveformfiles, tag,
+                        quakemlfile=quakemlfile,
                         staxml_filelist=staxmlfiles,
                         verbose=self._verbose, status_bar=self._status_bar,
                         create_simple_inv=create_simple_inv)
