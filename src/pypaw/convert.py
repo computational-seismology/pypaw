@@ -15,7 +15,8 @@ import glob
 from .utils import smart_read_json, drawProgressBar, timing
 from pyasdf import ASDFDataSet
 import obspy
-from obspy.core.inventory import Channel, Station, Network, Inventory, Site
+from obspy.station import Channel, Station, Network, Inventory, Site
+# from obspy.core.inventory import Channel, Station, Network, Inventory, Site
 
 
 def create_simple_inventory(network, station, latitude=None, longitude=None,

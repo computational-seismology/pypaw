@@ -115,9 +115,10 @@ def _stats_channel_window(adjsrcs, windows):
         chan_id = chan_win[0]["channel_id"]
         adj_win_dict[chan_id] = len(chan_win)
 
+    new_win_dict = {}
     for key in adj_win_dict:
-        if key not in adj_dict:
-            adj_win_dict.pop(key, None)
+        if key in adj_dict:
+            new_win_dict[key] = adj_win_dict[key]
 
     return adj_dict, adj_win_dict
 
