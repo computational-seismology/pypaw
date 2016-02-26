@@ -120,7 +120,7 @@ def _stats_channel_window(adjsrcs, windows):
         if key in adj_dict:
             new_win_dict[key] = adj_win_dict[key]
 
-    return adj_dict, adj_win_dict
+    return adj_dict, new_win_dict
 
 
 def calculate_chan_weight(adjsrcs, windows_sta):
