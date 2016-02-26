@@ -97,15 +97,16 @@ def adjoint_wrapper(obsd_station_group, synt_station_group, config=None,
     origin = event.preferred_origin() or event.origins[0]
     focal = event.preferred_focal_mechanism()
     hdr = focal.moment_tensor.source_time_function.duration
+    time_offset = -1.5 * hdr
     # according to SPECFEM starttime convention
-    interp_starttime = origin.time - 1.5 * hdr
+    interp_starttime = origin.time + time_offset
     new_adjsrcs = postprocess_adjsrc(
         adjsrcs, interp_starttime, interp_delta,
         interp_npts, rotate_flag=True, inventory=synt_staxml,
         event=event, sum_over_comp_flag=True, weight_flag=True,
         weight_dict=chan_weight_dict, filter_flag=False)
 
-    _final = reshape_adj(new_adjsrcs, 0.0)
+    _final = reshape_adj(new_adjsrcs, time_offset, synt_staxml)
 
     if _final is None:
         return

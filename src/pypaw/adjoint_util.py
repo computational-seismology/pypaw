@@ -56,7 +56,7 @@ def ensemble_fake_adj(stream, time_offset=0.0):
     return adjsrc_dict, nwin_dict
 
 
-def reshape_adj(adjsrcs, time_offset):
+def reshape_adj(adjsrcs, time_offset, staxml):
     """
     Reshape adjsrcs to a certain structure required by pyasdf writer
     """
@@ -66,6 +66,13 @@ def reshape_adj(adjsrcs, time_offset):
     vtype = "AuxiliaryData"
     reshape_list = []
     tag_list = []
+
+    # extract station information
+    sta_lat = staxml[0][0].latitude
+    sta_lon = staxml[0][0].longitude
+    sta_ele = staxml[0][0].elevation
+    sta_dep = staxml[0][0][0].depth
+
     for adj in adjsrcs:
         adj_array = adj.adjoint_source
 
@@ -76,8 +83,8 @@ def reshape_adj(adjsrcs, time_offset):
                       "adjoint_source_type": adj.adj_src_type,
                       "min_period": adj.min_period,
                       "max_period": adj.max_period,
-                      "latitude": 0.0, "longitude": 0.0,
-                      "elevation_in_m": 0.0,
+                      "latitude": sta_lat, "longitude": sta_lon,
+                      "elevation_in_m": sta_ele, "depth_in_m": sta_dep,
                       "station_id": station_id, "component": adj.component,
                       "units": "m"}
 
