@@ -1,4 +1,16 @@
 #!/usr/bin/env python
+"""
+Scripts that generate stations file from asdf file. If
+there are stations in waveforms, then a file `STATIONS_waveform`
+will be generated. Or if there are stations in AuxlilaryData,
+then a file `STATIONS_ADJOINT` will be generated.
+
+:copyright:
+    Wenjie Lei (lei@princeton.edu), 2016
+:license:
+    GNU General Public License, Version 3
+    (http://www.gnu.org/copyleft/gpl.html)
+"""
 from __future__ import (print_function)
 import pyasdf
 import os
