@@ -1,0 +1,326 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pypaw.adjoint &mdash; pypaw 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="pypaw 0.0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pypaw 0.0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pypaw.adjoint</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Class that calculate adjoint source using asdf</span>
+
+<span class="sd">:copyright:</span>
+<span class="sd">    Wenjie Lei (lei@princeton.edu), 2016</span>
+<span class="sd">:license:</span>
+<span class="sd">    GNU General Public License, Version 3</span>
+<span class="sd">    (http://www.gnu.org/copyleft/gpl.html)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">import</span> <span class="nn">pyadjoint</span>
+<span class="kn">from</span> <span class="nn">pytomo3d.adjoint.adjsrc</span> <span class="kn">import</span> <span class="n">calculate_adjsrc_on_stream</span>
+<span class="kn">from</span> <span class="nn">pytomo3d.adjoint.adjsrc</span> <span class="kn">import</span> <span class="n">postprocess_adjsrc</span>
+<span class="kn">from</span> <span class="nn">.procbase</span> <span class="kn">import</span> <span class="n">ProcASDFBase</span>
+<span class="kn">from</span> <span class="nn">.adjoint_util</span> <span class="kn">import</span> <span class="n">reshape_adj</span><span class="p">,</span> <span class="n">calculate_chan_weight</span>
+<span class="kn">from</span> <span class="nn">.adjoint_util</span> <span class="kn">import</span> <span class="n">smart_transform_window</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">smart_read_json</span><span class="p">,</span> <span class="n">smart_remove_file</span><span class="p">,</span> <span class="n">smart_check_file</span>
+
+
+<div class="viewcode-block" id="adjoint_wrapper"><a class="viewcode-back" href="../../pypaw.html#pypaw.adjoint.adjoint_wrapper">[docs]</a><span class="k">def</span> <span class="nf">adjoint_wrapper</span><span class="p">(</span><span class="n">obsd_station_group</span><span class="p">,</span> <span class="n">synt_station_group</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                    <span class="n">obsd_tag</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">synt_tag</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">windows</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                    <span class="n">adj_src_type</span><span class="o">=</span><span class="s">&quot;multitaper_misfit&quot;</span><span class="p">,</span>
+                    <span class="n">interp_delta</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">interp_npts</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                    <span class="n">figure_mode</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">figure_dir</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                    <span class="n">adjoint_src_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function wrapper for pyasdf.</span>
+
+<span class="sd">    :param obsd_station_group: observed station group, which contains</span>
+<span class="sd">        seismogram(stream) and station information(inventory)</span>
+<span class="sd">    :param synt_station_group: synthetic station group. Same as</span>
+<span class="sd">        obsd_station_group</span>
+<span class="sd">    :param config: config object for adjoint source</span>
+<span class="sd">    :type config: pyadjoint.Config</span>
+<span class="sd">    :param obsd_tag: observed seismogram tag, used for extracting the</span>
+<span class="sd">        seismogram in observed asdf file</span>
+<span class="sd">    :type obsd_tag: str</span>
+<span class="sd">    :param synt_tag: synthetic seismogram tag, used for extracting the</span>
+<span class="sd">        seismogram in synthetic asdf file</span>
+<span class="sd">    :type synt_tag: str</span>
+<span class="sd">    :param windows: windows for this station group. Two dimension list.</span>
+<span class="sd">        The first dimension is different channels, the second dimension</span>
+<span class="sd">        is windows for this channel, like [[chan1_win1, chan1_win2],</span>
+<span class="sd">        [chan2_win1,], ...]</span>
+<span class="sd">    :type windows: list</span>
+<span class="sd">    :param event: event information</span>
+<span class="sd">    :type event: obspy.Inventory</span>
+<span class="sd">    :param adj_src_type: adjoint source type, currently support:</span>
+<span class="sd">        1) &quot;cc_traveltime_misfit&quot;</span>
+<span class="sd">        2) &quot;multitaper_misfit&quot;</span>
+<span class="sd">        3) &quot;waveform_misfit&quot;</span>
+<span class="sd">    :type adj_src_type: st</span>
+<span class="sd">    :param adjoint_src_flag: calcualte adjoint source, put this to true.</span>
+<span class="sd">        If false, only make measurements but no adjoint sources.</span>
+<span class="sd">    :type adjoint_src_flag: bool</span>
+<span class="sd">    :param figure_mode: plot figures for adjoint source or not</span>
+<span class="sd">    :type figure_mode: bool</span>
+<span class="sd">    :param figure_dir: output figure directory</span>
+<span class="sd">    :type figure_dir: str</span>
+<span class="sd">    :return: adjoint sources for pyasdf write out(reshaped)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Make sure everything thats required is there.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obsd_station_group</span><span class="p">,</span> <span class="n">obsd_tag</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Missing tag &#39;</span><span class="si">%s</span><span class="s">&#39; from obsd_station_group </span><span class="si">%s</span><span class="s">. Skipped.&quot;</span> <span class="o">%</span>
+              <span class="p">(</span><span class="n">obsd_tag</span><span class="p">,</span> <span class="n">obsd_station_group</span><span class="o">.</span><span class="n">_station_name</span><span class="p">))</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">synt_station_group</span><span class="p">,</span> <span class="n">synt_tag</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Missing tag &#39;</span><span class="si">%s</span><span class="s">&#39; from synt_station_group </span><span class="si">%s</span><span class="s">. Skipped.&quot;</span> <span class="o">%</span>
+              <span class="p">(</span><span class="n">synt_tag</span><span class="p">,</span> <span class="n">synt_station_group</span><span class="o">.</span><span class="n">_station_name</span><span class="p">))</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">synt_station_group</span><span class="p">,</span> <span class="s">&quot;StationXML&quot;</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Missing tag &#39;STATIONXML&#39; from synt_station_group </span><span class="si">%s</span><span class="s">. Skipped&quot;</span> <span class="o">%</span>
+              <span class="p">(</span><span class="n">synt_tag</span><span class="p">,</span> <span class="n">synt_station_group</span><span class="o">.</span><span class="n">_station_name</span><span class="p">))</span>
+
+    <span class="n">observed</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obsd_station_group</span><span class="p">,</span> <span class="n">obsd_tag</span><span class="p">)</span>
+    <span class="n">synthetic</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">synt_station_group</span><span class="p">,</span> <span class="n">synt_tag</span><span class="p">)</span>
+    <span class="n">synt_staxml</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">synt_station_group</span><span class="p">,</span> <span class="s">&quot;StationXML&quot;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">window_sta</span> <span class="o">=</span> <span class="n">windows</span><span class="p">[</span><span class="n">obsd_station_group</span><span class="o">.</span><span class="n">_station_name</span><span class="p">]</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="n">window_sta</span> <span class="o">=</span> <span class="n">smart_transform_window</span><span class="p">(</span><span class="n">window_sta</span><span class="p">)</span>
+
+    <span class="n">adjsrcs</span> <span class="o">=</span> <span class="n">calculate_adjsrc_on_stream</span><span class="p">(</span>
+        <span class="n">observed</span><span class="p">,</span> <span class="n">synthetic</span><span class="p">,</span> <span class="n">window_sta</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">adj_src_type</span><span class="p">,</span>
+        <span class="n">figure_mode</span><span class="o">=</span><span class="n">figure_mode</span><span class="p">,</span> <span class="n">figure_dir</span><span class="o">=</span><span class="n">figure_dir</span><span class="p">,</span>
+        <span class="n">adjoint_src_flag</span><span class="o">=</span><span class="n">adjoint_src_flag</span><span class="p">)</span>
+
+    <span class="n">chan_weight_dict</span> <span class="o">=</span> <span class="n">calculate_chan_weight</span><span class="p">(</span><span class="n">adjsrcs</span><span class="p">,</span> <span class="n">window_sta</span><span class="p">)</span>
+
+    <span class="n">origin</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">preferred_origin</span><span class="p">()</span> <span class="ow">or</span> <span class="n">event</span><span class="o">.</span><span class="n">origins</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">focal</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">preferred_focal_mechanism</span><span class="p">()</span>
+    <span class="n">hdr</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">moment_tensor</span><span class="o">.</span><span class="n">source_time_function</span><span class="o">.</span><span class="n">duration</span>
+    <span class="n">time_offset</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.5</span> <span class="o">*</span> <span class="n">hdr</span>
+    <span class="c"># according to SPECFEM starttime convention</span>
+    <span class="n">interp_starttime</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">time_offset</span>
+    <span class="n">new_adjsrcs</span> <span class="o">=</span> <span class="n">postprocess_adjsrc</span><span class="p">(</span>
+        <span class="n">adjsrcs</span><span class="p">,</span> <span class="n">interp_starttime</span><span class="p">,</span> <span class="n">interp_delta</span><span class="p">,</span>
+        <span class="n">interp_npts</span><span class="p">,</span> <span class="n">rotate_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inventory</span><span class="o">=</span><span class="n">synt_staxml</span><span class="p">,</span>
+        <span class="n">event</span><span class="o">=</span><span class="n">event</span><span class="p">,</span> <span class="n">sum_over_comp_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">weight_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+        <span class="n">weight_dict</span><span class="o">=</span><span class="n">chan_weight_dict</span><span class="p">,</span> <span class="n">filter_flag</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+    <span class="n">_final</span> <span class="o">=</span> <span class="n">reshape_adj</span><span class="p">(</span><span class="n">new_adjsrcs</span><span class="p">,</span> <span class="n">time_offset</span><span class="p">,</span> <span class="n">synt_staxml</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">_final</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_final</span>
+
+</div>
+<div class="viewcode-block" id="AdjointASDF"><a class="viewcode-back" href="../../pypaw.html#pypaw.adjoint.AdjointASDF">[docs]</a><span class="k">class</span> <span class="nc">AdjointASDF</span><span class="p">(</span><span class="n">ProcASDFBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adjoint Source ASDF</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_validate_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Valicate path information</span>
+
+<span class="sd">        :param path: path information</span>
+<span class="sd">        :type path: dict</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">necessary_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;obsd_asdf&quot;</span><span class="p">,</span> <span class="s">&quot;obsd_tag&quot;</span><span class="p">,</span> <span class="s">&quot;synt_asdf&quot;</span><span class="p">,</span> <span class="s">&quot;synt_tag&quot;</span><span class="p">,</span>
+                          <span class="s">&quot;window_file&quot;</span><span class="p">,</span> <span class="s">&quot;output_file&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_missing_keys</span><span class="p">(</span><span class="n">necessary_keys</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_validate_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Valicate path information</span>
+
+<span class="sd">        :param path: path information</span>
+<span class="sd">        :type path: dict</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">necessary_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;adj_src_type&quot;</span><span class="p">,</span> <span class="s">&quot;min_period&quot;</span><span class="p">,</span> <span class="s">&quot;max_period&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_missing_keys</span><span class="p">(</span><span class="n">necessary_keys</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">param</span><span class="p">[</span><span class="s">&quot;min_period&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">param</span><span class="p">[</span><span class="s">&quot;max_period&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Error in param file, min_period(</span><span class="si">%5.1f</span><span class="s">) is larger&quot;</span>
+                             <span class="s">&quot;than max_period(</span><span class="si">%5.1f</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="s">&quot;min_period&quot;</span><span class="p">],</span>
+                                                         <span class="n">param</span><span class="p">[</span><span class="s">&quot;max_period&quot;</span><span class="p">]))</span>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="AdjointASDF.load_adjoint_config"><a class="viewcode-back" href="../../pypaw.html#pypaw.adjoint.AdjointASDF.load_adjoint_config">[docs]</a>    <span class="k">def</span> <span class="nf">load_adjoint_config</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load config into pyadjoint.Config</span>
+<span class="sd">        :param param:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">pyadjoint</span><span class="o">.</span><span class="n">Config</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AdjointASDF.load_windows"><a class="viewcode-back" href="../../pypaw.html#pypaw.adjoint.AdjointASDF.load_windows">[docs]</a>    <span class="k">def</span> <span class="nf">load_windows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">winfile</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        load window json file</span>
+
+<span class="sd">        :param winfile:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">smart_read_json</span><span class="p">(</span><span class="n">winfile</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
+                               <span class="n">object_hook</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">_core</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Core function that handles one pair of asdf file(observed and</span>
+<span class="sd">        synthetic), windows and configuration for adjoint source</span>
+
+<span class="sd">        :param path: path information, path of observed asdf, synthetic</span>
+<span class="sd">            asdf, windows files, observed tag, synthetic tag, output adjoint</span>
+<span class="sd">            file, figure mode and figure directory</span>
+<span class="sd">        :type path: dict</span>
+<span class="sd">        :param param: parameter information for constructing adjoint source</span>
+<span class="sd">        :type param: dict</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_param</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">extra_info</span><span class="o">=</span><span class="s">&quot;Path information&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">extra_info</span><span class="o">=</span><span class="s">&quot;Param information&quot;</span><span class="p">)</span>
+
+        <span class="n">obsd_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;obsd_asdf&quot;</span><span class="p">]</span>
+        <span class="n">synt_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;synt_asdf&quot;</span><span class="p">]</span>
+        <span class="n">window_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;window_file&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">smart_check_file</span><span class="p">(</span><span class="n">obsd_file</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
+                                <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Input obsd_asdf not exists: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">obsd_file</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">smart_check_file</span><span class="p">(</span><span class="n">synt_file</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
+                                <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Input synt_asdf not exists: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">synt_file</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">smart_check_file</span><span class="p">(</span><span class="n">window_file</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
+                                <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Input window_file not exists: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">window_file</span><span class="p">)</span>
+
+        <span class="n">obsd_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_asdf</span><span class="p">(</span><span class="n">obsd_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&quot;r&quot;</span><span class="p">)</span>
+        <span class="n">obsd_tag</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;obsd_tag&quot;</span><span class="p">]</span>
+        <span class="n">synt_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_asdf</span><span class="p">(</span><span class="n">synt_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&quot;r&quot;</span><span class="p">)</span>
+        <span class="n">synt_tag</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;synt_tag&quot;</span><span class="p">]</span>
+        <span class="n">output_filename</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;output_file&quot;</span><span class="p">]</span>
+        <span class="n">figure_mode</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;figure_mode&quot;</span><span class="p">]</span>
+        <span class="n">figure_dir</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;figure_dir&quot;</span><span class="p">]</span>
+
+        <span class="n">smart_remove_file</span><span class="p">(</span><span class="n">output_filename</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
+                          <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">)</span>
+
+        <span class="n">event</span> <span class="o">=</span> <span class="n">obsd_ds</span><span class="o">.</span><span class="n">events</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">windows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_windows</span><span class="p">(</span><span class="n">window_file</span><span class="p">)</span>
+
+        <span class="n">adj_src_type</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s">&quot;adj_src_type&quot;</span><span class="p">]</span>
+        <span class="n">interp_delta</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s">&quot;interp_delta&quot;</span><span class="p">]</span>
+        <span class="n">interp_npts</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s">&quot;interp_npts&quot;</span><span class="p">]</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&quot;adj_src_type&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&quot;interp_delta&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&quot;interp_npts&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_adjoint_config</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+
+        <span class="n">adjsrc_func</span> <span class="o">=</span> \
+            <span class="n">partial</span><span class="p">(</span><span class="n">adjoint_wrapper</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+                    <span class="n">obsd_tag</span><span class="o">=</span><span class="n">obsd_tag</span><span class="p">,</span> <span class="n">synt_tag</span><span class="o">=</span><span class="n">synt_tag</span><span class="p">,</span>
+                    <span class="n">windows</span><span class="o">=</span><span class="n">windows</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="n">event</span><span class="p">,</span>
+                    <span class="n">adj_src_type</span><span class="o">=</span><span class="n">adj_src_type</span><span class="p">,</span>
+                    <span class="n">interp_delta</span><span class="o">=</span><span class="n">interp_delta</span><span class="p">,</span> <span class="n">interp_npts</span><span class="o">=</span><span class="n">interp_npts</span><span class="p">,</span>
+                    <span class="n">figure_mode</span><span class="o">=</span><span class="n">figure_mode</span><span class="p">,</span> <span class="n">figure_dir</span><span class="o">=</span><span class="n">figure_dir</span><span class="p">)</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="n">obsd_ds</span><span class="o">.</span><span class="n">process_two_files</span><span class="p">(</span><span class="n">synt_ds</span><span class="p">,</span> <span class="n">adjsrc_func</span><span class="p">,</span>
+                                            <span class="n">output_filename</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">results</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pypaw 0.0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2016, Wenjie Lei.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

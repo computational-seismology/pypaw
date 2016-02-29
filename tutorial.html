@@ -1,0 +1,369 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Tutorial &mdash; pypaw 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pypaw 0.0.1 documentation" href="index.html" />
+    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="prev" title="Data Format and Conversion" href="data_format.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Examples"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="data_format.html" title="Data Format and Conversion"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pypaw 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="tutorial">
+<h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial requires you to have some basic knowledge about <a class="reference external" href="https://github.com/obspy/obspy/wiki">Obspy</a> and <a class="reference external" href="http://seismicdata.github.io/pyasdf/">Pyasdf</a>.</p>
+<div class="section" id="singal-processing">
+<h2>1. Singal Processing<a class="headerlink" href="#singal-processing" title="Permalink to this headline">¶</a></h2>
+<p>There are two files you need to prepare for the signal processing part.</p>
+<ol class="arabic">
+<li><p class="first">a <strong>path</strong> file which specifies the path of input asdf file and output asdf file, and tags asscociated with those files. A example &#8216;path.json&#8217; file:</p>
+<div class="highlight-python"><div class="highlight"><pre>{
+  &quot;input_asdf&quot;: &quot;/path/to/input/asdf/file&quot;
+  &quot;input_tag&quot;: &quot;input_tag&quot;,
+  &quot;output_asdf&quot;: &quot;/path/to/output/asdf/file&quot;,
+  &quot;output_tag&quot;: &quot;output_tag&quot;
+}
+</pre></div>
+</div>
+</li>
+<li><p class="first">a <strong>parameter</strong> file which specifies the processing parameter, like filtering band, cutting starttime and endtime, etc. A example &#8216;param.yml&#8217; file:</p>
+<div class="highlight-python"><div class="highlight"><pre># remove response flag to remove the instrument response from the
+# seismogram. For observed seismogram, you probably want to set this
+# flag to True to get real gound displacement. For synthetic data,
+# please set this flag to False
+remove_response_flag: True
+
+# filtering the seismogram. If you set both remove_response_flag to True
+# and filter_flag to True, the filtering will happen at the same time
+# when you remove the instrument response(to make sure the taper is applied
+# only once)
+filter_flag: True
+
+# frequency band of filtering, unit in Hz
+pre_filt: [0.0067, 0.01, 0.02, 0.025]
+
+# cut time relative to CMT time. The final seismogram will be at
+# time range: [cmt_time+relative_time, cmt_time+relative_time]
+relative_starttime: 0
+relative_endtime: 6000
+
+# resample the seismogram. Sampling_rate in unit Hz.
+resample_flag: True
+sampling_rate: 5
+
+# taper
+taper_type: &quot;hann&quot;
+taper_percentage: 0.05
+
+# rotate flag
+rotate_flag: True
+</pre></div>
+</div>
+</li>
+</ol>
+<p>After preparing the path and parameter file, you need the job script:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">from</span> <span class="nn">pypaw</span> <span class="kn">import</span> <span class="n">ProcASDF</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-p&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;params_file&#39;</span><span class="p">,</span>
+                        <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-f&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;path_file&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-v&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;verbose&#39;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">proc</span> <span class="o">=</span> <span class="n">ProcASDF</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">path_file</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">params_file</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="n">proc</span><span class="o">.</span><span class="n">smart_run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Save it as <cite>process_asdf.py</cite> and you can run it using 16 cores:</p>
+<div class="highlight-python"><div class="highlight"><pre>mpiexec -n 16 python process_asdf.py -f path.json -p param.yml
+</pre></div>
+</div>
+<p>Examples of the observed and synthetic data processing are at <tt class="docutils literal"><span class="pre">examples/signal_processing</span></tt></p>
+</div>
+<div class="section" id="window-selection">
+<h2>2. Window Selection<a class="headerlink" href="#window-selection" title="Permalink to this headline">¶</a></h2>
+<p>Window selection also requires two files to specify the data path and window parameters. For input, it requires one observed and one synthetic asdf file. The output is one window file. A example of &#8216;path.json&#8217; file is:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s">&quot;obsd_asdf&quot;</span><span class="p">:</span> <span class="s">&quot;/path/to/obsd/asdf/file&quot;</span><span class="p">,</span>
+  <span class="s">&quot;obsd_tag&quot;</span><span class="p">:</span> <span class="s">&quot;obsd_tag&quot;</span><span class="p">,</span>
+  <span class="s">&quot;synt_asdf&quot;</span><span class="p">:</span> <span class="s">&quot;/path/to/synt/asdf/file&quot;</span><span class="p">,</span>
+  <span class="s">&quot;synt_tag&quot;</span><span class="p">:</span> <span class="s">&quot;synt_tag&quot;</span><span class="p">,</span>
+  <span class="s">&quot;output_dir&quot;</span><span class="p">:</span> <span class="s">&quot;/path/to/output/directory&quot;</span><span class="p">,</span>
+  <span class="s">&quot;figure_mode&quot;</span><span class="p">:</span> <span class="bp">False</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>An example of &#8216;param.yml&#8217; file is:</p>
+<div class="highlight-python"><div class="highlight"><pre>&quot;Z&quot;: &quot;/path/to/window_selection.compZ.config.yaml&quot;
+&quot;R&quot;: &quot;/path/to/window_selection.compR.config.yaml&quot;
+&quot;T&quot;: &quot;/path/to/window_selection.compT.config.yaml&quot;
+</pre></div>
+</div>
+<p>Since sometimes people want to setup different criteria for different components, So in &#8216;param.yml&#8217; file you can set different <tt class="docutils literal"><span class="pre">'window_selection.comp*.config.yaml'</span></tt>. A example of &#8216;config.yml&#8217; file is located at <tt class="docutils literal"><span class="pre">'examples/window_selection/parfile/50_100.BHZ.config.yml'</span></tt>. It is a bit long so I won&#8217;t list the file here.</p>
+<p>Next step is prepare the job script, which is very similiar to the signal processing part:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">from</span> <span class="nn">pypaw</span> <span class="kn">import</span> <span class="n">WindowASDF</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-p&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;params_file&#39;</span><span class="p">,</span>
+                        <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-f&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;path_file&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-v&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;verbose&#39;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">proc</span> <span class="o">=</span> <span class="n">WindowASDF</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">path_file</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">params_file</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="n">proc</span><span class="o">.</span><span class="n">smart_run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Save it as <tt class="docutils literal"><span class="pre">window_selection_asdf.py</span></tt> and the job could be launched using 16 cores:</p>
+<div class="highlight-python"><div class="highlight"><pre>mpiexec -n 16 python window_selection_asdf.py -f path.json -p param.yml -v
+</pre></div>
+</div>
+<p>One tip, if you set the <tt class="docutils literal"><span class="pre">figure_mode</span></tt> as <tt class="docutils literal"><span class="pre">True</span></tt>, then don&#8217;t use too many cores because each core will generate a lot of  figures and output figure will take a lot of I/Os.</p>
+</div>
+<div class="section" id="adjoint-sources">
+<h2>3. Adjoint Sources<a class="headerlink" href="#adjoint-sources" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>Path and parameter files should be specified. For input, it requires an observed and synthetic asdf file, a window file. The output is an adjoint asdf file. A example of &#8216;path.json&#8217; file::</dt>
+<dd><dl class="first docutils">
+<dt>{</dt>
+<dd>&#8220;obsd_asdf&#8221;: &#8220;/path/to/obsd/asdf/file&#8221;,
+&#8220;obsd_tag&#8221;: &#8220;obsd_tag&#8221;,
+&#8220;synt_asdf&#8221;: &#8220;/path/to/synt/asdf/file&#8221;,
+&#8220;synt_tag&#8221;: &#8220;synt_tag&#8221;,
+&#8220;window_file&#8221;: &#8220;/path/to/window/file&#8221;,
+&#8220;output_file&#8221;: &#8220;/path/to/output/adjoint/asdf/file&#8221;,
+&#8220;figure_mode&#8221;: false,
+&#8220;figure_dir&#8221;: &#8220;/path/to/output/figure/dir&#8221;</dd>
+</dl>
+<p class="last">}</p>
+</dd>
+</dl>
+<p>For adjoint sources, you can choose different measurements. Currently, it supports three different measurements:
+* Waveform misfit
+* Cross-correlation traveltime misfit
+* Multi-taper traveltime misfit</p>
+<p>For different measurements, you need prepare different parameter files for this. A example of multi-taper misfit parameter file, &#8216;param.yml&#8217; is listed:</p>
+<div class="highlight-python"><div class="highlight"><pre># adjoint source type
+adj_src_type: &quot;multitaper_misfit&quot;
+
+# min and max period(unit: second)
+min_period: 50.0
+max_period: 100.0
+
+# adjoint config parameter
+lnpt: 15
+transfunc_waterlevel: 1.0E-10
+ipower_costaper: 10
+min_cycle_in_window: 3
+taper_percentage: 0.3
+mt_nw: 4.0
+num_taper: 5
+phase_step: 1.5
+dt_fac: 2.0
+err_fac: 2.5
+dt_max_scale: 3.5
+measure_type: &#39;dt&#39;
+taper_type: &#39;hann&#39;
+use_cc_error: True
+use_mt_error: False
+
+# for postprocessing
+interp_delta: 0.1425
+interp_npts: 42000
+</pre></div>
+</div>
+<p>Next step is also preparing the job script. Similiar to previous examples, the job script would be:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="kn">as</span> <span class="nn">mpl</span>
+<span class="n">mpl</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s">&#39;Agg&#39;</span><span class="p">)</span>  <span class="c"># NOQA</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">from</span> <span class="nn">pypaw</span> <span class="kn">import</span> <span class="n">AdjointASDF</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-p&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;params_file&#39;</span><span class="p">,</span>
+                        <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-f&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;path_file&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-v&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;verbose&#39;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">proc</span> <span class="o">=</span> <span class="n">AdjointASDF</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">path_file</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">params_file</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="n">proc</span><span class="o">.</span><span class="n">smart_run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Save it as <tt class="docutils literal"><span class="pre">adjoint_asdf.py</span></tt> and you can launch the parallel job using 16 cores:</p>
+<div class="highlight-python"><div class="highlight"><pre>mpiexec -n 16 python adjoint_asdf.py -f path.json -p param.json -v
+</pre></div>
+</div>
+<p>For more examples of different measurements, please take a look at <tt class="docutils literal"><span class="pre">examples/adjoint_sources</span></tt></p>
+</div>
+<div class="section" id="advanced-usage">
+<h2>4. Advanced usage<a class="headerlink" href="#advanced-usage" title="Permalink to this headline">¶</a></h2>
+<p>If you have already went through all the 3 steps above, a more advanced usage is provided, which combines all the 3 steps as a whole. The &#8216;path.json&#8217; specifies the observed and synthetic file, and output adjoint asdf file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s">&quot;obsd_asdf&quot;</span><span class="p">:</span> <span class="s">&quot;/path/to/raw/observed/asdf/file&quot;</span><span class="p">,</span>
+  <span class="s">&quot;obsd_tag&quot;</span><span class="p">:</span> <span class="s">&quot;observed&quot;</span><span class="p">,</span>
+  <span class="s">&quot;synt_asdf&quot;</span><span class="p">:</span> <span class="s">&quot;/path/to/raw/synthetic/asdf/file&quot;</span><span class="p">,</span>
+  <span class="s">&quot;synt_tag&quot;</span><span class="p">:</span> <span class="s">&quot;synthetic&quot;</span><span class="p">,</span>
+  <span class="s">&quot;output_asdf&quot;</span><span class="p">:</span> <span class="s">&quot;/path/to/output/adjoint/asdf/file&quot;</span><span class="p">,</span>
+  <span class="s">&quot;figure_mode&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+  <span class="s">&quot;figure_dir&quot;</span><span class="p">:</span> <span class="s">&quot;None&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The &#8216;param.yaml&#8217; file specifies the parameter files for different parts:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s">&quot;proc_obsd_param&quot;</span><span class="p">:</span> <span class="s">&quot;./proc_obsd.50_100.yml&quot;</span><span class="p">,</span>
+  <span class="s">&quot;proc_synt_param&quot;</span><span class="p">:</span> <span class="s">&quot;./proc_synt.50_100.yml&quot;</span><span class="p">,</span>
+  <span class="s">&quot;window_param&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s">&quot;Z&quot;</span><span class="p">:</span> <span class="s">&quot;50_100.BHZ.config.yml&quot;</span><span class="p">,</span>
+    <span class="s">&quot;R&quot;</span><span class="p">:</span> <span class="s">&quot;50_100.BHZ.config.yml&quot;</span><span class="p">,</span>
+    <span class="s">&quot;T&quot;</span><span class="p">:</span> <span class="s">&quot;50_100.BHZ.config.yml&quot;</span>
+  <span class="p">},</span>
+  <span class="s">&quot;adjsrc_param&quot;</span><span class="p">:</span> <span class="s">&quot;multitaper.adjoint.config.yml&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Job scripts:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">from</span> <span class="nn">pypaw</span> <span class="kn">import</span> <span class="n">AdjPreASDF</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-p&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;params_file&#39;</span><span class="p">,</span>
+                        <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-f&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;path_file&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-v&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;verbose&#39;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">proc</span> <span class="o">=</span> <span class="n">AdjPreASDF</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">path_file</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">params_file</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="n">proc</span><span class="o">.</span><span class="n">smart_run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Save it as &#8216;adjproc.py&#8217; and launch the job on 16 cores:</p>
+<blockquote>
+<div>mpiexec -n 16 python adjproc.py -f path.json -p param.yml -v</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Tutorial</a><ul>
+<li><a class="reference internal" href="#singal-processing">1. Singal Processing</a></li>
+<li><a class="reference internal" href="#window-selection">2. Window Selection</a></li>
+<li><a class="reference internal" href="#adjoint-sources">3. Adjoint Sources</a></li>
+<li><a class="reference internal" href="#advanced-usage">4. Advanced usage</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="data_format.html"
+                        title="previous chapter">Data Format and Conversion</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="examples.html"
+                        title="next chapter">Examples</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/tutorial.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Examples"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="data_format.html" title="Data Format and Conversion"
+             >previous</a> |</li>
+        <li><a href="index.html">pypaw 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2016, Wenjie Lei.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,292 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pypaw.utils &mdash; pypaw 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="pypaw 0.0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pypaw 0.0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pypaw.utils</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Parent class for singal processing asdf file and</span>
+<span class="sd">handles parallel I/O so they are invisible to users.</span>
+
+<span class="sd">:copyright:</span>
+<span class="sd">    Wenjie Lei (lei@princeton.edu), 2016</span>
+<span class="sd">:license:</span>
+<span class="sd">    GNU General Public License, Version 3</span>
+<span class="sd">    (http://www.gnu.org/copyleft/gpl.html)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+
+<div class="viewcode-block" id="is_mpi_env"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.is_mpi_env">[docs]</a><span class="k">def</span> <span class="nf">is_mpi_env</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Test if current environment is MPI or not</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">mpi4py</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">mpi4py.MPI</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">if</span> <span class="n">mpi4py</span><span class="o">.</span><span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">mpi4py</span><span class="o">.</span><span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">return</span> <span class="bp">True</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_get_mpi_comm</span><span class="p">():</span>
+    <span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
+    <span class="k">return</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
+
+
+<div class="viewcode-block" id="JSONObject"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.JSONObject">[docs]</a><span class="k">class</span> <span class="nc">JSONObject</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span> <span class="o">=</span> <span class="n">d</span>
+
+</div>
+<div class="viewcode-block" id="read_json_file"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.read_json_file">[docs]</a><span class="k">def</span> <span class="nf">read_json_file</span><span class="p">(</span><span class="n">parfile</span><span class="p">,</span> <span class="n">obj_hook</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Hook json to an JSONObject instance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">parfile</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;parfile not exists:</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">parfile</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">parfile</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">obj_hook</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">object_hook</span><span class="o">=</span><span class="n">JSONObject</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span>
+
+</div>
+<div class="viewcode-block" id="smart_read_json"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.smart_read_json">[docs]</a><span class="k">def</span> <span class="nf">smart_read_json</span><span class="p">(</span><span class="n">json_file</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">object_hook</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    read json file under mpi and multi-processing environment.</span>
+<span class="sd">    Hook it to an JSONObject(not the conventional way to</span>
+<span class="sd">    read it as object)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mpi_mode</span><span class="p">:</span>
+        <span class="n">json_obj</span> <span class="o">=</span> <span class="n">read_json_file</span><span class="p">(</span><span class="n">json_file</span><span class="p">,</span> <span class="n">obj_hook</span><span class="o">=</span><span class="n">object_hook</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">comm</span> <span class="o">=</span> <span class="n">_get_mpi_comm</span><span class="p">()</span>
+        <span class="n">rank</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">json_obj</span> <span class="o">=</span> <span class="n">read_json_file</span><span class="p">(</span><span class="n">json_file</span><span class="p">,</span> <span class="n">obj_hook</span><span class="o">=</span><span class="n">object_hook</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;Error in </span><span class="si">%s</span><span class="s">:</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">json_file</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
+                <span class="n">comm</span><span class="o">.</span><span class="n">Abort</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">json_obj</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">json_obj</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">json_obj</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">json_obj</span>
+
+</div>
+<div class="viewcode-block" id="read_yaml_file"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.read_yaml_file">[docs]</a><span class="k">def</span> <span class="nf">read_yaml_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="smart_read_yaml"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.smart_read_yaml">[docs]</a><span class="k">def</span> <span class="nf">smart_read_yaml</span><span class="p">(</span><span class="n">yaml_file</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read yaml file into python dict, in mpi_mode or not</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mpi_mode</span><span class="p">:</span>
+        <span class="n">yaml_dict</span> <span class="o">=</span> <span class="n">read_yaml_file</span><span class="p">(</span><span class="n">yaml_file</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">comm</span> <span class="o">=</span> <span class="n">_get_mpi_comm</span><span class="p">()</span>
+        <span class="n">rank</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">rank</span>
+        <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">yaml_dict</span> <span class="o">=</span> <span class="n">read_yaml_file</span><span class="p">(</span><span class="n">yaml_file</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;Error in read </span><span class="si">%s</span><span class="s"> as yaml file: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">yaml_file</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
+                <span class="n">comm</span><span class="o">.</span><span class="n">Abort</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">yaml_dict</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">yaml_dict</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">yaml_dict</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">yaml_dict</span>
+
+</div>
+<div class="viewcode-block" id="smart_check_file"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.smart_check_file">[docs]</a><span class="k">def</span> <span class="nf">smart_check_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mpi_mode</span><span class="p">:</span>
+        <span class="n">file_exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">comm</span> <span class="o">=</span> <span class="n">_get_mpi_comm</span><span class="p">()</span>
+        <span class="n">rank</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">rank</span>
+        <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">file_exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">file_exists</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">file_exists</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">file_exists</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">file_exists</span>
+
+</div>
+<div class="viewcode-block" id="smart_remove_file"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.smart_remove_file">[docs]</a><span class="k">def</span> <span class="nf">smart_remove_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">smart_check_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="n">mpi_mode</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">):</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="n">mpi_mode</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">comm</span> <span class="o">=</span> <span class="n">_get_mpi_comm</span><span class="p">()</span>
+        <span class="n">rank</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">rank</span>
+        <span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="smart_mkdir"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.smart_mkdir">[docs]</a><span class="k">def</span> <span class="nf">smart_mkdir</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="n">mpi_mode</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">comm</span> <span class="o">=</span> <span class="n">_get_mpi_comm</span><span class="p">()</span>
+        <span class="n">rank</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">rank</span>
+        <span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+        <span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="drawProgressBar"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.drawProgressBar">[docs]</a><span class="k">def</span> <span class="nf">drawProgressBar</span><span class="p">(</span><span class="n">percent</span><span class="p">,</span> <span class="n">user_text</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">barLen</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Draw status progress bars in terminal.</span>
+<span class="sd">    Not recommendded used for job scripts(will create</span>
+<span class="sd">    thousands of lines of output)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">user_text</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">user_text</span> <span class="o">=</span> <span class="s">&quot;Status&quot;</span>
+
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\r</span><span class="s">&quot;</span><span class="p">)</span>
+    <span class="n">progress</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">barLen</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">int</span><span class="p">(</span><span class="n">barLen</span> <span class="o">*</span> <span class="n">percent</span><span class="p">):</span>
+            <span class="n">progress</span> <span class="o">+=</span> <span class="s">&quot;=&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">progress</span> <span class="o">+=</span> <span class="s">&quot; &quot;</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+        <span class="s">&quot;</span><span class="si">%s</span><span class="s">: [ </span><span class="si">%s</span><span class="s"> ] </span><span class="si">%.2f%%</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">user_text</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="n">percent</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">percent</span> <span class="o">&gt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="timing"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.timing">[docs]</a><span class="k">def</span> <span class="nf">timing</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">time1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">time2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">print</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s"> function took </span><span class="si">%0.3f</span><span class="s"> s&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">func_name</span><span class="p">,</span> <span class="p">(</span><span class="n">time2</span><span class="o">-</span><span class="n">time1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">ret</span>
+    <span class="k">return</span> <span class="n">wrap</span>
+
+</div>
+<div class="viewcode-block" id="isclose"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.isclose">[docs]</a><span class="k">def</span> <span class="nf">isclose</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">rel_tol</span><span class="o">=</span><span class="mf">1.0e-09</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compare two numbers see if they are close to each other to a</span>
+<span class="sd">    tolerance level</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">max</span><span class="p">(</span><span class="n">rel_tol</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">b</span><span class="p">)),</span> <span class="n">abs_tol</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pypaw 0.0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2016, Wenjie Lei.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

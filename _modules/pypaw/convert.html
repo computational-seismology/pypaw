@@ -1,0 +1,394 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pypaw.convert &mdash; pypaw 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="pypaw 0.0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pypaw 0.0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pypaw.convert</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Methods that contains utils for adjoint sources</span>
+
+<span class="sd">:copyright:</span>
+<span class="sd">    Wenjie Lei (lei@princeton.edu), 2016</span>
+<span class="sd">:license:</span>
+<span class="sd">    GNU General Public License, Version 3</span>
+<span class="sd">    (http://www.gnu.org/copyleft/gpl.html)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">smart_read_json</span><span class="p">,</span> <span class="n">drawProgressBar</span><span class="p">,</span> <span class="n">timing</span>
+<span class="kn">from</span> <span class="nn">pyasdf</span> <span class="kn">import</span> <span class="n">ASDFDataSet</span>
+<span class="kn">import</span> <span class="nn">obspy</span>
+<span class="kn">from</span> <span class="nn">obspy.station</span> <span class="kn">import</span> <span class="n">Channel</span><span class="p">,</span> <span class="n">Station</span><span class="p">,</span> <span class="n">Network</span><span class="p">,</span> <span class="n">Inventory</span><span class="p">,</span> <span class="n">Site</span>
+<span class="c"># from obspy.core.inventory import Channel, Station, Network, Inventory, Site</span>
+
+
+<div class="viewcode-block" id="create_simple_inventory"><a class="viewcode-back" href="../../pypaw.html#pypaw.convert.create_simple_inventory">[docs]</a><span class="k">def</span> <span class="nf">create_simple_inventory</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">station</span><span class="p">,</span> <span class="n">latitude</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                            <span class="n">elevation</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">start_date</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                            <span class="n">end_date</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">location_code</span><span class="o">=</span><span class="s">&quot;S3&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create simple inventory for synthetic data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">azi_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;MXZ&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>  <span class="s">&quot;MXN&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;MXE&quot;</span><span class="p">:</span> <span class="mf">90.0</span><span class="p">}</span>
+    <span class="n">dip_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;MXZ&quot;</span><span class="p">:</span> <span class="mf">90.0</span><span class="p">,</span> <span class="s">&quot;MXN&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;MXE&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">}</span>
+    <span class="n">channel_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">start_date</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">start_date</span> <span class="o">=</span> <span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">_chan_code</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;MXZ&quot;</span><span class="p">,</span> <span class="s">&quot;MXE&quot;</span><span class="p">,</span> <span class="s">&quot;MXN&quot;</span><span class="p">]:</span>
+        <span class="n">chan</span> <span class="o">=</span> <span class="n">Channel</span><span class="p">(</span><span class="n">_chan_code</span><span class="p">,</span> <span class="n">location_code</span><span class="p">,</span> <span class="n">latitude</span><span class="o">=</span><span class="n">latitude</span><span class="p">,</span>
+                       <span class="n">longitude</span><span class="o">=</span><span class="n">longitude</span><span class="p">,</span> <span class="n">elevation</span><span class="o">=</span><span class="n">elevation</span><span class="p">,</span>
+                       <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">azimuth</span><span class="o">=</span><span class="n">azi_dict</span><span class="p">[</span><span class="n">_chan_code</span><span class="p">],</span>
+                       <span class="n">dip</span><span class="o">=</span><span class="n">dip_dict</span><span class="p">[</span><span class="n">_chan_code</span><span class="p">],</span> <span class="n">start_date</span><span class="o">=</span><span class="n">start_date</span><span class="p">,</span>
+                       <span class="n">end_date</span><span class="o">=</span><span class="n">end_date</span><span class="p">)</span>
+        <span class="n">channel_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chan</span><span class="p">)</span>
+
+    <span class="n">site</span> <span class="o">=</span> <span class="n">Site</span><span class="p">(</span><span class="s">&quot;N/A&quot;</span><span class="p">)</span>
+    <span class="n">sta</span> <span class="o">=</span> <span class="n">Station</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="n">latitude</span><span class="o">=</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">longitude</span><span class="p">,</span>
+                  <span class="n">elevation</span><span class="o">=</span><span class="n">elevation</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="n">channel_list</span><span class="p">,</span> <span class="n">site</span><span class="o">=</span><span class="n">site</span><span class="p">,</span>
+                  <span class="n">creation_date</span><span class="o">=</span><span class="n">start_date</span><span class="p">,</span> <span class="n">total_number_of_channels</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                  <span class="n">selected_number_of_channels</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="n">nw</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">stations</span><span class="o">=</span><span class="p">[</span><span class="n">sta</span><span class="p">,</span> <span class="p">],</span> <span class="n">total_number_of_stations</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                 <span class="n">selected_number_of_stations</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">inv</span> <span class="o">=</span> <span class="n">Inventory</span><span class="p">([</span><span class="n">nw</span><span class="p">,</span> <span class="p">],</span> <span class="n">source</span><span class="o">=</span><span class="s">&quot;SPECFEM3D_GLOBE&quot;</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="s">&quot;Princeton&quot;</span><span class="p">,</span>
+                    <span class="n">created</span><span class="o">=</span><span class="n">start_date</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">inv</span>
+
+</div>
+<span class="nd">@timing</span>
+<span class="k">def</span> <span class="nf">convert_to_asdf</span><span class="p">(</span><span class="n">asdf_fn</span><span class="p">,</span> <span class="n">waveform_filelist</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">quakemlfile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                    <span class="n">staxml_filelist</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">status_bar</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                    <span class="n">create_simple_inv</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert files(sac or mseed) to asdf</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;*&quot;</span><span class="o">*</span><span class="mi">10</span> <span class="o">+</span> <span class="s">&quot; ASDF Converter &quot;</span> <span class="o">+</span> <span class="s">&quot;*&quot;</span><span class="o">*</span><span class="mi">10</span><span class="p">)</span>
+
+    <span class="n">nwaveform</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">waveform_filelist</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nwaveform</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;No file specified. Return...&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">asdf_fn</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;File &#39;</span><span class="si">%s</span><span class="s">&#39; exists.&quot;</span> <span class="o">%</span> <span class="n">asdf_fn</span><span class="p">)</span>
+
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">ASDFDataSet</span><span class="p">(</span><span class="n">asdf_fn</span><span class="p">)</span>
+
+    <span class="c"># Add event</span>
+    <span class="k">if</span> <span class="n">quakemlfile</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">quakemlfile</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Quakeml file not exists:</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">quakemlfile</span><span class="p">)</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">add_quakeml</span><span class="p">(</span><span class="n">quakemlfile</span><span class="p">)</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">events</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">status_bar</span><span class="p">:</span>
+            <span class="n">drawProgressBar</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s">&quot;Adding Quakeml data&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;No Event file&quot;</span><span class="p">)</span>
+
+    <span class="n">sta_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c"># Add waveforms.</span>
+    <span class="k">for</span> <span class="n">_i</span><span class="p">,</span> <span class="n">filename</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">waveform_filelist</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;File not exist </span><span class="si">%i</span><span class="s"> of </span><span class="si">%i</span><span class="s">: </span><span class="si">%s</span><span class="s">&quot;</span>
+                             <span class="o">%</span> <span class="p">(</span><span class="n">_i</span><span class="p">,</span> <span class="n">nwaveform</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+
+        <span class="n">st</span> <span class="o">=</span> <span class="n">obspy</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">add_waveforms</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span> <span class="n">event_id</span><span class="o">=</span><span class="n">event</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">create_simple_inv</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">tr</span> <span class="ow">in</span> <span class="n">st</span><span class="p">:</span>
+                <span class="n">sta_tag</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">station</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">sta_tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sta_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">_sac</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">sac</span>
+                    <span class="n">sta_dict</span><span class="p">[</span><span class="n">sta_tag</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">station</span><span class="p">,</span>
+                                         <span class="n">_sac</span><span class="p">[</span><span class="s">&quot;stla&quot;</span><span class="p">],</span> <span class="n">_sac</span><span class="p">[</span><span class="s">&quot;stlo&quot;</span><span class="p">],</span>
+                                         <span class="n">_sac</span><span class="p">[</span><span class="s">&quot;stel&quot;</span><span class="p">],</span> <span class="n">_sac</span><span class="p">[</span><span class="s">&quot;stdp&quot;</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="n">status_bar</span><span class="p">:</span>
+            <span class="n">drawProgressBar</span><span class="p">((</span><span class="n">_i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">nwaveform</span><span class="p">,</span> <span class="s">&quot;Adding Waveform data&quot;</span><span class="p">)</span>
+
+    <span class="c"># Add StationXML files.</span>
+    <span class="k">if</span> <span class="n">create_simple_inv</span><span class="p">:</span>
+        <span class="n">nstaxml</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sta_dict</span><span class="p">)</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">sta_dict</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">origin</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">preferred_origin</span><span class="p">()</span> <span class="ow">or</span> <span class="n">event</span><span class="o">.</span><span class="n">origins</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">event_time</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">time</span>
+            <span class="n">start_date</span> <span class="o">=</span> <span class="n">event_time</span> <span class="o">-</span> <span class="mf">120.0</span>
+            <span class="n">inv</span> <span class="o">=</span> <span class="n">create_simple_inventory</span><span class="p">(</span>
+                    <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">latitude</span><span class="o">=</span><span class="n">value</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">longitude</span><span class="o">=</span><span class="n">value</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                    <span class="n">elevation</span><span class="o">=</span><span class="n">value</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">depth</span><span class="o">=</span><span class="n">value</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">start_date</span><span class="o">=</span><span class="n">start_date</span><span class="p">)</span>
+            <span class="n">ds</span><span class="o">.</span><span class="n">add_stationxml</span><span class="p">(</span><span class="n">inv</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">status_bar</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">drawProgressBar</span><span class="p">((</span><span class="n">count</span><span class="p">)</span><span class="o">/</span><span class="n">nstaxml</span><span class="p">,</span> <span class="s">&quot;Adding StationXML data&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">nstaxml</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">staxml_filelist</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">staxml_filelist</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">nstaxml</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">_i</span><span class="p">,</span> <span class="n">filename</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">staxml_filelist</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Staxml not exist </span><span class="si">%i</span><span class="s"> of </span><span class="si">%i</span><span class="s">: </span><span class="si">%s</span><span class="s">&quot;</span>
+                                     <span class="o">%</span> <span class="p">(</span><span class="n">_i</span><span class="p">,</span> <span class="n">nstaxml</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+                <span class="n">ds</span><span class="o">.</span><span class="n">add_stationxml</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">status_bar</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">drawProgressBar</span><span class="p">((</span><span class="n">_i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">nstaxml</span><span class="p">,</span> <span class="s">&quot;Adding StationXML data&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;No stationxml added&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;ASDF filesize: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">ds</span><span class="o">.</span><span class="n">pretty_filesize</span><span class="p">)</span>
+    <span class="k">del</span> <span class="n">ds</span>
+
+
+<div class="viewcode-block" id="write_stream_to_sac"><a class="viewcode-back" href="../../pypaw.html#pypaw.convert.write_stream_to_sac">[docs]</a><span class="k">def</span> <span class="nf">write_stream_to_sac</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">outputdir</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">tr</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputdir</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">.sac&quot;</span> <span class="o">%</span> <span class="n">tr</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputdir</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">.sac&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">tag</span><span class="p">))</span>
+        <span class="n">tr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&quot;SAC&quot;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="convert_from_asdf"><a class="viewcode-back" href="../../pypaw.html#pypaw.convert.convert_from_asdf">[docs]</a><span class="k">def</span> <span class="nf">convert_from_asdf</span><span class="p">(</span><span class="n">asdf_fn</span><span class="p">,</span> <span class="n">outputdir</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="s">&quot;sac&quot;</span><span class="p">,</span>
+                      <span class="n">output_staxml</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">output_quakeml</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                      <span class="n">_verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert asdf to different types of file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">filetype</span> <span class="o">=</span> <span class="n">filetype</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">filetype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;SAC&quot;</span><span class="p">,</span> <span class="s">&quot;MSEED&quot;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Supported filetype: 1) sac; 2) mseed&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">asdf_fn</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;No asdf file: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">asdf_fn</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">outputdir</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">outputdir</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">tag_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">tag</span><span class="p">]</span>
+
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">ASDFDataSet</span><span class="p">(</span><span class="n">asdf_fn</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">output_quakeml</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">events</span><span class="p">:</span>
+            <span class="n">event_id</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">event_descriptions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputdir</span><span class="p">,</span> <span class="s">&quot;CMT_</span><span class="si">%s</span><span class="s">.xml&quot;</span> <span class="o">%</span> <span class="n">event_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">_verbose</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;Quakeml file: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="n">event</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&quot;QUAKEML&quot;</span><span class="p">)</span>
+
+    <span class="n">sta_list</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">waveforms</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">station_name</span> <span class="ow">in</span> <span class="n">sta_list</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">_verbose</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Convert station: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">station_name</span><span class="p">)</span>
+        <span class="n">station_name2</span> <span class="o">=</span> <span class="n">station_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">,</span> <span class="s">&quot;_&quot;</span><span class="p">)</span>
+        <span class="n">station</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">waveforms</span><span class="p">,</span> <span class="n">station_name2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tag</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">tag_list</span> <span class="o">=</span> <span class="n">station</span><span class="o">.</span><span class="n">get_waveform_tags</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">_tag</span> <span class="ow">in</span> <span class="n">tag_list</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">stream</span><span class="p">,</span> <span class="n">inv</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get_data_for_tag</span><span class="p">(</span><span class="n">station_name2</span><span class="p">,</span> <span class="n">_tag</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;Error for station:&quot;</span><span class="p">,</span> <span class="n">station_name2</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s">&quot;SAC&quot;</span><span class="p">:</span>
+                <span class="n">write_stream_to_sac</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">outputdir</span><span class="p">,</span> <span class="n">_tag</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s">&quot;MSEED&quot;</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputdir</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">.mseed&quot;</span>
+                                        <span class="o">%</span> <span class="p">(</span><span class="n">station_name</span><span class="p">,</span> <span class="n">_tag</span><span class="p">))</span>
+                <span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&quot;MSEED&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">output_staxml</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputdir</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">.xml&quot;</span>
+                                        <span class="o">%</span> <span class="p">(</span><span class="n">station_name</span><span class="p">,</span> <span class="n">_tag</span><span class="p">))</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">inv</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&quot;STATIONXML&quot;</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Error creating STATIONXML: </span><span class="si">%f</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+
+    <span class="k">del</span> <span class="n">ds</span>
+
+</div>
+<div class="viewcode-block" id="ConvertASDF"><a class="viewcode-back" href="../../pypaw.html#pypaw.convert.ConvertASDF">[docs]</a><span class="k">class</span> <span class="nc">ConvertASDF</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">status_bar</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_status_bar</span> <span class="o">=</span> <span class="n">status_bar</span>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="ConvertASDF.print_info"><a class="viewcode-back" href="../../pypaw.html#pypaw.convert.ConvertASDF.print_info">[docs]</a>    <span class="k">def</span> <span class="nf">print_info</span><span class="p">(</span><span class="n">waveform_files</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">staxml_files</span><span class="p">,</span> <span class="n">quakemlfile</span><span class="p">,</span>
+                   <span class="n">output_fn</span><span class="p">,</span> <span class="n">create_simple_inv</span><span class="p">):</span>
+        <span class="n">waveform_dir</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">_i</span><span class="p">)</span> <span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="n">waveform_files</span><span class="p">])</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="o">*</span><span class="mi">20</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Quakeml files: &quot;</span><span class="p">,</span> <span class="n">quakemlfile</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Waveform dirs:&quot;</span><span class="p">,</span> <span class="n">waveform_dir</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Number of waveform files:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">waveform_files</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">create_simple_inv</span><span class="p">:</span>
+            <span class="n">staxml_dir</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">_i</span><span class="p">)</span> <span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="n">staxml_files</span><span class="p">])</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Stationxml dirs:&quot;</span><span class="p">,</span> <span class="n">staxml_dir</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Number of Stationxml files:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">staxml_files</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Stationxml files: generated based on input waveform&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Output filename:&quot;</span><span class="p">,</span> <span class="n">output_fn</span><span class="p">)</span>
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="ConvertASDF.clean_output"><a class="viewcode-back" href="../../pypaw.html#pypaw.convert.ConvertASDF.clean_output">[docs]</a>    <span class="k">def</span> <span class="nf">clean_output</span><span class="p">(</span><span class="n">output_fn</span><span class="p">):</span>
+        <span class="n">basepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">output_fn</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">basepath</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Output dir not exists so created: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">basepath</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">basepath</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">output_fn</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Outfile exist and being removed:&quot;</span><span class="p">,</span> <span class="n">output_fn</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">output_fn</span><span class="p">)</span>
+</div>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_parse_path</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="s">&quot;waveform_files&quot;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+            <span class="n">waveformfiles</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;waveform_files&quot;</span><span class="p">]</span>
+            <span class="n">filetype</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">elif</span> <span class="s">&quot;waveform_dir&quot;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+            <span class="n">waveformdir</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;waveform_dir&quot;</span><span class="p">]</span>
+            <span class="n">filetype</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;filetype&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">waveform_pattern</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">waveformdir</span><span class="p">,</span> <span class="s">&quot;*&quot;</span><span class="o">+</span><span class="n">filetype</span><span class="p">)</span>
+            <span class="n">waveformfiles</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">waveform_pattern</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;missing keywords in json file, &#39;waveform_files&#39;&quot;</span>
+                             <span class="s">&quot;or &#39;waveformdir&#39;&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s">&quot;staxml_files&quot;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+            <span class="n">staxmlfiles</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;staxml_files&quot;</span><span class="p">]</span>
+            <span class="n">create_simple_inv</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">elif</span> <span class="s">&quot;staxml_dir&quot;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+            <span class="n">staxmldir</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;staxml_dir&quot;</span><span class="p">]</span>
+            <span class="n">staxml_pattern</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">staxmldir</span><span class="p">,</span> <span class="s">&#39;*.xml&#39;</span><span class="p">)</span>
+            <span class="n">staxmlfiles</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">staxml_pattern</span><span class="p">)</span>
+            <span class="n">create_simple_inv</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">filetype</span> <span class="o">!=</span> <span class="s">&quot;sac&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;create_simple_inv only supports sac&quot;</span><span class="p">)</span>
+            <span class="n">staxmlfiles</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">create_simple_inv</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="n">tag</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;tag&quot;</span><span class="p">]</span>
+        <span class="n">quakemlfile</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;quakeml_file&quot;</span><span class="p">]</span>
+        <span class="n">outputfile</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;output_file&quot;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">waveformfiles</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">staxmlfiles</span><span class="p">,</span> <span class="n">quakemlfile</span><span class="p">,</span> <span class="n">outputfile</span><span class="p">,</span>\
+            <span class="n">create_simple_inv</span>
+
+    <span class="k">def</span> <span class="nf">_run_subs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+
+        <span class="n">waveformfiles</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">staxmlfiles</span><span class="p">,</span> <span class="n">quakemlfile</span><span class="p">,</span> <span class="n">outputfile</span><span class="p">,</span> \
+            <span class="n">create_simple_inv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">waveformfiles</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">staxmlfiles</span><span class="p">,</span> <span class="n">quakemlfile</span><span class="p">,</span>
+                        <span class="n">outputfile</span><span class="p">,</span> <span class="n">create_simple_inv</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">clean_output</span><span class="p">(</span><span class="n">outputfile</span><span class="p">)</span>
+
+        <span class="n">convert_to_asdf</span><span class="p">(</span><span class="n">outputfile</span><span class="p">,</span> <span class="n">waveformfiles</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span>
+                        <span class="n">quakemlfile</span><span class="o">=</span><span class="n">quakemlfile</span><span class="p">,</span>
+                        <span class="n">staxml_filelist</span><span class="o">=</span><span class="n">staxmlfiles</span><span class="p">,</span>
+                        <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">,</span> <span class="n">status_bar</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_status_bar</span><span class="p">,</span>
+                        <span class="n">create_simple_inv</span><span class="o">=</span><span class="n">create_simple_inv</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ConvertASDF.run"><a class="viewcode-back" href="../../pypaw.html#pypaw.convert.ConvertASDF.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">smart_read_json</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">_path</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_run_subs</span><span class="p">(</span><span class="n">_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_run_subs</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pypaw 0.0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2016, Wenjie Lei.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

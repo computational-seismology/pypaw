@@ -1,0 +1,250 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pypaw.adjoint_util &mdash; pypaw 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="pypaw 0.0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pypaw 0.0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pypaw.adjoint_util</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Methods that contains utils for adjoint sources</span>
+
+<span class="sd">:copyright:</span>
+<span class="sd">    Wenjie Lei (lei@princeton.edu), 2016</span>
+<span class="sd">:license:</span>
+<span class="sd">    GNU General Public License, Version 3</span>
+<span class="sd">    (http://www.gnu.org/copyleft/gpl.html)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">pyadjoint</span> <span class="kn">import</span> <span class="n">AdjointSource</span>
+<span class="kn">from</span> <span class="nn">pytomo3d.window.write_window</span> <span class="kn">import</span> <span class="n">get_json_content</span>
+<span class="kn">from</span> <span class="nn">pyflex.window</span> <span class="kn">import</span> <span class="n">Window</span>
+
+
+<div class="viewcode-block" id="smart_transform_window"><a class="viewcode-back" href="../../pypaw.html#pypaw.adjoint_util.smart_transform_window">[docs]</a><span class="k">def</span> <span class="nf">smart_transform_window</span><span class="p">(</span><span class="n">windows</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Smart tranfer window object to dict if it is type of pyflex.Window</span>
+
+<span class="sd">    :param windows:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">windows</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">all_windows</span> <span class="o">=</span> <span class="n">windows</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">windows</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">Window</span><span class="p">):</span>
+        <span class="n">all_windows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">chan_win</span> <span class="ow">in</span> <span class="n">windows</span><span class="p">:</span>
+            <span class="n">_chan_win_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_json_content</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">chan_win</span><span class="p">]</span>
+            <span class="n">all_windows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_chan_win_list</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Not recgonized type of window&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">all_windows</span>
+
+</div>
+<div class="viewcode-block" id="ensemble_fake_adj"><a class="viewcode-back" href="../../pypaw.html#pypaw.adjoint_util.ensemble_fake_adj">[docs]</a><span class="k">def</span> <span class="nf">ensemble_fake_adj</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">time_offset</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ensemble fake adjoint sources from stream, for test purpose</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">adjsrc_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">comps</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;R&quot;</span><span class="p">,</span> <span class="s">&quot;T&quot;</span><span class="p">]</span>
+    <span class="n">nwin_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">:</span>
+        <span class="n">tr</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="s">&quot;*</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">comp</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">adj</span> <span class="o">=</span> <span class="n">AdjointSource</span><span class="p">(</span><span class="s">&quot;waveform_misfit&quot;</span><span class="p">,</span> <span class="n">misfit</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">delta</span><span class="p">,</span>
+                            <span class="n">min_period</span><span class="o">=</span><span class="mf">50.0</span><span class="p">,</span> <span class="n">max_period</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span>
+                            <span class="n">component</span><span class="o">=</span><span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">channel</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                            <span class="n">adjoint_source</span><span class="o">=</span><span class="n">tr</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">network</span><span class="p">,</span>
+                            <span class="n">station</span><span class="o">=</span><span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">station</span><span class="p">)</span>
+        <span class="n">adjsrc_dict</span><span class="p">[</span><span class="n">tr</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">adj</span>
+        <span class="n">nwin_dict</span><span class="p">[</span><span class="n">tr</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">adjsrc_dict</span><span class="p">,</span> <span class="n">nwin_dict</span>
+
+</div>
+<div class="viewcode-block" id="reshape_adj"><a class="viewcode-back" href="../../pypaw.html#pypaw.adjoint_util.reshape_adj">[docs]</a><span class="k">def</span> <span class="nf">reshape_adj</span><span class="p">(</span><span class="n">adjsrcs</span><span class="p">,</span> <span class="n">time_offset</span><span class="p">,</span> <span class="n">staxml</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reshape adjsrcs to a certain structure required by pyasdf writer</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">adjsrcs</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Input ajdsrcs must be a list of adjoint sources&quot;</span><span class="p">)</span>
+
+    <span class="n">vtype</span> <span class="o">=</span> <span class="s">&quot;AuxiliaryData&quot;</span>
+    <span class="n">reshape_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">tag_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c"># extract station information</span>
+    <span class="n">sta_lat</span> <span class="o">=</span> <span class="n">staxml</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">latitude</span>
+    <span class="n">sta_lon</span> <span class="o">=</span> <span class="n">staxml</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">longitude</span>
+    <span class="n">sta_ele</span> <span class="o">=</span> <span class="n">staxml</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">elevation</span>
+    <span class="n">sta_dep</span> <span class="o">=</span> <span class="n">staxml</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">depth</span>
+
+    <span class="k">for</span> <span class="n">adj</span> <span class="ow">in</span> <span class="n">adjsrcs</span><span class="p">:</span>
+        <span class="n">adj_array</span> <span class="o">=</span> <span class="n">adj</span><span class="o">.</span><span class="n">adjoint_source</span>
+
+        <span class="n">station_id</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">adj</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="n">adj</span><span class="o">.</span><span class="n">station</span><span class="p">)</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;dt&quot;</span><span class="p">:</span> <span class="n">adj</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="s">&quot;time_offset&quot;</span><span class="p">:</span> <span class="n">time_offset</span><span class="p">,</span>
+                      <span class="s">&quot;misfit&quot;</span><span class="p">:</span> <span class="n">adj</span><span class="o">.</span><span class="n">misfit</span><span class="p">,</span>
+                      <span class="s">&quot;adjoint_source_type&quot;</span><span class="p">:</span> <span class="n">adj</span><span class="o">.</span><span class="n">adj_src_type</span><span class="p">,</span>
+                      <span class="s">&quot;min_period&quot;</span><span class="p">:</span> <span class="n">adj</span><span class="o">.</span><span class="n">min_period</span><span class="p">,</span>
+                      <span class="s">&quot;max_period&quot;</span><span class="p">:</span> <span class="n">adj</span><span class="o">.</span><span class="n">max_period</span><span class="p">,</span>
+                      <span class="s">&quot;latitude&quot;</span><span class="p">:</span> <span class="n">sta_lat</span><span class="p">,</span> <span class="s">&quot;longitude&quot;</span><span class="p">:</span> <span class="n">sta_lon</span><span class="p">,</span>
+                      <span class="s">&quot;elevation_in_m&quot;</span><span class="p">:</span> <span class="n">sta_ele</span><span class="p">,</span> <span class="s">&quot;depth_in_m&quot;</span><span class="p">:</span> <span class="n">sta_dep</span><span class="p">,</span>
+                      <span class="s">&quot;station_id&quot;</span><span class="p">:</span> <span class="n">station_id</span><span class="p">,</span> <span class="s">&quot;component&quot;</span><span class="p">:</span> <span class="n">adj</span><span class="o">.</span><span class="n">component</span><span class="p">,</span>
+                      <span class="s">&quot;units&quot;</span><span class="p">:</span> <span class="s">&quot;m&quot;</span><span class="p">}</span>
+
+        <span class="n">tag</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">_</span><span class="si">%s</span><span class="s">_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">adj</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="n">adj</span><span class="o">.</span><span class="n">station</span><span class="p">,</span> <span class="n">adj</span><span class="o">.</span><span class="n">component</span><span class="p">)</span>
+        <span class="n">tag_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+
+        <span class="n">dataset_path</span> <span class="o">=</span> <span class="s">&quot;AdjointSources/</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">tag</span>
+
+        <span class="n">_reshape</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;object&quot;</span><span class="p">:</span> <span class="n">adj_array</span><span class="p">,</span> <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="n">vtype</span><span class="p">,</span>
+                    <span class="s">&quot;path&quot;</span><span class="p">:</span> <span class="n">dataset_path</span><span class="p">,</span> <span class="s">&quot;parameters&quot;</span><span class="p">:</span> <span class="n">parameters</span><span class="p">}</span>
+
+        <span class="n">reshape_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_reshape</span><span class="p">)</span>
+
+    <span class="c"># check if there are different adjoint sources with the same tag. If so,</span>
+    <span class="c"># the writer won&#39;t be able to write out because of the same dataset path</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">tag_list</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tag_list</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Duplicate tag in adjoint sources list: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span>
+                         <span class="n">tag_list</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">reshape_list</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_stats_channel_window</span><span class="p">(</span><span class="n">adjsrcs</span><span class="p">,</span> <span class="n">windows</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determine number of windows on each channel of each component.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">adj_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">adj</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">adjsrcs</span><span class="p">):</span>
+        <span class="n">adj_id</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">adj</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="n">adj</span><span class="o">.</span><span class="n">station</span><span class="p">,</span> <span class="n">adj</span><span class="o">.</span><span class="n">location</span><span class="p">,</span>
+                                  <span class="n">adj</span><span class="o">.</span><span class="n">component</span><span class="p">)</span>
+        <span class="n">adj_dict</span><span class="p">[</span><span class="n">adj_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx</span>
+
+    <span class="n">adj_win_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">chan_win</span> <span class="ow">in</span> <span class="n">windows</span><span class="p">:</span>
+        <span class="n">chan_id</span> <span class="o">=</span> <span class="n">chan_win</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;channel_id&quot;</span><span class="p">]</span>
+        <span class="n">adj_win_dict</span><span class="p">[</span><span class="n">chan_id</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">chan_win</span><span class="p">)</span>
+
+    <span class="n">new_win_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">adj_win_dict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">adj_dict</span><span class="p">:</span>
+            <span class="n">new_win_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">adj_win_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">adj_dict</span><span class="p">,</span> <span class="n">new_win_dict</span>
+
+
+<div class="viewcode-block" id="calculate_chan_weight"><a class="viewcode-back" href="../../pypaw.html#pypaw.adjoint_util.calculate_chan_weight">[docs]</a><span class="k">def</span> <span class="nf">calculate_chan_weight</span><span class="p">(</span><span class="n">adjsrcs</span><span class="p">,</span> <span class="n">windows_sta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calcualte window weights based on adjoint sources and windows</span>
+
+<span class="sd">    :param adjsrcs:</span>
+<span class="sd">    :param windows_sta:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">adj_win_dict</span> <span class="o">=</span> <span class="n">_stats_channel_window</span><span class="p">(</span><span class="n">adjsrcs</span><span class="p">,</span> <span class="n">windows_sta</span><span class="p">)</span>
+
+    <span class="n">comp_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">tr_id</span><span class="p">,</span> <span class="n">nwins</span> <span class="ow">in</span> <span class="n">adj_win_dict</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="n">comp</span> <span class="o">=</span> <span class="s">&quot;MX</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">tr_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">comp</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">comp_dict</span><span class="p">:</span>
+            <span class="n">comp_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">comp_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">][</span><span class="n">tr_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">nwins</span>
+
+    <span class="k">for</span> <span class="n">comp</span><span class="p">,</span> <span class="n">comp_wins</span> <span class="ow">in</span> <span class="n">comp_dict</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="n">ntotal</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">chan_id</span><span class="p">,</span> <span class="n">chan_win</span> <span class="ow">in</span> <span class="n">comp_wins</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">ntotal</span> <span class="o">+=</span> <span class="n">chan_win</span>
+        <span class="k">for</span> <span class="n">chan_id</span><span class="p">,</span> <span class="n">chan_win</span> <span class="ow">in</span> <span class="n">comp_wins</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">comp_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">][</span><span class="n">chan_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">chan_win</span> <span class="o">/</span> <span class="n">ntotal</span>
+
+    <span class="k">return</span> <span class="n">comp_dict</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pypaw 0.0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2016, Wenjie Lei.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

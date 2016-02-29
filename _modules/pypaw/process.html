@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pypaw.process &mdash; pypaw 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="pypaw 0.0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pypaw 0.0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pypaw.process</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Parent class for singal processing asdf file and</span>
+<span class="sd">handles parallel I/O so they are invisible to users.</span>
+
+<span class="sd">:copyright:</span>
+<span class="sd">    Wenjie Lei (lei@princeton.edu), 2016</span>
+<span class="sd">:license:</span>
+<span class="sd">    GNU General Public License, Version 3</span>
+<span class="sd">    (http://www.gnu.org/copyleft/gpl.html)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="p">(</span><span class="n">print_function</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">absolute_import</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">pytomo3d.signal.process</span> <span class="kn">import</span> <span class="n">process</span>
+<span class="kn">from</span> <span class="nn">.procbase</span> <span class="kn">import</span> <span class="n">ProcASDFBase</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">smart_remove_file</span><span class="p">,</span> <span class="n">smart_check_file</span>
+
+
+<div class="viewcode-block" id="process_wrapper"><a class="viewcode-back" href="../../pypaw.html#pypaw.process.process_wrapper">[docs]</a><span class="k">def</span> <span class="nf">process_wrapper</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">inv</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Process function wrapper for pyasdf</span>
+
+<span class="sd">    :param stream:</span>
+<span class="sd">    :param inv:</span>
+<span class="sd">    :param param:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">process</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">inventory</span><span class="o">=</span><span class="n">inv</span><span class="p">,</span> <span class="o">**</span><span class="n">param</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="ProcASDF"><a class="viewcode-back" href="../../pypaw.html#pypaw.process.ProcASDF">[docs]</a><span class="k">class</span> <span class="nc">ProcASDF</span><span class="p">(</span><span class="n">ProcASDFBase</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="n">ProcASDFBase</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_validate_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="n">necessary_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;input_asdf&quot;</span><span class="p">,</span> <span class="s">&quot;input_tag&quot;</span><span class="p">,</span>
+                          <span class="s">&quot;output_asdf&quot;</span><span class="p">,</span> <span class="s">&quot;output_tag&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_missing_keys</span><span class="p">(</span><span class="n">necessary_keys</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_validate_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+        <span class="n">necessary_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;remove_response_flag&quot;</span><span class="p">,</span> <span class="s">&quot;filter_flag&quot;</span><span class="p">,</span> <span class="s">&quot;pre_filt&quot;</span><span class="p">,</span>
+                          <span class="s">&quot;relative_starttime&quot;</span><span class="p">,</span> <span class="s">&quot;relative_endtime&quot;</span><span class="p">,</span>
+                          <span class="s">&quot;resample_flag&quot;</span><span class="p">,</span> <span class="s">&quot;sampling_rate&quot;</span><span class="p">,</span> <span class="s">&quot;rotate_flag&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_missing_keys</span><span class="p">(</span><span class="n">necessary_keys</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_core</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_param</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">extra_info</span><span class="o">=</span><span class="s">&quot;Path Info&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">extra_info</span><span class="o">=</span><span class="s">&quot;Param Info&quot;</span><span class="p">)</span>
+
+        <span class="n">input_asdf</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;input_asdf&quot;</span><span class="p">]</span>
+        <span class="n">input_tag</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;input_tag&quot;</span><span class="p">]</span>
+        <span class="n">output_asdf</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;output_asdf&quot;</span><span class="p">]</span>
+        <span class="n">output_tag</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;output_tag&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">smart_check_file</span><span class="p">(</span><span class="n">input_asdf</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
+                                <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Input file not exists: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">input_asdf</span><span class="p">)</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_asdf</span><span class="p">(</span><span class="n">input_asdf</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+
+        <span class="c"># read in event</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">events</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">preferred_origin</span><span class="p">()</span>
+        <span class="n">event_latitude</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">latitude</span>
+        <span class="n">event_longitude</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">longitude</span>
+        <span class="n">event_time</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">time</span>
+
+        <span class="c"># figure out interpolation parameter</span>
+        <span class="n">param</span><span class="p">[</span><span class="s">&quot;starttime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_time</span> <span class="o">+</span> <span class="n">param</span><span class="p">[</span><span class="s">&quot;relative_starttime&quot;</span><span class="p">]</span>
+        <span class="n">param</span><span class="p">[</span><span class="s">&quot;endtime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_time</span> <span class="o">+</span> <span class="n">param</span><span class="p">[</span><span class="s">&quot;relative_endtime&quot;</span><span class="p">]</span>
+        <span class="n">param</span><span class="p">[</span><span class="s">&quot;event_latitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_latitude</span>
+        <span class="n">param</span><span class="p">[</span><span class="s">&quot;event_longitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_longitude</span>
+
+        <span class="n">process_function</span> <span class="o">=</span> \
+            <span class="n">partial</span><span class="p">(</span><span class="n">process_wrapper</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="n">param</span><span class="p">)</span>
+
+        <span class="n">smart_remove_file</span><span class="p">(</span><span class="n">output_asdf</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
+                          <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">)</span>
+
+        <span class="n">tag_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">input_tag</span><span class="p">:</span> <span class="n">output_tag</span><span class="p">}</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">process_function</span><span class="p">,</span> <span class="n">output_asdf</span><span class="p">,</span> <span class="n">tag_map</span><span class="o">=</span><span class="n">tag_map</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">ds</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pypaw 0.0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2016, Wenjie Lei.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>
