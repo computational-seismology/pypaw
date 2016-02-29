@@ -58,7 +58,7 @@ Pypaw has dependancies on the following packages:
 7. load(or install) hdf5-parallel
 
   For large computing clusters, hdf5-parallel is usually pre-installed(or work as a module). So first you want to check if this library is pre-installed on your machine. If so, load the module and go to the next step. If not, you need to install hdf5-parallel yourself.  
-  For some cases, even the hdf5-parallel is pre-installed on your machine, it might not work since it is not compiled with correct flags(shared library or so). If the system library, install it yourself. For example, there is a module one tiger called `hdf5/intel-13.0/openmpi-1.8.8`. However, I could not use that since h5py fails on it. So I download hdf5 and compiled it myself.
+  For some cases, even the hdf5-parallel is pre-installed on your machine, it might not work since it is not compiled with correct flags(shared library or so). If the system library doesn't work, install it yourself. For example, there is a module one tiger called `hdf5/intel-13.0/openmpi-1.8.8`. However, I could not use that since h5py fails on it. So I download hdf5 and compiled it myself.
 
   If you decided to install the library yourself, get it from this link: [https://www.hdfgroup.org/HDF5/release/obtainsrc.html](https://www.hdfgroup.org/HDF5/release/obtainsrc.html) or use command line:
   ```
