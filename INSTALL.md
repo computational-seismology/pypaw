@@ -31,7 +31,7 @@ Pypaw has dependancies on the following packages:
 4. install obspy using conda
 
   ```
-  conda install -c obspy obspy
+  conda install -c obspy obspy=0.10.2
   ```
 
 5. Install pytomo3d. Pytomo3d also has dependancies(including obspy, pyflex and pyadjoint). Please see the *INSTALL.md* in pytomo3d to check the dependacies.
