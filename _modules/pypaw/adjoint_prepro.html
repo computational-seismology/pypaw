@@ -1,54 +1,138 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pypaw.adjoint_prepro &mdash; pypaw 0.0.1 documentation</title>
-    
-    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '0.0.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="pypaw 0.0.1 documentation" href="../../index.html" />
-    <link rel="up" title="Module code" href="../index.html" /> 
-  </head>
-  <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li><a href="../../index.html">pypaw 0.0.1 documentation</a> &raquo;</li>
-          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
-      </ul>
-    </div>  
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pypaw.adjoint_prepro &mdash; pypaw 0.0.1 documentation</title>
+  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body">
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="pypaw 0.0.1 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pypaw
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data_format.html">Data Format and Conversion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">pypaw</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>pypaw.adjoint_prepro</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for pypaw.adjoint_prepro</h1><div class="highlight"><pre>
-<span class="c">#!/usr/bin/env python</span>
-<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Class that handles the whole preprocessing workflow, including:</span>
 <span class="sd">    1) signal processing</span>
@@ -85,8 +169,8 @@
 
 </div>
 <div class="viewcode-block" id="load_adjoint_config"><a class="viewcode-back" href="../../pypaw.html#pypaw.adjoint_prepro.load_adjoint_config">[docs]</a><span class="k">def</span> <span class="nf">load_adjoint_config</span><span class="p">(</span><span class="n">param</span><span class="p">):</span>
-    <span class="n">adj_src_type</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s">&quot;adj_src_type&quot;</span><span class="p">]</span>
-    <span class="n">param</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&quot;adj_src_type&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="n">adj_src_type</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;adj_src_type&quot;</span><span class="p">]</span>
+    <span class="n">param</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;adj_src_type&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
     <span class="n">config</span> <span class="o">=</span> <span class="n">pyadjoint</span><span class="o">.</span><span class="n">Config</span><span class="p">(</span><span class="o">**</span><span class="n">param</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">config</span><span class="p">,</span> <span class="n">adj_src_type</span>
 
@@ -101,19 +185,19 @@
 <span class="sd">    3) window selection based on a pair of data</span>
 <span class="sd">    4) adjoint source constructor</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c"># Make sure everything thats required is there.</span>
+    <span class="c1"># Make sure everything thats required is there.</span>
     <span class="n">_station_name</span> <span class="o">=</span> <span class="n">obsd_station_group</span><span class="o">.</span><span class="n">_station_name</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obsd_station_group</span><span class="p">,</span> <span class="s">&quot;StationXML&quot;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;obsd station group &#39;</span><span class="si">%s</span><span class="s">&#39; missing &#39;StationXML&#39;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obsd_station_group</span><span class="p">,</span> <span class="s2">&quot;StationXML&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;obsd station group &#39;</span><span class="si">%s</span><span class="s2">&#39; missing &#39;StationXML&#39;&quot;</span>
                          <span class="o">%</span> <span class="n">_station_name</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">synt_station_group</span><span class="p">,</span> <span class="s">&quot;StationXML&quot;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;synt station group &#39;</span><span class="si">%s</span><span class="s">&#39; missing &#39;StationXML&#39;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">synt_station_group</span><span class="p">,</span> <span class="s2">&quot;StationXML&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;synt station group &#39;</span><span class="si">%s</span><span class="s2">&#39; missing &#39;StationXML&#39;&quot;</span>
                          <span class="o">%</span> <span class="n">_station_name</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obsd_station_group</span><span class="p">,</span> <span class="n">obsd_tag</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;obsd station group &#39;</span><span class="si">%s</span><span class="s">&#39; missing &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;obsd station group &#39;</span><span class="si">%s</span><span class="s2">&#39; missing &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span>
                          <span class="o">%</span> <span class="p">(</span><span class="n">_station_name</span><span class="p">,</span> <span class="n">obsd_tag</span><span class="p">))</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">synt_station_group</span><span class="p">,</span> <span class="n">synt_tag</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;synt station group &#39;</span><span class="si">%s</span><span class="s">&#39; missing &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;synt station group &#39;</span><span class="si">%s</span><span class="s2">&#39; missing &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span>
                          <span class="o">%</span> <span class="p">(</span><span class="n">_station_name</span><span class="p">,</span> <span class="n">synt_tag</span><span class="p">))</span>
 
     <span class="n">param</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
@@ -123,24 +207,24 @@
     <span class="n">observed</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obsd_station_group</span><span class="p">,</span> <span class="n">obsd_tag</span><span class="p">)</span>
     <span class="n">synthetic</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">synt_station_group</span><span class="p">,</span> <span class="n">synt_tag</span><span class="p">)</span>
 
-    <span class="c"># keep a reference for construct adjoint source, which</span>
-    <span class="c"># should be same length and dt as raw synt</span>
+    <span class="c1"># keep a reference for construct adjoint source, which</span>
+    <span class="c1"># should be same length and dt as raw synt</span>
     <span class="n">_raw_synt_tr</span> <span class="o">=</span> <span class="n">synthetic</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-    <span class="n">obsd_param</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s">&quot;proc_obsd_param&quot;</span><span class="p">]</span>
+    <span class="n">obsd_param</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;proc_obsd_param&quot;</span><span class="p">]</span>
     <span class="n">new_obsd</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="n">observed</span><span class="p">,</span> <span class="n">inventory</span><span class="o">=</span><span class="n">obsd_staxml</span><span class="p">,</span> <span class="o">**</span><span class="n">obsd_param</span><span class="p">)</span>
 
-    <span class="n">synt_param</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s">&quot;proc_synt_param&quot;</span><span class="p">]</span>
+    <span class="n">synt_param</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;proc_synt_param&quot;</span><span class="p">]</span>
     <span class="n">new_synt</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="n">synthetic</span><span class="p">,</span> <span class="n">inventory</span><span class="o">=</span><span class="n">synt_staxml</span><span class="p">,</span> <span class="o">**</span><span class="n">synt_param</span><span class="p">)</span>
 
-    <span class="n">window_config</span> <span class="o">=</span> <span class="n">load_window_config</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="s">&quot;window_param&quot;</span><span class="p">])</span>
+    <span class="n">window_config</span> <span class="o">=</span> <span class="n">load_window_config</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="s2">&quot;window_param&quot;</span><span class="p">])</span>
     <span class="n">windows</span> <span class="o">=</span> <span class="n">window_on_stream</span><span class="p">(</span><span class="n">new_obsd</span><span class="p">,</span> <span class="n">new_synt</span><span class="p">,</span> <span class="n">window_config</span><span class="p">,</span>
                                <span class="n">station</span><span class="o">=</span><span class="n">synt_staxml</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="n">event</span><span class="p">,</span>
                                <span class="n">figure_mode</span><span class="o">=</span><span class="n">figure_mode</span><span class="p">,</span> <span class="n">figure_dir</span><span class="o">=</span><span class="n">figure_dir</span><span class="p">,</span>
                                <span class="n">_verbose</span><span class="o">=</span><span class="n">_verbose</span><span class="p">)</span>
     <span class="n">windows</span> <span class="o">=</span> <span class="n">smart_transform_window</span><span class="p">(</span><span class="n">windows</span><span class="p">)</span>
 
-    <span class="n">adj_config</span><span class="p">,</span> <span class="n">adj_src_type</span> <span class="o">=</span> <span class="n">load_adjoint_config</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="s">&quot;adjsrc_param&quot;</span><span class="p">])</span>
+    <span class="n">adj_config</span><span class="p">,</span> <span class="n">adj_src_type</span> <span class="o">=</span> <span class="n">load_adjoint_config</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="s2">&quot;adjsrc_param&quot;</span><span class="p">])</span>
     <span class="n">adjsrcs</span> <span class="o">=</span> <span class="n">calculate_adjsrc_on_stream</span><span class="p">(</span>
         <span class="n">new_obsd</span><span class="p">,</span> <span class="n">new_synt</span><span class="p">,</span> <span class="n">windows</span><span class="p">,</span> <span class="n">adj_config</span><span class="p">,</span> <span class="n">adj_src_type</span><span class="p">,</span>
         <span class="n">figure_mode</span><span class="o">=</span><span class="n">figure_mode</span><span class="p">,</span> <span class="n">figure_dir</span><span class="o">=</span><span class="n">figure_dir</span><span class="p">,</span>
@@ -151,7 +235,7 @@
     <span class="n">interp_starttime</span> <span class="o">=</span> <span class="n">_raw_synt_tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">starttime</span>
     <span class="n">interp_delta</span> <span class="o">=</span> <span class="n">_raw_synt_tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">delta</span>
     <span class="n">interp_npts</span> <span class="o">=</span> <span class="n">_raw_synt_tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">npts</span>
-    <span class="n">pre_filt</span> <span class="o">=</span> <span class="n">obsd_param</span><span class="p">[</span><span class="s">&quot;pre_filt&quot;</span><span class="p">]</span>
+    <span class="n">pre_filt</span> <span class="o">=</span> <span class="n">obsd_param</span><span class="p">[</span><span class="s2">&quot;pre_filt&quot;</span><span class="p">]</span>
     <span class="n">new_adjsrcs</span> <span class="o">=</span> <span class="n">postprocess_adjsrc</span><span class="p">(</span>
         <span class="n">adjsrcs</span><span class="p">,</span> <span class="n">interp_starttime</span><span class="p">,</span> <span class="n">interp_delta</span><span class="p">,</span> <span class="n">interp_npts</span><span class="p">,</span>
         <span class="n">rotate_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inventory</span><span class="o">=</span><span class="n">synt_staxml</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="n">event</span><span class="p">,</span>
@@ -168,7 +252,7 @@
 </div>
 <div class="viewcode-block" id="AdjPreASDF"><a class="viewcode-back" href="../../pypaw.html#pypaw.adjoint_prepro.AdjPreASDF">[docs]</a><span class="k">class</span> <span class="nc">AdjPreASDF</span><span class="p">(</span><span class="n">ProcASDFBase</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;R&quot;</span><span class="p">,</span> <span class="s">&quot;T&quot;</span><span class="p">],</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">],</span>
                  <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
 
         <span class="n">ProcASDFBase</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
@@ -182,12 +266,12 @@
         <span class="n">param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_yaml</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
 
         <span class="n">param_dict</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;proc_obsd_param&quot;</span><span class="p">,</span> <span class="s">&quot;proc_synt_param&quot;</span><span class="p">,</span> <span class="s">&quot;adjsrc_param&quot;</span><span class="p">]</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;proc_obsd_param&quot;</span><span class="p">,</span> <span class="s2">&quot;proc_synt_param&quot;</span><span class="p">,</span> <span class="s2">&quot;adjsrc_param&quot;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
             <span class="n">param_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_yaml</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
 
-        <span class="n">param_dict</span><span class="p">[</span><span class="s">&quot;window_param&quot;</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">__load_window_param</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="s">&quot;window_param&quot;</span><span class="p">])</span>
+        <span class="n">param_dict</span><span class="p">[</span><span class="s2">&quot;window_param&quot;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">__load_window_param</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="s2">&quot;window_param&quot;</span><span class="p">])</span>
 
         <span class="k">return</span> <span class="n">param_dict</span>
 
@@ -196,8 +280,8 @@
 <span class="sd">        load window param</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">window_param</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;window param &#39;</span><span class="si">%s</span><span class="s">&#39; components(</span><span class="si">%s</span><span class="s">) is &quot;</span>
-                             <span class="s">&quot;inconsistent with init settings(</span><span class="si">%s</span><span class="s">)&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;window param &#39;</span><span class="si">%s</span><span class="s2">&#39; components(</span><span class="si">%s</span><span class="s2">) is &quot;</span>
+                             <span class="s2">&quot;inconsistent with init settings(</span><span class="si">%s</span><span class="s2">)&quot;</span>
                              <span class="o">%</span> <span class="p">(</span><span class="n">window_param</span><span class="p">,</span> <span class="n">window_param</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span>
                                 <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">))</span>
         <span class="n">param_dict</span> <span class="o">=</span> <span class="p">{}</span>
@@ -206,13 +290,13 @@
         <span class="k">return</span> <span class="n">param_dict</span>
 
     <span class="k">def</span> <span class="nf">_validate_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-        <span class="n">necessary_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;obsd_asdf&quot;</span><span class="p">,</span> <span class="s">&quot;obsd_tag&quot;</span><span class="p">,</span> <span class="s">&quot;synt_asdf&quot;</span><span class="p">,</span> <span class="s">&quot;synt_tag&quot;</span><span class="p">,</span>
-                          <span class="s">&quot;output_asdf&quot;</span><span class="p">,</span> <span class="s">&quot;figure_mode&quot;</span><span class="p">,</span> <span class="s">&quot;figure_dir&quot;</span><span class="p">]</span>
+        <span class="n">necessary_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;obsd_asdf&quot;</span><span class="p">,</span> <span class="s2">&quot;obsd_tag&quot;</span><span class="p">,</span> <span class="s2">&quot;synt_asdf&quot;</span><span class="p">,</span> <span class="s2">&quot;synt_tag&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;output_asdf&quot;</span><span class="p">,</span> <span class="s2">&quot;figure_mode&quot;</span><span class="p">,</span> <span class="s2">&quot;figure_dir&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_missing_keys</span><span class="p">(</span><span class="n">necessary_keys</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_validate_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
-        <span class="n">necessary_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;proc_obsd_param&quot;</span><span class="p">,</span> <span class="s">&quot;proc_synt_param&quot;</span><span class="p">,</span> <span class="s">&quot;adjsrc_param&quot;</span><span class="p">,</span>
-                          <span class="s">&quot;window_param&quot;</span><span class="p">]</span>
+        <span class="n">necessary_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;proc_obsd_param&quot;</span><span class="p">,</span> <span class="s2">&quot;proc_synt_param&quot;</span><span class="p">,</span> <span class="s2">&quot;adjsrc_param&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;window_param&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_missing_keys</span><span class="p">(</span><span class="n">necessary_keys</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
@@ -221,19 +305,19 @@
         <span class="n">event_time</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">time</span>
         <span class="n">event_latitude</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">latitude</span>
         <span class="n">event_longitude</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">longitude</span>
-        <span class="n">param</span><span class="p">[</span><span class="s">&quot;starttime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_time</span> <span class="o">+</span> <span class="n">param</span><span class="p">[</span><span class="s">&quot;relative_starttime&quot;</span><span class="p">]</span>
-        <span class="n">param</span><span class="p">[</span><span class="s">&quot;endtime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_time</span> <span class="o">+</span> <span class="n">param</span><span class="p">[</span><span class="s">&quot;relative_endtime&quot;</span><span class="p">]</span>
-        <span class="n">param</span><span class="p">[</span><span class="s">&quot;event_latitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_latitude</span>
-        <span class="n">param</span><span class="p">[</span><span class="s">&quot;event_longitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_longitude</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;starttime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_time</span> <span class="o">+</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;relative_starttime&quot;</span><span class="p">]</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;endtime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_time</span> <span class="o">+</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;relative_endtime&quot;</span><span class="p">]</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;event_latitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_latitude</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;event_longitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_longitude</span>
 
     <span class="k">def</span> <span class="nf">_refine_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Refine event-based parameter, for example, some parameters</span>
 <span class="sd">        in signal processing stage</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">obsd_param</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s">&quot;proc_obsd_param&quot;</span><span class="p">]</span>
+        <span class="n">obsd_param</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;proc_obsd_param&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__refine_signalproc_param</span><span class="p">(</span><span class="n">obsd_param</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span>
-        <span class="n">synt_param</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s">&quot;proc_synt_param&quot;</span><span class="p">]</span>
+        <span class="n">synt_param</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;proc_synt_param&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__refine_signalproc_param</span><span class="p">(</span><span class="n">synt_param</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_core</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
@@ -241,22 +325,22 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_param</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&quot;Path Info&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="s">&quot;Param Info&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;Path Info&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="s2">&quot;Param Info&quot;</span><span class="p">)</span>
 
-        <span class="n">obsd_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;obsd_asdf&quot;</span><span class="p">]</span>
-        <span class="n">synt_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;synt_asdf&quot;</span><span class="p">]</span>
+        <span class="n">obsd_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;obsd_asdf&quot;</span><span class="p">]</span>
+        <span class="n">synt_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;synt_asdf&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">smart_check_file</span><span class="p">(</span><span class="n">obsd_file</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
                                 <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;No file: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">obsd_file</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No file: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">obsd_file</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">smart_check_file</span><span class="p">(</span><span class="n">synt_file</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
                                 <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;No file: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">synt_file</span><span class="p">)</span>
-        <span class="n">obsd_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_asdf</span><span class="p">(</span><span class="n">obsd_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&quot;r&quot;</span><span class="p">)</span>
-        <span class="n">synt_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_asdf</span><span class="p">(</span><span class="n">synt_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&quot;r&quot;</span><span class="p">)</span>
-        <span class="n">synt_tag</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;synt_tag&quot;</span><span class="p">]</span>
-        <span class="n">obsd_tag</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;obsd_tag&quot;</span><span class="p">]</span>
-        <span class="n">output_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;output_asdf&quot;</span><span class="p">]</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No file: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">synt_file</span><span class="p">)</span>
+        <span class="n">obsd_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_asdf</span><span class="p">(</span><span class="n">obsd_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+        <span class="n">synt_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_asdf</span><span class="p">(</span><span class="n">synt_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+        <span class="n">synt_tag</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;synt_tag&quot;</span><span class="p">]</span>
+        <span class="n">obsd_tag</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;obsd_tag&quot;</span><span class="p">]</span>
+        <span class="n">output_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;output_asdf&quot;</span><span class="p">]</span>
 
         <span class="n">event</span> <span class="o">=</span> <span class="n">obsd_ds</span><span class="o">.</span><span class="n">events</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -271,44 +355,62 @@
             <span class="n">synt_ds</span><span class="p">,</span> <span class="n">proc_func</span><span class="p">,</span> <span class="n">output_filename</span><span class="o">=</span><span class="n">output_file</span><span class="p">)</span></div>
 </pre></div>
 
+           </div>
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li><a href="../../index.html">pypaw 0.0.1 documentation</a> &raquo;</li>
-          <li><a href="../index.html" >Module code</a> &raquo;</li> 
-      </ul>
-    </div>
-    <div class="footer">
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
         &copy; Copyright 2016, Wenjie Lei.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
-    </div>
-  </body>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>

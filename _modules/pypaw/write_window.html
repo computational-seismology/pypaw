@@ -1,54 +1,138 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pypaw.write_window &mdash; pypaw 0.0.1 documentation</title>
-    
-    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '0.0.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="pypaw 0.0.1 documentation" href="../../index.html" />
-    <link rel="up" title="Module code" href="../index.html" /> 
-  </head>
-  <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li><a href="../../index.html">pypaw 0.0.1 documentation</a> &raquo;</li>
-          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
-      </ul>
-    </div>  
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pypaw.write_window &mdash; pypaw 0.0.1 documentation</title>
+  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body">
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="pypaw 0.0.1 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pypaw
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data_format.html">Data Format and Conversion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">pypaw</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>pypaw.write_window</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for pypaw.write_window</h1><div class="highlight"><pre>
-<span class="c">#!/usr/bin/env python</span>
-<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Methods for write out windows</span>
 
@@ -67,23 +151,23 @@
 
 <div class="viewcode-block" id="get_json_content"><a class="viewcode-back" href="../../pypaw.html#pypaw.write_window.get_json_content">[docs]</a><span class="k">def</span> <span class="nf">get_json_content</span><span class="p">(</span><span class="n">window</span><span class="p">):</span>
     <span class="n">info</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s">&quot;left_index&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">left</span><span class="p">,</span>
-        <span class="s">&quot;right_index&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">right</span><span class="p">,</span>
-        <span class="s">&quot;center_index&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">center</span><span class="p">,</span>
-        <span class="s">&quot;channel_id&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">channel_id</span><span class="p">,</span>
-        <span class="s">&quot;time_of_first_sample&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">time_of_first_sample</span><span class="p">,</span>
-        <span class="s">&quot;max_cc_value&quot;</span><span class="p">:</span>  <span class="n">window</span><span class="o">.</span><span class="n">max_cc_value</span><span class="p">,</span>
-        <span class="s">&quot;cc_shift_in_samples&quot;</span><span class="p">:</span>  <span class="n">window</span><span class="o">.</span><span class="n">cc_shift</span><span class="p">,</span>
-        <span class="s">&quot;cc_shift_in_seconds&quot;</span><span class="p">:</span>  <span class="n">window</span><span class="o">.</span><span class="n">cc_shift_in_seconds</span><span class="p">,</span>
-        <span class="s">&quot;dlnA&quot;</span><span class="p">:</span>  <span class="n">window</span><span class="o">.</span><span class="n">dlnA</span><span class="p">,</span>
-        <span class="s">&quot;dt&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
-        <span class="s">&quot;min_period&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">min_period</span><span class="p">,</span>
-        <span class="c"># &quot;phase_arrivals&quot;: window.phase_arrivals,</span>
-        <span class="s">&quot;absolute_starttime&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">absolute_starttime</span><span class="p">,</span>
-        <span class="s">&quot;absolute_endtime&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">absolute_endtime</span><span class="p">,</span>
-        <span class="s">&quot;relative_starttime&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">relative_starttime</span><span class="p">,</span>
-        <span class="s">&quot;relative_endtime&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">relative_endtime</span><span class="p">,</span>
-        <span class="s">&quot;window_weight&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">weight</span><span class="p">}</span>
+        <span class="s2">&quot;left_index&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">left</span><span class="p">,</span>
+        <span class="s2">&quot;right_index&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">right</span><span class="p">,</span>
+        <span class="s2">&quot;center_index&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">center</span><span class="p">,</span>
+        <span class="s2">&quot;channel_id&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">channel_id</span><span class="p">,</span>
+        <span class="s2">&quot;time_of_first_sample&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">time_of_first_sample</span><span class="p">,</span>
+        <span class="s2">&quot;max_cc_value&quot;</span><span class="p">:</span>  <span class="n">window</span><span class="o">.</span><span class="n">max_cc_value</span><span class="p">,</span>
+        <span class="s2">&quot;cc_shift_in_samples&quot;</span><span class="p">:</span>  <span class="n">window</span><span class="o">.</span><span class="n">cc_shift</span><span class="p">,</span>
+        <span class="s2">&quot;cc_shift_in_seconds&quot;</span><span class="p">:</span>  <span class="n">window</span><span class="o">.</span><span class="n">cc_shift_in_seconds</span><span class="p">,</span>
+        <span class="s2">&quot;dlnA&quot;</span><span class="p">:</span>  <span class="n">window</span><span class="o">.</span><span class="n">dlnA</span><span class="p">,</span>
+        <span class="s2">&quot;dt&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+        <span class="s2">&quot;min_period&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">min_period</span><span class="p">,</span>
+        <span class="c1"># &quot;phase_arrivals&quot;: window.phase_arrivals,</span>
+        <span class="s2">&quot;absolute_starttime&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">absolute_starttime</span><span class="p">,</span>
+        <span class="s2">&quot;absolute_endtime&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">absolute_endtime</span><span class="p">,</span>
+        <span class="s2">&quot;relative_starttime&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">relative_starttime</span><span class="p">,</span>
+        <span class="s2">&quot;relative_endtime&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">relative_endtime</span><span class="p">,</span>
+        <span class="s2">&quot;window_weight&quot;</span><span class="p">:</span> <span class="n">window</span><span class="o">.</span><span class="n">weight</span><span class="p">}</span>
 
     <span class="k">return</span> <span class="n">info</span>
 
@@ -92,7 +176,7 @@
 <div class="viewcode-block" id="WindowEncoder.default"><a class="viewcode-back" href="../../pypaw.html#pypaw.write_window.WindowEncoder.default">[docs]</a>    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-        <span class="c"># Numpy objects also require explicit handling.</span>
+        <span class="c1"># Numpy objects also require explicit handling.</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">):</span>
@@ -101,14 +185,14 @@
             <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-        <span class="c"># Let the base class default method raise the TypeError</span>
+        <span class="c1"># Let the base class default method raise the TypeError</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
 
 </div></div>
 <div class="viewcode-block" id="write_window_json"><a class="viewcode-back" href="../../pypaw.html#pypaw.write_window.write_window_json">[docs]</a><span class="k">def</span> <span class="nf">write_window_json</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">outputdir</span><span class="p">):</span>
 
-    <span class="n">output_json</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputdir</span><span class="p">,</span> <span class="s">&quot;windows.json&quot;</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Output window file: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">output_json</span><span class="p">)</span>
+    <span class="n">output_json</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputdir</span><span class="p">,</span> <span class="s2">&quot;windows.json&quot;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Output window file: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">output_json</span><span class="p">)</span>
     <span class="n">window_all</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">sta_win</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">sta_win</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">sta_win</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -120,53 +204,71 @@
             <span class="n">_window_comp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_window</span><span class="p">)</span>
         <span class="n">window_all</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_window_comp</span>
 
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_json</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_json</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
         <span class="n">j</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">window_all</span><span class="p">,</span> <span class="n">cls</span><span class="o">=</span><span class="n">WindowEncoder</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                       <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">,</span> <span class="s">&#39;:&#39;</span><span class="p">))</span>
+                       <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;:&#39;</span><span class="p">))</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
             <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span></div>
 </pre></div>
 
+           </div>
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li><a href="../../index.html">pypaw 0.0.1 documentation</a> &raquo;</li>
-          <li><a href="../index.html" >Module code</a> &raquo;</li> 
-      </ul>
-    </div>
-    <div class="footer">
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
         &copy; Copyright 2016, Wenjie Lei.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
-    </div>
-  </body>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>

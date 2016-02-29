@@ -1,141 +1,765 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pypaw package &mdash; pypaw 0.0.1 documentation</title>
-    
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.0.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="pypaw 0.0.1 documentation" href="index.html" /> 
-  </head>
-  <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li><a href="index.html">pypaw 0.0.1 documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pypaw package &mdash; pypaw 0.0.1 documentation</title>
+  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body">
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="pypaw 0.0.1 documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pypaw
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_format.html">Data Format and Conversion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">pypaw</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>pypaw package</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/pypaw.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="pypaw-package">
 <h1>pypaw package<a class="headerlink" href="#pypaw-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="pypaw-adjoint-module">
-<h2>pypaw.adjoint module<a class="headerlink" href="#pypaw-adjoint-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-pypaw.adjoint">
+<span id="pypaw-adjoint-module"></span><h2>pypaw.adjoint module<a class="headerlink" href="#module-pypaw.adjoint" title="Permalink to this headline">¶</a></h2>
+<p>Class that calculate adjoint source using asdf</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">copyright:</th><td class="field-body">Wenjie Lei (<a class="reference external" href="mailto:lei&#37;&#52;&#48;princeton&#46;edu">lei<span>&#64;</span>princeton<span>&#46;</span>edu</a>), 2016</td>
+</tr>
+<tr class="field-even field"><th class="field-name">license:</th><td class="field-body">GNU General Public License, Version 3
+(<a class="reference external" href="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</a>)</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="pypaw.adjoint.AdjointASDF">
+<em class="property">class </em><tt class="descclassname">pypaw.adjoint.</tt><tt class="descname">AdjointASDF</tt><big>(</big><em>path</em>, <em>param</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/pypaw/adjoint.html#AdjointASDF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.adjoint.AdjointASDF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pypaw.procbase.ProcASDFBase" title="pypaw.procbase.ProcASDFBase"><tt class="xref py py-class docutils literal"><span class="pre">pypaw.procbase.ProcASDFBase</span></tt></a></p>
+<p>Adjoint Source ASDF</p>
+<dl class="staticmethod">
+<dt id="pypaw.adjoint.AdjointASDF.load_adjoint_config">
+<em class="property">static </em><tt class="descname">load_adjoint_config</tt><big>(</big><em>config</em><big>)</big><a class="reference internal" href="_modules/pypaw/adjoint.html#AdjointASDF.load_adjoint_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.adjoint.AdjointASDF.load_adjoint_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load config into pyadjoint.Config
+:param param:
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pypaw.adjoint.AdjointASDF.load_windows">
+<tt class="descname">load_windows</tt><big>(</big><em>winfile</em><big>)</big><a class="reference internal" href="_modules/pypaw/adjoint.html#AdjointASDF.load_windows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.adjoint.AdjointASDF.load_windows" title="Permalink to this definition">¶</a></dt>
+<dd><p>load window json file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>winfile</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pypaw.adjoint.adjoint_wrapper">
+<tt class="descclassname">pypaw.adjoint.</tt><tt class="descname">adjoint_wrapper</tt><big>(</big><em>obsd_station_group</em>, <em>synt_station_group</em>, <em>config=None</em>, <em>obsd_tag=None</em>, <em>synt_tag=None</em>, <em>windows=None</em>, <em>event=None</em>, <em>adj_src_type='multitaper_misfit'</em>, <em>interp_delta=None</em>, <em>interp_npts=None</em>, <em>figure_mode=False</em>, <em>figure_dir=False</em>, <em>adjoint_src_flag=True</em><big>)</big><a class="reference internal" href="_modules/pypaw/adjoint.html#adjoint_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.adjoint.adjoint_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function wrapper for pyasdf.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>obsd_station_group</strong> &#8211; observed station group, which contains
+seismogram(stream) and station information(inventory)</li>
+<li><strong>synt_station_group</strong> &#8211; synthetic station group. Same as
+obsd_station_group</li>
+<li><strong>config</strong> (<em>pyadjoint.Config</em>) &#8211; config object for adjoint source</li>
+<li><strong>obsd_tag</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; observed seismogram tag, used for extracting the
+seismogram in observed asdf file</li>
+<li><strong>synt_tag</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; synthetic seismogram tag, used for extracting the
+seismogram in synthetic asdf file</li>
+<li><strong>windows</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; windows for this station group. Two dimension list.
+The first dimension is different channels, the second dimension
+is windows for this channel, like [[chan1_win1, chan1_win2],
+[chan2_win1,], ...]</li>
+<li><strong>event</strong> (<em>obspy.Inventory</em>) &#8211; event information</li>
+<li><strong>adj_src_type</strong> (<em>st</em>) &#8211; adjoint source type, currently support:
+1) &#8220;cc_traveltime_misfit&#8221;
+2) &#8220;multitaper_misfit&#8221;
+3) &#8220;waveform_misfit&#8221;</li>
+<li><strong>adjoint_src_flag</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; calcualte adjoint source, put this to true.
+If false, only make measurements but no adjoint sources.</li>
+<li><strong>figure_mode</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; plot figures for adjoint source or not</li>
+<li><strong>figure_dir</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; output figure directory</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">adjoint sources for pyasdf write out(reshaped)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
-<div class="section" id="pypaw-adjoint-prepro-module">
-<h2>pypaw.adjoint_prepro module<a class="headerlink" href="#pypaw-adjoint-prepro-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-pypaw.adjoint_prepro">
+<span id="pypaw-adjoint-prepro-module"></span><h2>pypaw.adjoint_prepro module<a class="headerlink" href="#module-pypaw.adjoint_prepro" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>Class that handles the whole preprocessing workflow, including:</dt>
+<dd><ol class="first last arabic simple">
+<li>signal processing</li>
+<li>window selection</li>
+<li>adjoint sources</li>
+</ol>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">copyright:</th><td class="field-body">Wenjie Lei (<a class="reference external" href="mailto:lei&#37;&#52;&#48;princeton&#46;edu">lei<span>&#64;</span>princeton<span>&#46;</span>edu</a>), 2016</td>
+</tr>
+<tr class="field-even field"><th class="field-name">license:</th><td class="field-body">GNU General Public License, Version 3
+(<a class="reference external" href="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</a>)</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="pypaw.adjoint_prepro.AdjPreASDF">
+<em class="property">class </em><tt class="descclassname">pypaw.adjoint_prepro.</tt><tt class="descname">AdjPreASDF</tt><big>(</big><em>path, param, components=['Z', 'R', 'T'], verbose=False</em><big>)</big><a class="reference internal" href="_modules/pypaw/adjoint_prepro.html#AdjPreASDF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.adjoint_prepro.AdjPreASDF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pypaw.procbase.ProcASDFBase" title="pypaw.procbase.ProcASDFBase"><tt class="xref py py-class docutils literal"><span class="pre">pypaw.procbase.ProcASDFBase</span></tt></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pypaw.adjoint_prepro.func_wrapper">
+<tt class="descclassname">pypaw.adjoint_prepro.</tt><tt class="descname">func_wrapper</tt><big>(</big><em>obsd_station_group</em>, <em>synt_station_group</em>, <em>obsd_tag=None</em>, <em>synt_tag=None</em>, <em>event=None</em>, <em>param=None</em>, <em>_verbose=False</em>, <em>figure_mode=False</em>, <em>figure_dir=None</em><big>)</big><a class="reference internal" href="_modules/pypaw/adjoint_prepro.html#func_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.adjoint_prepro.func_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>combo function, including:
+1) observed data signal processing
+2) synthetic data signal processing
+3) window selection based on a pair of data
+4) adjoint source constructor</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pypaw.adjoint_prepro.load_adjoint_config">
+<tt class="descclassname">pypaw.adjoint_prepro.</tt><tt class="descname">load_adjoint_config</tt><big>(</big><em>param</em><big>)</big><a class="reference internal" href="_modules/pypaw/adjoint_prepro.html#load_adjoint_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.adjoint_prepro.load_adjoint_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pypaw.adjoint_prepro.load_window_config">
+<tt class="descclassname">pypaw.adjoint_prepro.</tt><tt class="descname">load_window_config</tt><big>(</big><em>param</em><big>)</big><a class="reference internal" href="_modules/pypaw/adjoint_prepro.html#load_window_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.adjoint_prepro.load_window_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
-<div class="section" id="pypaw-adjoint-util-module">
-<h2>pypaw.adjoint_util module<a class="headerlink" href="#pypaw-adjoint-util-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-pypaw.adjoint_util">
+<span id="pypaw-adjoint-util-module"></span><h2>pypaw.adjoint_util module<a class="headerlink" href="#module-pypaw.adjoint_util" title="Permalink to this headline">¶</a></h2>
+<p>Methods that contains utils for adjoint sources</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">copyright:</th><td class="field-body">Wenjie Lei (<a class="reference external" href="mailto:lei&#37;&#52;&#48;princeton&#46;edu">lei<span>&#64;</span>princeton<span>&#46;</span>edu</a>), 2016</td>
+</tr>
+<tr class="field-even field"><th class="field-name">license:</th><td class="field-body">GNU General Public License, Version 3
+(<a class="reference external" href="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</a>)</td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="pypaw.adjoint_util.calculate_chan_weight">
+<tt class="descclassname">pypaw.adjoint_util.</tt><tt class="descname">calculate_chan_weight</tt><big>(</big><em>adjsrcs</em>, <em>windows_sta</em><big>)</big><a class="reference internal" href="_modules/pypaw/adjoint_util.html#calculate_chan_weight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.adjoint_util.calculate_chan_weight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calcualte window weights based on adjoint sources and windows</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>adjsrcs</strong> &#8211; </li>
+<li><strong>windows_sta</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pypaw.adjoint_util.ensemble_fake_adj">
+<tt class="descclassname">pypaw.adjoint_util.</tt><tt class="descname">ensemble_fake_adj</tt><big>(</big><em>stream</em>, <em>time_offset=0.0</em><big>)</big><a class="reference internal" href="_modules/pypaw/adjoint_util.html#ensemble_fake_adj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.adjoint_util.ensemble_fake_adj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensemble fake adjoint sources from stream, for test purpose</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pypaw.adjoint_util.reshape_adj">
+<tt class="descclassname">pypaw.adjoint_util.</tt><tt class="descname">reshape_adj</tt><big>(</big><em>adjsrcs</em>, <em>time_offset</em>, <em>staxml</em><big>)</big><a class="reference internal" href="_modules/pypaw/adjoint_util.html#reshape_adj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.adjoint_util.reshape_adj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reshape adjsrcs to a certain structure required by pyasdf writer</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pypaw.adjoint_util.smart_transform_window">
+<tt class="descclassname">pypaw.adjoint_util.</tt><tt class="descname">smart_transform_window</tt><big>(</big><em>windows</em><big>)</big><a class="reference internal" href="_modules/pypaw/adjoint_util.html#smart_transform_window"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.adjoint_util.smart_transform_window" title="Permalink to this definition">¶</a></dt>
+<dd><p>Smart tranfer window object to dict if it is type of pyflex.Window</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>windows</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
-<div class="section" id="pypaw-convert-module">
-<h2>pypaw.convert module<a class="headerlink" href="#pypaw-convert-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-pypaw.convert">
+<span id="pypaw-convert-module"></span><h2>pypaw.convert module<a class="headerlink" href="#module-pypaw.convert" title="Permalink to this headline">¶</a></h2>
+<p>Methods that contains utils for adjoint sources</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">copyright:</th><td class="field-body">Wenjie Lei (<a class="reference external" href="mailto:lei&#37;&#52;&#48;princeton&#46;edu">lei<span>&#64;</span>princeton<span>&#46;</span>edu</a>), 2016</td>
+</tr>
+<tr class="field-even field"><th class="field-name">license:</th><td class="field-body">GNU General Public License, Version 3
+(<a class="reference external" href="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</a>)</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="pypaw.convert.ConvertASDF">
+<em class="property">class </em><tt class="descclassname">pypaw.convert.</tt><tt class="descname">ConvertASDF</tt><big>(</big><em>path</em>, <em>verbose=False</em>, <em>status_bar=False</em><big>)</big><a class="reference internal" href="_modules/pypaw/convert.html#ConvertASDF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.convert.ConvertASDF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></a></p>
+<dl class="staticmethod">
+<dt id="pypaw.convert.ConvertASDF.clean_output">
+<em class="property">static </em><tt class="descname">clean_output</tt><big>(</big><em>output_fn</em><big>)</big><a class="reference internal" href="_modules/pypaw/convert.html#ConvertASDF.clean_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.convert.ConvertASDF.clean_output" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="pypaw.convert.ConvertASDF.print_info">
+<em class="property">static </em><tt class="descname">print_info</tt><big>(</big><em>waveform_files</em>, <em>tag</em>, <em>staxml_files</em>, <em>quakemlfile</em>, <em>output_fn</em>, <em>create_simple_inv</em><big>)</big><a class="reference internal" href="_modules/pypaw/convert.html#ConvertASDF.print_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.convert.ConvertASDF.print_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pypaw.convert.ConvertASDF.run">
+<tt class="descname">run</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pypaw/convert.html#ConvertASDF.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.convert.ConvertASDF.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pypaw.convert.convert_from_asdf">
+<tt class="descclassname">pypaw.convert.</tt><tt class="descname">convert_from_asdf</tt><big>(</big><em>asdf_fn</em>, <em>outputdir</em>, <em>tag=None</em>, <em>filetype='sac'</em>, <em>output_staxml=True</em>, <em>output_quakeml=True</em>, <em>_verbose=True</em><big>)</big><a class="reference internal" href="_modules/pypaw/convert.html#convert_from_asdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.convert.convert_from_asdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert asdf to different types of file</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pypaw.convert.create_simple_inventory">
+<tt class="descclassname">pypaw.convert.</tt><tt class="descname">create_simple_inventory</tt><big>(</big><em>network</em>, <em>station</em>, <em>latitude=None</em>, <em>longitude=None</em>, <em>elevation=None</em>, <em>depth=None</em>, <em>start_date=None</em>, <em>end_date=None</em>, <em>location_code='S3'</em><big>)</big><a class="reference internal" href="_modules/pypaw/convert.html#create_simple_inventory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.convert.create_simple_inventory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create simple inventory for synthetic data</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pypaw.convert.write_stream_to_sac">
+<tt class="descclassname">pypaw.convert.</tt><tt class="descname">write_stream_to_sac</tt><big>(</big><em>stream</em>, <em>outputdir</em>, <em>tag=''</em><big>)</big><a class="reference internal" href="_modules/pypaw/convert.html#write_stream_to_sac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.convert.write_stream_to_sac" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
-<div class="section" id="pypaw-procbase-module">
-<h2>pypaw.procbase module<a class="headerlink" href="#pypaw-procbase-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-pypaw.procbase">
+<span id="pypaw-procbase-module"></span><h2>pypaw.procbase module<a class="headerlink" href="#module-pypaw.procbase" title="Permalink to this headline">¶</a></h2>
+<p>Parent class for general asdf processing. Wraps things like MPI
+and parallel I/O so they are invisible to users.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">copyright:</th><td class="field-body">Wenjie Lei (<a class="reference external" href="mailto:lei&#37;&#52;&#48;princeton&#46;edu">lei<span>&#64;</span>princeton<span>&#46;</span>edu</a>), 2016</td>
+</tr>
+<tr class="field-even field"><th class="field-name">license:</th><td class="field-body">GNU General Public License, Version 3
+(<a class="reference external" href="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</a>)</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="pypaw.procbase.ProcASDFBase">
+<em class="property">class </em><tt class="descclassname">pypaw.procbase.</tt><tt class="descname">ProcASDFBase</tt><big>(</big><em>path</em>, <em>param</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/pypaw/procbase.html#ProcASDFBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.procbase.ProcASDFBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></a></p>
+<dl class="staticmethod">
+<dt id="pypaw.procbase.ProcASDFBase.clean_memory">
+<em class="property">static </em><tt class="descname">clean_memory</tt><big>(</big><em>asdf_ds</em><big>)</big><a class="reference internal" href="_modules/pypaw/procbase.html#ProcASDFBase.clean_memory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.procbase.ProcASDFBase.clean_memory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete asdf dataset</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pypaw.procbase.ProcASDFBase.detect_env">
+<tt class="descname">detect_env</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pypaw/procbase.html#ProcASDFBase.detect_env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.procbase.ProcASDFBase.detect_env" title="Permalink to this definition">¶</a></dt>
+<dd><p>Detect environment, mpi or not</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pypaw.procbase.ProcASDFBase.load_asdf">
+<tt class="descname">load_asdf</tt><big>(</big><em>filename</em>, <em>mode='a'</em><big>)</big><a class="reference internal" href="_modules/pypaw/procbase.html#ProcASDFBase.load_asdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.procbase.ProcASDFBase.load_asdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load asdf file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> &#8211; </li>
+<li><strong>mode</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pypaw.procbase.ProcASDFBase.print_info">
+<tt class="descname">print_info</tt><big>(</big><em>dict_obj</em>, <em>extra_info=''</em><big>)</big><a class="reference internal" href="_modules/pypaw/procbase.html#ProcASDFBase.print_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.procbase.ProcASDFBase.print_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print dict. You can use it to print out information
+for path and param</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dict_obj</strong> &#8211; </li>
+<li><strong>extra_info</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pypaw.procbase.ProcASDFBase.smart_run">
+<tt class="descname">smart_run</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pypaw/procbase.html#ProcASDFBase.smart_run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.procbase.ProcASDFBase.smart_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Job launch method</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="pypaw-process-module">
-<h2>pypaw.process module<a class="headerlink" href="#pypaw-process-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-pypaw.process">
+<span id="pypaw-process-module"></span><h2>pypaw.process module<a class="headerlink" href="#module-pypaw.process" title="Permalink to this headline">¶</a></h2>
+<p>Parent class for singal processing asdf file and
+handles parallel I/O so they are invisible to users.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">copyright:</th><td class="field-body">Wenjie Lei (<a class="reference external" href="mailto:lei&#37;&#52;&#48;princeton&#46;edu">lei<span>&#64;</span>princeton<span>&#46;</span>edu</a>), 2016</td>
+</tr>
+<tr class="field-even field"><th class="field-name">license:</th><td class="field-body">GNU General Public License, Version 3
+(<a class="reference external" href="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</a>)</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="pypaw.process.ProcASDF">
+<em class="property">class </em><tt class="descclassname">pypaw.process.</tt><tt class="descname">ProcASDF</tt><big>(</big><em>path</em>, <em>param</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/pypaw/process.html#ProcASDF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.process.ProcASDF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pypaw.procbase.ProcASDFBase" title="pypaw.procbase.ProcASDFBase"><tt class="xref py py-class docutils literal"><span class="pre">pypaw.procbase.ProcASDFBase</span></tt></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pypaw.process.process_wrapper">
+<tt class="descclassname">pypaw.process.</tt><tt class="descname">process_wrapper</tt><big>(</big><em>stream</em>, <em>inv</em>, <em>param=None</em><big>)</big><a class="reference internal" href="_modules/pypaw/process.html#process_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.process.process_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process function wrapper for pyasdf</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>stream</strong> &#8211; </li>
+<li><strong>inv</strong> &#8211; </li>
+<li><strong>param</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
-<div class="section" id="pypaw-utils-module">
-<h2>pypaw.utils module<a class="headerlink" href="#pypaw-utils-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-pypaw.utils">
+<span id="pypaw-utils-module"></span><h2>pypaw.utils module<a class="headerlink" href="#module-pypaw.utils" title="Permalink to this headline">¶</a></h2>
+<p>Parent class for singal processing asdf file and
+handles parallel I/O so they are invisible to users.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">copyright:</th><td class="field-body">Wenjie Lei (<a class="reference external" href="mailto:lei&#37;&#52;&#48;princeton&#46;edu">lei<span>&#64;</span>princeton<span>&#46;</span>edu</a>), 2016</td>
+</tr>
+<tr class="field-even field"><th class="field-name">license:</th><td class="field-body">GNU General Public License, Version 3
+(<a class="reference external" href="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</a>)</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="pypaw.utils.JSONObject">
+<em class="property">class </em><tt class="descclassname">pypaw.utils.</tt><tt class="descname">JSONObject</tt><big>(</big><em>d</em><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#JSONObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.JSONObject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pypaw.utils.drawProgressBar">
+<tt class="descclassname">pypaw.utils.</tt><tt class="descname">drawProgressBar</tt><big>(</big><em>percent</em>, <em>user_text=''</em>, <em>barLen=20</em><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#drawProgressBar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.drawProgressBar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw status progress bars in terminal.
+Not recommendded used for job scripts(will create
+thousands of lines of output)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pypaw.utils.is_mpi_env">
+<tt class="descclassname">pypaw.utils.</tt><tt class="descname">is_mpi_env</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#is_mpi_env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.is_mpi_env" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if current environment is MPI or not</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pypaw.utils.isclose">
+<tt class="descclassname">pypaw.utils.</tt><tt class="descname">isclose</tt><big>(</big><em>a</em>, <em>b</em>, <em>rel_tol=1e-09</em>, <em>abs_tol=0.0</em><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#isclose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.isclose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare two numbers see if they are close to each other to a
+tolerance level</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pypaw.utils.read_json_file">
+<tt class="descclassname">pypaw.utils.</tt><tt class="descname">read_json_file</tt><big>(</big><em>parfile</em>, <em>obj_hook=True</em><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#read_json_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.read_json_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook json to an JSONObject instance</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pypaw.utils.read_yaml_file">
+<tt class="descclassname">pypaw.utils.</tt><tt class="descname">read_yaml_file</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#read_yaml_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.read_yaml_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pypaw.utils.smart_check_file">
+<tt class="descclassname">pypaw.utils.</tt><tt class="descname">smart_check_file</tt><big>(</big><em>filename</em>, <em>mpi_mode=False</em>, <em>comm=None</em><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#smart_check_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.smart_check_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pypaw.utils.smart_mkdir">
+<tt class="descclassname">pypaw.utils.</tt><tt class="descname">smart_mkdir</tt><big>(</big><em>dirname</em>, <em>mpi_mode=False</em>, <em>comm=None</em><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#smart_mkdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.smart_mkdir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pypaw.utils.smart_read_json">
+<tt class="descclassname">pypaw.utils.</tt><tt class="descname">smart_read_json</tt><big>(</big><em>json_file</em>, <em>mpi_mode=False</em>, <em>comm=None</em>, <em>object_hook=False</em><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#smart_read_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.smart_read_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>read json file under mpi and multi-processing environment.
+Hook it to an JSONObject(not the conventional way to
+read it as object)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pypaw.utils.smart_read_yaml">
+<tt class="descclassname">pypaw.utils.</tt><tt class="descname">smart_read_yaml</tt><big>(</big><em>yaml_file</em>, <em>mpi_mode=False</em>, <em>comm=None</em><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#smart_read_yaml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.smart_read_yaml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read yaml file into python dict, in mpi_mode or not</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pypaw.utils.smart_remove_file">
+<tt class="descclassname">pypaw.utils.</tt><tt class="descname">smart_remove_file</tt><big>(</big><em>filename</em>, <em>mpi_mode=False</em>, <em>comm=None</em><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#smart_remove_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.smart_remove_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pypaw.utils.timing">
+<tt class="descclassname">pypaw.utils.</tt><tt class="descname">timing</tt><big>(</big><em>f</em><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#timing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.timing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
-<div class="section" id="pypaw-window-module">
-<h2>pypaw.window module<a class="headerlink" href="#pypaw-window-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-pypaw.window">
+<span id="pypaw-window-module"></span><h2>pypaw.window module<a class="headerlink" href="#module-pypaw.window" title="Permalink to this headline">¶</a></h2>
+<p>Class for window selection on asdf file and handles parallel I/O
+so they are invisible to users.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">copyright:</th><td class="field-body">Wenjie Lei (<a class="reference external" href="mailto:lei&#37;&#52;&#48;princeton&#46;edu">lei<span>&#64;</span>princeton<span>&#46;</span>edu</a>), 2016</td>
+</tr>
+<tr class="field-even field"><th class="field-name">license:</th><td class="field-body">GNU General Public License, Version 3
+(<a class="reference external" href="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</a>)</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="pypaw.window.WindowASDF">
+<em class="property">class </em><tt class="descclassname">pypaw.window.</tt><tt class="descname">WindowASDF</tt><big>(</big><em>path, param, components=['Z', 'R', 'T'], verbose=False</em><big>)</big><a class="reference internal" href="_modules/pypaw/window.html#WindowASDF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.window.WindowASDF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pypaw.procbase.ProcASDFBase" title="pypaw.procbase.ProcASDFBase"><tt class="xref py py-class docutils literal"><span class="pre">pypaw.procbase.ProcASDFBase</span></tt></a></p>
+<dl class="staticmethod">
+<dt id="pypaw.window.WindowASDF.load_window_config">
+<em class="property">static </em><tt class="descname">load_window_config</tt><big>(</big><em>param</em><big>)</big><a class="reference internal" href="_modules/pypaw/window.html#WindowASDF.load_window_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.window.WindowASDF.load_window_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pypaw.window.window_wrapper">
+<tt class="descclassname">pypaw.window.</tt><tt class="descname">window_wrapper</tt><big>(</big><em>obsd_station_group</em>, <em>synt_station_group</em>, <em>config_dict=None</em>, <em>obsd_tag=None</em>, <em>synt_tag=None</em>, <em>event=None</em>, <em>figure_mode=False</em>, <em>figure_dir=None</em>, <em>_verbose=False</em><big>)</big><a class="reference internal" href="_modules/pypaw/window.html#window_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.window.window_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper for asdf I/O</p>
+</dd></dl>
+
 </div>
-<div class="section" id="pypaw-write-window-module">
-<h2>pypaw.write_window module<a class="headerlink" href="#pypaw-write-window-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-pypaw.write_window">
+<span id="pypaw-write-window-module"></span><h2>pypaw.write_window module<a class="headerlink" href="#module-pypaw.write_window" title="Permalink to this headline">¶</a></h2>
+<p>Methods for write out windows</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">copyright:</th><td class="field-body">Wenjie Lei (<a class="reference external" href="mailto:lei&#37;&#52;&#48;princeton&#46;edu">lei<span>&#64;</span>princeton<span>&#46;</span>edu</a>), 2016</td>
+</tr>
+<tr class="field-even field"><th class="field-name">license:</th><td class="field-body">GNU General Public License, Version 3
+(<a class="reference external" href="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</a>)</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="pypaw.write_window.WindowEncoder">
+<em class="property">class </em><tt class="descclassname">pypaw.write_window.</tt><tt class="descname">WindowEncoder</tt><big>(</big><em>skipkeys=False</em>, <em>ensure_ascii=True</em>, <em>check_circular=True</em>, <em>allow_nan=True</em>, <em>sort_keys=False</em>, <em>indent=None</em>, <em>separators=None</em>, <em>encoding='utf-8'</em>, <em>default=None</em><big>)</big><a class="reference internal" href="_modules/pypaw/write_window.html#WindowEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.write_window.WindowEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">json.encoder.JSONEncoder</span></tt></p>
+<dl class="method">
+<dt id="pypaw.write_window.WindowEncoder.default">
+<tt class="descname">default</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="_modules/pypaw/write_window.html#WindowEncoder.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.write_window.WindowEncoder.default" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pypaw.write_window.get_json_content">
+<tt class="descclassname">pypaw.write_window.</tt><tt class="descname">get_json_content</tt><big>(</big><em>window</em><big>)</big><a class="reference internal" href="_modules/pypaw/write_window.html#get_json_content"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.write_window.get_json_content" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pypaw.write_window.write_window_json">
+<tt class="descclassname">pypaw.write_window.</tt><tt class="descname">write_window_json</tt><big>(</big><em>results</em>, <em>outputdir</em><big>)</big><a class="reference internal" href="_modules/pypaw/write_window.html#write_window_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.write_window.write_window_json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
-<div class="section" id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-pypaw">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pypaw" title="Permalink to this headline">¶</a></h2>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">copyright:</th><td class="field-body">Wenjie Lei (<a class="reference external" href="mailto:lei&#37;&#52;&#48;princeton&#46;edu">lei<span>&#64;</span>princeton<span>&#46;</span>edu</a>), 2016</td>
+</tr>
+<tr class="field-even field"><th class="field-name">license:</th><td class="field-body">GNU General Public License, Version 3
+(<a class="reference external" href="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</a>)</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 
 
+           </div>
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">pypaw package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#pypaw-adjoint-module">pypaw.adjoint module</a></li>
-<li><a class="reference internal" href="#pypaw-adjoint-prepro-module">pypaw.adjoint_prepro module</a></li>
-<li><a class="reference internal" href="#pypaw-adjoint-util-module">pypaw.adjoint_util module</a></li>
-<li><a class="reference internal" href="#pypaw-convert-module">pypaw.convert module</a></li>
-<li><a class="reference internal" href="#pypaw-procbase-module">pypaw.procbase module</a></li>
-<li><a class="reference internal" href="#pypaw-process-module">pypaw.process module</a></li>
-<li><a class="reference internal" href="#pypaw-utils-module">pypaw.utils module</a></li>
-<li><a class="reference internal" href="#pypaw-window-module">pypaw.window module</a></li>
-<li><a class="reference internal" href="#pypaw-write-window-module">pypaw.write_window module</a></li>
-<li><a class="reference internal" href="#module-contents">Module contents</a></li>
-</ul>
-</li>
-</ul>
+          <footer>
+  
 
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/pypaw.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Wenjie Lei.
+
     </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li><a href="index.html">pypaw 0.0.1 documentation</a> &raquo;</li> 
-      </ul>
-    </div>
-    <div class="footer">
-        &copy; Copyright 2016, Wenjie Lei.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>

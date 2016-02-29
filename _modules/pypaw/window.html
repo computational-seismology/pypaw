@@ -1,54 +1,138 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pypaw.window &mdash; pypaw 0.0.1 documentation</title>
-    
-    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '0.0.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="pypaw 0.0.1 documentation" href="../../index.html" />
-    <link rel="up" title="Module code" href="../index.html" /> 
-  </head>
-  <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li><a href="../../index.html">pypaw 0.0.1 documentation</a> &raquo;</li>
-          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
-      </ul>
-    </div>  
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pypaw.window &mdash; pypaw 0.0.1 documentation</title>
+  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body">
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="pypaw 0.0.1 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pypaw
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data_format.html">Data Format and Conversion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">pypaw</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>pypaw.window</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for pypaw.window</h1><div class="highlight"><pre>
-<span class="c">#!/usr/bin/env python</span>
-<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Class for window selection on asdf file and handles parallel I/O</span>
 <span class="sd">so they are invisible to users.</span>
@@ -75,15 +159,15 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Wrapper for asdf I/O</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c"># Make sure everything thats required is there.</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">synt_station_group</span><span class="p">,</span> <span class="s">&quot;StationXML&quot;</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Missing StationXML from synt_staiton_group&quot;</span><span class="p">)</span>
+    <span class="c1"># Make sure everything thats required is there.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">synt_station_group</span><span class="p">,</span> <span class="s2">&quot;StationXML&quot;</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Missing StationXML from synt_staiton_group&quot;</span><span class="p">)</span>
         <span class="k">return</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obsd_station_group</span><span class="p">,</span> <span class="n">obsd_tag</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Missing tag &#39;</span><span class="si">%s</span><span class="s">&#39; from obsd_station_group&quot;</span> <span class="o">%</span> <span class="n">obsd_tag</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Missing tag &#39;</span><span class="si">%s</span><span class="s2">&#39; from obsd_station_group&quot;</span> <span class="o">%</span> <span class="n">obsd_tag</span><span class="p">)</span>
         <span class="k">return</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">synt_station_group</span><span class="p">,</span> <span class="n">synt_tag</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Missing tag &#39;</span><span class="si">%s</span><span class="s">&#39; from synt_station_group&quot;</span> <span class="o">%</span> <span class="n">synt_tag</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Missing tag &#39;</span><span class="si">%s</span><span class="s2">&#39; from synt_station_group&quot;</span> <span class="o">%</span> <span class="n">synt_tag</span><span class="p">)</span>
         <span class="k">return</span>
 
     <span class="n">inv</span> <span class="o">=</span> <span class="n">synt_station_group</span><span class="o">.</span><span class="n">StationXML</span>
@@ -98,7 +182,7 @@
 </div>
 <div class="viewcode-block" id="WindowASDF"><a class="viewcode-back" href="../../pypaw.html#pypaw.window.WindowASDF">[docs]</a><span class="k">class</span> <span class="nc">WindowASDF</span><span class="p">(</span><span class="n">ProcASDFBase</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;R&quot;</span><span class="p">,</span> <span class="s">&quot;T&quot;</span><span class="p">],</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">],</span>
                  <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
 
         <span class="n">ProcASDFBase</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
@@ -111,19 +195,19 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="c"># should be a file</span>
+            <span class="c1"># should be a file</span>
             <span class="n">param</span> <span class="o">=</span> <span class="n">smart_read_yaml</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s">&quot;param must be dictionary, for example, {&#39;Z&#39;: &#39;/path/Z/file&#39;,&quot;</span>
-                <span class="s">&quot;&#39;R&#39;:&#39;/path/R/config&#39;, &#39;T&#39;: &#39;/path/T/config&#39;} or &quot;</span>
-                <span class="s">&quot;{&#39;Z&#39;: pyflex.Config, &#39;R&#39;: pyflex.Config, &#39;T&#39;: pyflex.Config}&quot;</span><span class="p">)</span>
+                <span class="s2">&quot;param must be dictionary, for example, {&#39;Z&#39;: &#39;/path/Z/file&#39;,&quot;</span>
+                <span class="s2">&quot;&#39;R&#39;:&#39;/path/R/config&#39;, &#39;T&#39;: &#39;/path/T/config&#39;} or &quot;</span>
+                <span class="s2">&quot;{&#39;Z&#39;: pyflex.Config, &#39;R&#39;: pyflex.Config, &#39;T&#39;: pyflex.Config}&quot;</span><span class="p">)</span>
 
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;param:&quot;</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;param:&quot;</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;param should contains the same key(</span><span class="si">%s</span><span class="s">) as &quot;</span>
-                             <span class="s">&quot;component keys(</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;param should contains the same key(</span><span class="si">%s</span><span class="s2">) as &quot;</span>
+                             <span class="s2">&quot;component keys(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
                                                      <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">))</span>
 
         <span class="n">param_dict</span> <span class="o">=</span> <span class="p">{}</span>
@@ -133,19 +217,19 @@
         <span class="k">return</span> <span class="n">param_dict</span>
 
     <span class="k">def</span> <span class="nf">_validate_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-        <span class="n">necessary_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;obsd_asdf&quot;</span><span class="p">,</span> <span class="s">&quot;obsd_tag&quot;</span><span class="p">,</span> <span class="s">&quot;synt_asdf&quot;</span><span class="p">,</span> <span class="s">&quot;synt_tag&quot;</span><span class="p">,</span>
-                          <span class="s">&quot;output_dir&quot;</span><span class="p">,</span> <span class="s">&quot;figure_mode&quot;</span><span class="p">]</span>
+        <span class="n">necessary_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;obsd_asdf&quot;</span><span class="p">,</span> <span class="s2">&quot;obsd_tag&quot;</span><span class="p">,</span> <span class="s2">&quot;synt_asdf&quot;</span><span class="p">,</span> <span class="s2">&quot;synt_tag&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;output_dir&quot;</span><span class="p">,</span> <span class="s2">&quot;figure_mode&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_missing_keys</span><span class="p">(</span><span class="n">necessary_keys</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_validate_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">param</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
-            <span class="n">necessary_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;min_period&quot;</span><span class="p">,</span> <span class="s">&quot;max_period&quot;</span><span class="p">,</span> <span class="s">&quot;selection_mode&quot;</span><span class="p">]</span>
+            <span class="n">necessary_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;min_period&quot;</span><span class="p">,</span> <span class="s2">&quot;max_period&quot;</span><span class="p">,</span> <span class="s2">&quot;selection_mode&quot;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_missing_keys</span><span class="p">(</span><span class="n">necessary_keys</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-            <span class="n">minp</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s">&quot;min_period&quot;</span><span class="p">]</span>
-            <span class="n">maxp</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s">&quot;max_period&quot;</span><span class="p">]</span>
+            <span class="n">minp</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s2">&quot;min_period&quot;</span><span class="p">]</span>
+            <span class="n">maxp</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s2">&quot;max_period&quot;</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">minp</span> <span class="o">&gt;</span> <span class="n">maxp</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;min_period(</span><span class="si">%6.2f</span><span class="s">) is larger than max_period&quot;</span>
-                                 <span class="s">&quot;(</span><span class="si">%6.2f</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">minp</span><span class="p">,</span> <span class="n">maxp</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;min_period(</span><span class="si">%6.2f</span><span class="s2">) is larger than max_period&quot;</span>
+                                 <span class="s2">&quot;(</span><span class="si">%6.2f</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">minp</span><span class="p">,</span> <span class="n">maxp</span><span class="p">))</span>
 
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="WindowASDF.load_window_config"><a class="viewcode-back" href="../../pypaw.html#pypaw.window.WindowASDF.load_window_config">[docs]</a>    <span class="k">def</span> <span class="nf">load_window_config</span><span class="p">(</span><span class="n">param</span><span class="p">):</span>
@@ -159,24 +243,24 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_param</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&quot;Path Info&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="s">&quot;Param Info&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;Path Info&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="s2">&quot;Param Info&quot;</span><span class="p">)</span>
 
-        <span class="n">obsd_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;obsd_asdf&quot;</span><span class="p">]</span>
-        <span class="n">synt_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;synt_asdf&quot;</span><span class="p">]</span>
+        <span class="n">obsd_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;obsd_asdf&quot;</span><span class="p">]</span>
+        <span class="n">synt_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;synt_asdf&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">smart_check_file</span><span class="p">(</span><span class="n">obsd_file</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
                                 <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Input obsd file not exists: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">obsd_file</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input obsd file not exists: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">obsd_file</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">smart_check_file</span><span class="p">(</span><span class="n">synt_file</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
                                 <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Input obsd file not exists: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">synt_file</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input obsd file not exists: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">synt_file</span><span class="p">)</span>
         <span class="n">obsd_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_asdf</span><span class="p">(</span><span class="n">obsd_file</span><span class="p">)</span>
         <span class="n">synt_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_asdf</span><span class="p">(</span><span class="n">synt_file</span><span class="p">)</span>
-        <span class="n">obsd_tag</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;obsd_tag&quot;</span><span class="p">]</span>
-        <span class="n">synt_tag</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;synt_tag&quot;</span><span class="p">]</span>
-        <span class="n">figure_mode</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;figure_mode&quot;</span><span class="p">]</span>
-        <span class="n">figure_dir</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;output_dir&quot;</span><span class="p">]</span>
-        <span class="n">output_dir</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s">&quot;output_dir&quot;</span><span class="p">]</span>
+        <span class="n">obsd_tag</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;obsd_tag&quot;</span><span class="p">]</span>
+        <span class="n">synt_tag</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;synt_tag&quot;</span><span class="p">]</span>
+        <span class="n">figure_mode</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;figure_mode&quot;</span><span class="p">]</span>
+        <span class="n">figure_dir</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;output_dir&quot;</span><span class="p">]</span>
+        <span class="n">output_dir</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;output_dir&quot;</span><span class="p">]</span>
 
         <span class="n">smart_mkdir</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
                     <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">)</span>
@@ -197,44 +281,62 @@
             <span class="n">write_window_json</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">)</span></div>
 </pre></div>
 
+           </div>
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li><a href="../../index.html">pypaw 0.0.1 documentation</a> &raquo;</li>
-          <li><a href="../index.html" >Module code</a> &raquo;</li> 
-      </ul>
-    </div>
-    <div class="footer">
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
         &copy; Copyright 2016, Wenjie Lei.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
-    </div>
-  </body>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>
