@@ -118,6 +118,7 @@ One tip, if you set the ``figure_mode`` as ``True``, then don't use too many cor
 3. Adjoint Sources
 ------------------
 Path and parameter files should be specified. For input, it requires an observed and synthetic asdf file, a window file. The output is an adjoint asdf file. A example of 'path.json' file::
+
   {
     "obsd_asdf": "/path/to/obsd/asdf/file",
     "obsd_tag": "obsd_tag",

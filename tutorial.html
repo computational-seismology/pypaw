@@ -168,22 +168,19 @@ rotate_flag: True
 </div>
 <div class="section" id="adjoint-sources">
 <h2>3. Adjoint Sources<a class="headerlink" href="#adjoint-sources" title="Permalink to this headline">¶</a></h2>
-<dl class="docutils">
-<dt>Path and parameter files should be specified. For input, it requires an observed and synthetic asdf file, a window file. The output is an adjoint asdf file. A example of &#8216;path.json&#8217; file::</dt>
-<dd><dl class="first docutils">
-<dt>{</dt>
-<dd>&#8220;obsd_asdf&#8221;: &#8220;/path/to/obsd/asdf/file&#8221;,
-&#8220;obsd_tag&#8221;: &#8220;obsd_tag&#8221;,
-&#8220;synt_asdf&#8221;: &#8220;/path/to/synt/asdf/file&#8221;,
-&#8220;synt_tag&#8221;: &#8220;synt_tag&#8221;,
-&#8220;window_file&#8221;: &#8220;/path/to/window/file&#8221;,
-&#8220;output_file&#8221;: &#8220;/path/to/output/adjoint/asdf/file&#8221;,
-&#8220;figure_mode&#8221;: false,
-&#8220;figure_dir&#8221;: &#8220;/path/to/output/figure/dir&#8221;</dd>
-</dl>
-<p class="last">}</p>
-</dd>
-</dl>
+<p>Path and parameter files should be specified. For input, it requires an observed and synthetic asdf file, a window file. The output is an adjoint asdf file. A example of &#8216;path.json&#8217; file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s2">&quot;obsd_asdf&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/obsd/asdf/file&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;obsd_tag&quot;</span><span class="p">:</span> <span class="s2">&quot;obsd_tag&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;synt_asdf&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/synt/asdf/file&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;synt_tag&quot;</span><span class="p">:</span> <span class="s2">&quot;synt_tag&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;window_file&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/window/file&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;output_file&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/output/adjoint/asdf/file&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;figure_mode&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+  <span class="s2">&quot;figure_dir&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/output/figure/dir&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 <p>For adjoint sources, you can choose different measurements. Currently, it supports three different measurements:
 * Waveform misfit
 * Cross-correlation traveltime misfit
