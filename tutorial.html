@@ -35,9 +35,6 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="examples.html" title="Examples"
              accesskey="N">next</a> |</li>
         <li class="right" >
@@ -105,17 +102,17 @@ rotate_flag: True
 </li>
 </ol>
 <p>After preparing the path and parameter file, you need the job script:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="ch">#!/usr/bin/env python</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">from</span> <span class="nn">pypaw</span> <span class="kn">import</span> <span class="n">ProcASDF</span>
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
 
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-p&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;params_file&#39;</span><span class="p">,</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-p&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;params_file&#39;</span><span class="p">,</span>
                         <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-f&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;path_file&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-v&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;verbose&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;path_file&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;verbose&#39;</span><span class="p">)</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
     <span class="n">proc</span> <span class="o">=</span> <span class="n">ProcASDF</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">path_file</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">params_file</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
     <span class="n">proc</span><span class="o">.</span><span class="n">smart_run</span><span class="p">()</span>
@@ -131,12 +128,12 @@ rotate_flag: True
 <h2>2. Window Selection<a class="headerlink" href="#window-selection" title="Permalink to this headline">¶</a></h2>
 <p>Window selection also requires two files to specify the data path and window parameters. For input, it requires one observed and one synthetic asdf file. The output is one window file. A example of &#8216;path.json&#8217; file is:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-  <span class="s">&quot;obsd_asdf&quot;</span><span class="p">:</span> <span class="s">&quot;/path/to/obsd/asdf/file&quot;</span><span class="p">,</span>
-  <span class="s">&quot;obsd_tag&quot;</span><span class="p">:</span> <span class="s">&quot;obsd_tag&quot;</span><span class="p">,</span>
-  <span class="s">&quot;synt_asdf&quot;</span><span class="p">:</span> <span class="s">&quot;/path/to/synt/asdf/file&quot;</span><span class="p">,</span>
-  <span class="s">&quot;synt_tag&quot;</span><span class="p">:</span> <span class="s">&quot;synt_tag&quot;</span><span class="p">,</span>
-  <span class="s">&quot;output_dir&quot;</span><span class="p">:</span> <span class="s">&quot;/path/to/output/directory&quot;</span><span class="p">,</span>
-  <span class="s">&quot;figure_mode&quot;</span><span class="p">:</span> <span class="bp">False</span>
+  <span class="s2">&quot;obsd_asdf&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/obsd/asdf/file&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;obsd_tag&quot;</span><span class="p">:</span> <span class="s2">&quot;obsd_tag&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;synt_asdf&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/synt/asdf/file&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;synt_tag&quot;</span><span class="p">:</span> <span class="s2">&quot;synt_tag&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;output_dir&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/output/directory&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;figure_mode&quot;</span><span class="p">:</span> <span class="bp">False</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -148,16 +145,16 @@ rotate_flag: True
 </div>
 <p>Since sometimes people want to setup different criteria for different components, So in &#8216;param.yml&#8217; file you can set different <tt class="docutils literal"><span class="pre">'window_selection.comp*.config.yaml'</span></tt>. A example of &#8216;config.yml&#8217; file is located at <tt class="docutils literal"><span class="pre">'examples/window_selection/parfile/50_100.BHZ.config.yml'</span></tt>. It is a bit long so I won&#8217;t list the file here.</p>
 <p>Next step is prepare the job script, which is very similiar to the signal processing part:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="ch">#!/usr/bin/env python</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">from</span> <span class="nn">pypaw</span> <span class="kn">import</span> <span class="n">WindowASDF</span>
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-p&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;params_file&#39;</span><span class="p">,</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-p&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;params_file&#39;</span><span class="p">,</span>
                         <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-f&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;path_file&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-v&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;verbose&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;path_file&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;verbose&#39;</span><span class="p">)</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
     <span class="n">proc</span> <span class="o">=</span> <span class="n">WindowASDF</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">path_file</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">params_file</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
     <span class="n">proc</span><span class="o">.</span><span class="n">smart_run</span><span class="p">()</span>
@@ -222,19 +219,19 @@ interp_npts: 42000
 </pre></div>
 </div>
 <p>Next step is also preparing the job script. Similiar to previous examples, the job script would be:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="ch">#!/usr/bin/env python</span>
 <span class="kn">import</span> <span class="nn">matplotlib</span> <span class="kn">as</span> <span class="nn">mpl</span>
-<span class="n">mpl</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s">&#39;Agg&#39;</span><span class="p">)</span>  <span class="c"># NOQA</span>
+<span class="n">mpl</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;Agg&#39;</span><span class="p">)</span>  <span class="c1"># NOQA</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">from</span> <span class="nn">pypaw</span> <span class="kn">import</span> <span class="n">AdjointASDF</span>
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
 
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-p&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;params_file&#39;</span><span class="p">,</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-p&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;params_file&#39;</span><span class="p">,</span>
                         <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-f&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;path_file&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-v&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;verbose&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;path_file&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;verbose&#39;</span><span class="p">)</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
 
     <span class="n">proc</span> <span class="o">=</span> <span class="n">AdjointASDF</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">path_file</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">params_file</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
@@ -251,41 +248,41 @@ interp_npts: 42000
 <h2>4. Advanced usage<a class="headerlink" href="#advanced-usage" title="Permalink to this headline">¶</a></h2>
 <p>If you have already went through all the 3 steps above, a more advanced usage is provided, which combines all the 3 steps as a whole. The &#8216;path.json&#8217; specifies the observed and synthetic file, and output adjoint asdf file:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-  <span class="s">&quot;obsd_asdf&quot;</span><span class="p">:</span> <span class="s">&quot;/path/to/raw/observed/asdf/file&quot;</span><span class="p">,</span>
-  <span class="s">&quot;obsd_tag&quot;</span><span class="p">:</span> <span class="s">&quot;observed&quot;</span><span class="p">,</span>
-  <span class="s">&quot;synt_asdf&quot;</span><span class="p">:</span> <span class="s">&quot;/path/to/raw/synthetic/asdf/file&quot;</span><span class="p">,</span>
-  <span class="s">&quot;synt_tag&quot;</span><span class="p">:</span> <span class="s">&quot;synthetic&quot;</span><span class="p">,</span>
-  <span class="s">&quot;output_asdf&quot;</span><span class="p">:</span> <span class="s">&quot;/path/to/output/adjoint/asdf/file&quot;</span><span class="p">,</span>
-  <span class="s">&quot;figure_mode&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
-  <span class="s">&quot;figure_dir&quot;</span><span class="p">:</span> <span class="s">&quot;None&quot;</span>
+  <span class="s2">&quot;obsd_asdf&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/raw/observed/asdf/file&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;obsd_tag&quot;</span><span class="p">:</span> <span class="s2">&quot;observed&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;synt_asdf&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/raw/synthetic/asdf/file&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;synt_tag&quot;</span><span class="p">:</span> <span class="s2">&quot;synthetic&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;output_asdf&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/output/adjoint/asdf/file&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;figure_mode&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+  <span class="s2">&quot;figure_dir&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>The &#8216;param.yaml&#8217; file specifies the parameter files for different parts:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-  <span class="s">&quot;proc_obsd_param&quot;</span><span class="p">:</span> <span class="s">&quot;./proc_obsd.50_100.yml&quot;</span><span class="p">,</span>
-  <span class="s">&quot;proc_synt_param&quot;</span><span class="p">:</span> <span class="s">&quot;./proc_synt.50_100.yml&quot;</span><span class="p">,</span>
-  <span class="s">&quot;window_param&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="s">&quot;Z&quot;</span><span class="p">:</span> <span class="s">&quot;50_100.BHZ.config.yml&quot;</span><span class="p">,</span>
-    <span class="s">&quot;R&quot;</span><span class="p">:</span> <span class="s">&quot;50_100.BHZ.config.yml&quot;</span><span class="p">,</span>
-    <span class="s">&quot;T&quot;</span><span class="p">:</span> <span class="s">&quot;50_100.BHZ.config.yml&quot;</span>
+  <span class="s2">&quot;proc_obsd_param&quot;</span><span class="p">:</span> <span class="s2">&quot;./proc_obsd.50_100.yml&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;proc_synt_param&quot;</span><span class="p">:</span> <span class="s2">&quot;./proc_synt.50_100.yml&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;window_param&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;Z&quot;</span><span class="p">:</span> <span class="s2">&quot;50_100.BHZ.config.yml&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;R&quot;</span><span class="p">:</span> <span class="s2">&quot;50_100.BHZ.config.yml&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;T&quot;</span><span class="p">:</span> <span class="s2">&quot;50_100.BHZ.config.yml&quot;</span>
   <span class="p">},</span>
-  <span class="s">&quot;adjsrc_param&quot;</span><span class="p">:</span> <span class="s">&quot;multitaper.adjoint.config.yml&quot;</span>
+  <span class="s2">&quot;adjsrc_param&quot;</span><span class="p">:</span> <span class="s2">&quot;multitaper.adjoint.config.yml&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>Job scripts:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="ch">#!/usr/bin/env python</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">from</span> <span class="nn">pypaw</span> <span class="kn">import</span> <span class="n">AdjPreASDF</span>
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
 
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-p&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;params_file&#39;</span><span class="p">,</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-p&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;params_file&#39;</span><span class="p">,</span>
                         <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-f&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;path_file&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-v&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&#39;verbose&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;path_file&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;verbose&#39;</span><span class="p">)</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
 
     <span class="n">proc</span> <span class="o">=</span> <span class="n">AdjPreASDF</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">path_file</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">params_file</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
@@ -349,9 +346,6 @@ interp_npts: 42000
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="right" >
           <a href="examples.html" title="Examples"
              >next</a> |</li>

@@ -35,9 +35,6 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="tutorial.html" title="Tutorial"
              accesskey="N">next</a> |</li>
         <li class="right" >
@@ -86,23 +83,23 @@
 You need to prepare a path file to specify the path of waveforms, stationxmls and quakeml.</p>
 <p>For example, for observed data in MSEED, the path file(in json format):</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-  <span class="s">&quot;waveform_dir&quot;</span><span class="p">:</span> <span class="s">&quot;/path/to/observed/waveform/dir&quot;</span><span class="p">,</span>
-  <span class="s">&quot;filetype&quot;</span><span class="p">:</span> <span class="s">&quot;mseed&quot;</span><span class="p">,</span>
-  <span class="s">&quot;quakeml_file&quot;</span><span class="p">:</span> <span class="s">&quot;/path/to/quakeml/file&quot;</span><span class="p">,</span>
-  <span class="s">&quot;staxml_dir&quot;</span><span class="p">:</span> <span class="s">&quot;/path/to/stationxml/dir&quot;</span><span class="p">,</span>
-  <span class="s">&quot;output_file&quot;</span><span class="p">:</span> <span class="s">&quot;path/to/output/asdf/file&quot;</span><span class="p">,</span>
-  <span class="s">&quot;tag&quot;</span><span class="p">:</span> <span class="s">&quot;observed&quot;</span>
+  <span class="s2">&quot;waveform_dir&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/observed/waveform/dir&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;filetype&quot;</span><span class="p">:</span> <span class="s2">&quot;mseed&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;quakeml_file&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/quakeml/file&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;staxml_dir&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/stationxml/dir&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;output_file&quot;</span><span class="p">:</span> <span class="s2">&quot;path/to/output/asdf/file&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;tag&quot;</span><span class="p">:</span> <span class="s2">&quot;observed&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>The <tt class="docutils literal"><span class="pre">tag</span></tt> is waveform tags required by ASDF.</p>
 <p>For synthetic data in SAC, if station location information(laitude, longitude, elevation and depth) is already stored in the header, then you don&#8217;t need external stationxml files. During the conversion, a simple stationxml will be generated in the memory:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-  <span class="s">&quot;waveform_dir&quot;</span><span class="p">:</span> <span class="s">&quot;/path/to/synthetic/waveform/dir&quot;</span><span class="p">,</span>
-  <span class="s">&quot;filetype&quot;</span><span class="p">:</span> <span class="s">&quot;sac&quot;</span><span class="p">,</span>
-  <span class="s">&quot;quakeml_file&quot;</span><span class="p">:</span> <span class="s">&quot;/path/to/quakeml/file&quot;</span><span class="p">,</span>
-  <span class="s">&quot;output_file&quot;</span><span class="p">:</span> <span class="s">&quot;path/to/output/asdf/file&quot;</span><span class="p">,</span>
-  <span class="s">&quot;tag&quot;</span><span class="p">:</span> <span class="s">&quot;synthetic&quot;</span>
+  <span class="s2">&quot;waveform_dir&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/synthetic/waveform/dir&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;filetype&quot;</span><span class="p">:</span> <span class="s2">&quot;sac&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;quakeml_file&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/quakeml/file&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;output_file&quot;</span><span class="p">:</span> <span class="s2">&quot;path/to/output/asdf/file&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;tag&quot;</span><span class="p">:</span> <span class="s2">&quot;synthetic&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -181,9 +178,6 @@ if __name__ == &#39;__main__&#39;:
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="right" >
           <a href="tutorial.html" title="Tutorial"
              >next</a> |</li>
