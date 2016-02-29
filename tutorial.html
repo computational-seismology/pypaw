@@ -51,7 +51,12 @@
             
   <div class="section" id="tutorial">
 <h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
-<p>This tutorial requires you to have some basic knowledge about <a class="reference external" href="https://github.com/obspy/obspy/wiki">Obspy</a> and <a class="reference external" href="http://seismicdata.github.io/pyasdf/">Pyasdf</a>.</p>
+<p>** This tutorial requires you to have some basic knowledge about <a class="reference external" href="https://github.com/obspy/obspy/wiki">Obspy</a> and <a class="reference external" href="http://seismicdata.github.io/pyasdf/">Pyasdf</a>.</p>
+<p>If you hava difficulty plotting figures on cluster, check you X11 settings. Also, if you don&#8217;t want to use X11 environment, please add add these two lines at the top of your python job script:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">matplotlib</span> <span class="kn">as</span> <span class="nn">mpl</span>
+<span class="n">mpl</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;Agg&#39;</span><span class="p">)</span>  <span class="c1"># NOQA</span>
+</pre></div>
+</div>
 <div class="section" id="singal-processing">
 <h2>1. Singal Processing<a class="headerlink" href="#singal-processing" title="Permalink to this headline">¶</a></h2>
 <p>There are two files you need to prepare for the signal processing part.</p>
@@ -287,8 +292,9 @@ interp_npts: 42000
 </pre></div>
 </div>
 <p>Save it as &#8216;adjproc.py&#8217; and launch the job on 16 cores:</p>
-<blockquote>
-<div>mpiexec -n 16 python adjproc.py -f path.json -p param.yml -v</div></blockquote>
+<div class="highlight-python"><div class="highlight"><pre>mpiexec -n 16 python adjproc.py -f path.json -p param.yml -v
+</pre></div>
+</div>
 </div>
 </div>
 
