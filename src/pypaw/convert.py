@@ -166,6 +166,11 @@ def convert_from_asdf(asdf_fn, outputdir, tag=None, filetype="sac",
     if isinstance(tag, str):
         tag_list = [tag]
 
+    print("Input ASDF: %s" % asdf_fn)
+    print("Output dir: %s" % outputdir)
+    print("Output StationXML and Quakeml: [%s, %s]" % (output_staxml,
+                                                       output_quakeml))
+
     ds = ASDFDataSet(asdf_fn)
 
     if output_quakeml:
@@ -183,9 +188,14 @@ def convert_from_asdf(asdf_fn, outputdir, tag=None, filetype="sac",
             print("Convert station: %s" % station_name)
         station_name2 = station_name.replace(".", "_")
         station = getattr(ds.waveforms, station_name2)
+        default_tag_list = station.get_waveform_tags()
         if tag is None:
-            tag_list = station.get_waveform_tags()
+            tag_list = default_tag_list
         for _tag in tag_list:
+            if _tag not in default_tag_list:
+                print("Tag(%s) not in Station(%s) taglist(%s)" %
+                      (_tag, station_name2, default_tag_list))
+                continue
             try:
                 stream, inv = ds.get_data_for_tag(station_name2, _tag)
             except:
