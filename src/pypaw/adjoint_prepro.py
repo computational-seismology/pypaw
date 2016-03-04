@@ -22,7 +22,6 @@ from pytomo3d.adjoint.adjsrc import postprocess_adjsrc
 from pytomo3d.window.window import window_on_stream
 from .adjoint_util import calculate_chan_weight, reshape_adj
 from .adjoint_util import smart_transform_window
-from .utils import smart_check_file, smart_remove_file
 import pyflex
 import pyadjoint
 import copy
@@ -89,6 +88,10 @@ def func_wrapper(obsd_station_group, synt_station_group, obsd_tag=None,
                                station=synt_staxml, event=event,
                                figure_mode=figure_mode, figure_dir=figure_dir,
                                _verbose=_verbose)
+    if len(windows) == 0:
+        # No windows selected
+        return
+
     windows = smart_transform_window(windows)
 
     adj_config, adj_src_type = load_adjoint_config(param["adjsrc_param"])
@@ -112,7 +115,7 @@ def func_wrapper(obsd_station_group, synt_station_group, obsd_tag=None,
 
     origin = event.preferred_origin() or event.origins[0]
     time_offset = interp_starttime - origin.time
-    results = reshape_adj(new_adjsrcs, time_offset)
+    results = reshape_adj(new_adjsrcs, time_offset, synt_staxml)
 
     return results
 
@@ -197,17 +200,16 @@ class AdjPreASDF(ProcASDFBase):
 
         obsd_file = path["obsd_asdf"]
         synt_file = path["synt_asdf"]
-        if not smart_check_file(obsd_file, mpi_mode=self.mpi_mode,
-                                comm=self.comm):
-            raise ValueError("No file: %s" % obsd_file)
-        if not smart_check_file(synt_file, mpi_mode=self.mpi_mode,
-                                comm=self.comm):
-            raise ValueError("No file: %s" % synt_file)
+        output_file = path["output_asdf"]
+
+        self.check_input_file(obsd_file)
+        self.check_input_file(synt_file)
+        self.check_output_file(output_file)
+
         obsd_ds = self.load_asdf(obsd_file, mode="r")
         synt_ds = self.load_asdf(synt_file, mode="r")
         synt_tag = path["synt_tag"]
         obsd_tag = path["obsd_tag"]
-        output_file = path["output_asdf"]
 
         event = obsd_ds.events[0]
 
@@ -215,8 +217,6 @@ class AdjPreASDF(ProcASDFBase):
 
         proc_func = partial(func_wrapper, event=event, obsd_tag=obsd_tag,
                             synt_tag=synt_tag, param=param)
-
-        smart_remove_file(output_file, mpi_mode=self.mpi_mode, comm=self.comm)
 
         obsd_ds.process_two_files(
             synt_ds, proc_func, output_filename=output_file)

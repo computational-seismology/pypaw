@@ -11,9 +11,11 @@ and parallel I/O so they are invisible to users.
     (http://www.gnu.org/copyleft/gpl.html)
 """
 from __future__ import (absolute_import, division, print_function)
+import os
 from pyasdf import ASDFDataSet
 from mpi4py import MPI
 from .utils import smart_read_yaml, smart_read_json, is_mpi_env
+from .utils import smart_check_path, smart_remove_file
 
 
 class ProcASDFBase(object):
@@ -121,6 +123,32 @@ class ProcASDFBase(object):
                                mode=mode)
         else:
             return ASDFDataSet(filename, mode=mode)
+
+    def check_input_file(self, filename):
+        """
+        Check existance of input file. If not, raise ValueError
+        """
+        if not smart_check_path(filename, mpi_mode=self.mpi_mode,
+                                comm=self.comm):
+            raise ValueError("Input file not exists: %s" % filename)
+
+    def check_output_file(self, filename, remove_flag=True):
+        """
+        Check existance of output file. If directory of output file
+        not exists, raise ValueError; If output file exists, remove it
+        """
+        dirname = os.path.dirname(filename)
+        if not smart_check_path(dirname, mpi_mode=self.mpi_mode,
+                                comm=self.comm):
+            raise ValueError("Output dir not exists: %s" % dirname)
+
+        if smart_check_path(filename, mpi_mode=self.mpi_mode,
+                            comm=self.comm):
+            if remove_flag:
+                if self.rank == 0:
+                    print("Output file already exists and removed:%s"
+                          % filename)
+                smart_remove_file(filename)
 
     @staticmethod
     def clean_memory(asdf_ds):

@@ -17,7 +17,7 @@ from pytomo3d.adjoint.adjsrc import postprocess_adjsrc
 from .procbase import ProcASDFBase
 from .adjoint_util import reshape_adj, calculate_chan_weight
 from .adjoint_util import smart_transform_window
-from .utils import smart_read_json, smart_remove_file, smart_check_file
+from .utils import smart_read_json
 
 
 def adjoint_wrapper(obsd_station_group, synt_station_group, config=None,
@@ -188,26 +188,19 @@ class AdjointASDF(ProcASDFBase):
         obsd_file = path["obsd_asdf"]
         synt_file = path["synt_asdf"]
         window_file = path["window_file"]
-        if not smart_check_file(obsd_file, mpi_mode=self.mpi_mode,
-                                comm=self.comm):
-            raise ValueError("Input obsd_asdf not exists: %s" % obsd_file)
-        if not smart_check_file(synt_file, mpi_mode=self.mpi_mode,
-                                comm=self.comm):
-            raise ValueError("Input synt_asdf not exists: %s" % synt_file)
-        if not smart_check_file(window_file, mpi_mode=self.mpi_mode,
-                                comm=self.comm):
-            raise ValueError("Input window_file not exists: %s" % window_file)
+        output_filename = path["output_file"]
+
+        self.check_input_file(obsd_file)
+        self.check_input_file(synt_file)
+        self.check_input_file(window_file)
+        self.check_output_file(output_filename)
 
         obsd_ds = self.load_asdf(obsd_file, mode="r")
         obsd_tag = path["obsd_tag"]
         synt_ds = self.load_asdf(synt_file, mode="r")
         synt_tag = path["synt_tag"]
-        output_filename = path["output_file"]
         figure_mode = path["figure_mode"]
         figure_dir = path["figure_dir"]
-
-        smart_remove_file(output_filename, mpi_mode=self.mpi_mode,
-                          comm=self.comm)
 
         event = obsd_ds.events[0]
         windows = self.load_windows(window_file)

@@ -61,7 +61,7 @@ def read_json_file(parfile, obj_hook=True):
     return data
 
 
-def smart_read_json(json_file, mpi_mode=False, comm=None, object_hook=False):
+def smart_read_json(json_file, mpi_mode=True, comm=None, object_hook=False):
     """
     read json file under mpi and multi-processing environment.
     Hook it to an JSONObject(not the conventional way to
@@ -90,7 +90,7 @@ def read_yaml_file(filename):
         return yaml.load(fh)
 
 
-def smart_read_yaml(yaml_file, mpi_mode=False, comm=None):
+def smart_read_yaml(yaml_file, mpi_mode=True, comm=None):
     """
     Read yaml file into python dict, in mpi_mode or not
     """
@@ -112,23 +112,23 @@ def smart_read_yaml(yaml_file, mpi_mode=False, comm=None):
     return yaml_dict
 
 
-def smart_check_file(filename, mpi_mode=False, comm=None):
+def smart_check_path(path, mpi_mode=True, comm=None):
     if not mpi_mode:
-        file_exists = os.path.exists(filename)
+        path_exists = os.path.exists(path)
     else:
         if comm is None:
             comm = _get_mpi_comm()
         rank = comm.rank
         if rank == 0:
-            file_exists = os.path.exists(filename)
+            path_exists = os.path.exists(path)
         else:
-            file_exists = None
-        file_exists = comm.bcast(file_exists, root=0)
-    return file_exists
+            path_exists = None
+        path_exists = comm.bcast(path_exists, root=0)
+    return path_exists
 
 
-def smart_remove_file(filename, mpi_mode=False, comm=None):
-    if not smart_check_file(filename, mpi_mode=mpi_mode, comm=comm):
+def smart_remove_file(filename, mpi_mode=True, comm=None):
+    if not smart_check_path(filename, mpi_mode=mpi_mode, comm=comm):
         return
     if mpi_mode:
         if comm is None:
@@ -142,7 +142,7 @@ def smart_remove_file(filename, mpi_mode=False, comm=None):
         os.remove(filename)
 
 
-def smart_mkdir(dirname, mpi_mode=False, comm=None):
+def smart_mkdir(dirname, mpi_mode=True, comm=None):
     if os.path.exists(dirname):
         return
     if mpi_mode:

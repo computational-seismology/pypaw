@@ -14,7 +14,6 @@ from __future__ import (print_function, division, absolute_import)
 from functools import partial
 from pytomo3d.signal.process import process
 from .procbase import ProcASDFBase
-from .utils import smart_remove_file, smart_check_file
 
 
 def process_wrapper(stream, inv, param=None):
@@ -60,9 +59,9 @@ class ProcASDF(ProcASDFBase):
         output_asdf = path["output_asdf"]
         output_tag = path["output_tag"]
 
-        if not smart_check_file(input_asdf, mpi_mode=self.mpi_mode,
-                                comm=self.comm):
-            raise ValueError("Input file not exists: %s" % input_asdf)
+        self.check_input_file(input_asdf)
+        self.check_output_file(output_asdf, remove_flag=True)
+
         ds = self.load_asdf(input_asdf, mode='r')
 
         # read in event
@@ -80,9 +79,6 @@ class ProcASDF(ProcASDFBase):
 
         process_function = \
             partial(process_wrapper, param=param)
-
-        smart_remove_file(output_asdf, mpi_mode=self.mpi_mode,
-                          comm=self.comm)
 
         tag_map = {input_tag: output_tag}
         ds.process(process_function, output_asdf, tag_map=tag_map)

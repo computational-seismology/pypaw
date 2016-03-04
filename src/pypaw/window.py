@@ -15,7 +15,7 @@ from functools import partial
 from .procbase import ProcASDFBase
 from pytomo3d.window.window import window_on_stream
 import pyflex
-from .utils import smart_read_yaml, smart_mkdir, smart_check_file
+from .utils import smart_read_yaml, smart_mkdir
 from .write_window import write_window_json
 
 
@@ -115,22 +115,20 @@ class WindowASDF(ProcASDFBase):
 
         obsd_file = path["obsd_asdf"]
         synt_file = path["synt_asdf"]
-        if not smart_check_file(obsd_file, mpi_mode=self.mpi_mode,
-                                comm=self.comm):
-            raise ValueError("Input obsd file not exists: %s" % obsd_file)
-        if not smart_check_file(synt_file, mpi_mode=self.mpi_mode,
-                                comm=self.comm):
-            raise ValueError("Input obsd file not exists: %s" % synt_file)
-        obsd_ds = self.load_asdf(obsd_file)
-        synt_ds = self.load_asdf(synt_file)
+        output_dir = path["output_dir"]
+
+        self.check_input_file(obsd_file)
+        self.check_input_file(synt_file)
+        smart_mkdir(output_dir, mpi_mode=self.mpi_mode,
+                    comm=self.comm)
+
         obsd_tag = path["obsd_tag"]
         synt_tag = path["synt_tag"]
         figure_mode = path["figure_mode"]
         figure_dir = path["output_dir"]
-        output_dir = path["output_dir"]
 
-        smart_mkdir(output_dir, mpi_mode=self.mpi_mode,
-                    comm=self.comm)
+        obsd_ds = self.load_asdf(obsd_file)
+        synt_ds = self.load_asdf(synt_file)
 
         event = obsd_ds.events[0]
 
