@@ -194,7 +194,7 @@
     <span class="k">return</span> <span class="n">data</span>
 
 </div>
-<div class="viewcode-block" id="smart_read_json"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.smart_read_json">[docs]</a><span class="k">def</span> <span class="nf">smart_read_json</span><span class="p">(</span><span class="n">json_file</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">object_hook</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="smart_read_json"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.smart_read_json">[docs]</a><span class="k">def</span> <span class="nf">smart_read_json</span><span class="p">(</span><span class="n">json_file</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">object_hook</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    read json file under mpi and multi-processing environment.</span>
 <span class="sd">    Hook it to an JSONObject(not the conventional way to</span>
@@ -223,7 +223,7 @@
         <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
 
 </div>
-<div class="viewcode-block" id="smart_read_yaml"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.smart_read_yaml">[docs]</a><span class="k">def</span> <span class="nf">smart_read_yaml</span><span class="p">(</span><span class="n">yaml_file</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="smart_read_yaml"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.smart_read_yaml">[docs]</a><span class="k">def</span> <span class="nf">smart_read_yaml</span><span class="p">(</span><span class="n">yaml_file</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Read yaml file into python dict, in mpi_mode or not</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -245,23 +245,23 @@
     <span class="k">return</span> <span class="n">yaml_dict</span>
 
 </div>
-<div class="viewcode-block" id="smart_check_file"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.smart_check_file">[docs]</a><span class="k">def</span> <span class="nf">smart_check_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="smart_check_path"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.smart_check_path">[docs]</a><span class="k">def</span> <span class="nf">smart_check_path</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">mpi_mode</span><span class="p">:</span>
-        <span class="n">file_exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">path_exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">comm</span> <span class="o">=</span> <span class="n">_get_mpi_comm</span><span class="p">()</span>
         <span class="n">rank</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">rank</span>
         <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">file_exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+            <span class="n">path_exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">file_exists</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="n">file_exists</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">file_exists</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">file_exists</span>
+            <span class="n">path_exists</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">path_exists</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">path_exists</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">path_exists</span>
 
 </div>
-<div class="viewcode-block" id="smart_remove_file"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.smart_remove_file">[docs]</a><span class="k">def</span> <span class="nf">smart_remove_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">smart_check_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="n">mpi_mode</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">):</span>
+<div class="viewcode-block" id="smart_remove_file"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.smart_remove_file">[docs]</a><span class="k">def</span> <span class="nf">smart_remove_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">smart_check_path</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="n">mpi_mode</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">):</span>
         <span class="k">return</span>
     <span class="k">if</span> <span class="n">mpi_mode</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -275,7 +275,7 @@
         <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 
 </div>
-<div class="viewcode-block" id="smart_mkdir"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.smart_mkdir">[docs]</a><span class="k">def</span> <span class="nf">smart_mkdir</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="smart_mkdir"><a class="viewcode-back" href="../../pypaw.html#pypaw.utils.smart_mkdir">[docs]</a><span class="k">def</span> <span class="nf">smart_mkdir</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span>
         <span class="k">return</span>
     <span class="k">if</span> <span class="n">mpi_mode</span><span class="p">:</span>

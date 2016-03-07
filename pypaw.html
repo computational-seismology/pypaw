@@ -370,12 +370,6 @@ If false, only make measurements but no adjoint sources.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="pypaw.convert.convert_from_asdf">
-<tt class="descclassname">pypaw.convert.</tt><tt class="descname">convert_from_asdf</tt><big>(</big><em>asdf_fn</em>, <em>outputdir</em>, <em>tag=None</em>, <em>filetype='sac'</em>, <em>output_staxml=True</em>, <em>output_quakeml=True</em>, <em>_verbose=True</em><big>)</big><a class="reference internal" href="_modules/pypaw/convert.html#convert_from_asdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.convert.convert_from_asdf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert asdf to different types of file</p>
-</dd></dl>
-
-<dl class="function">
 <dt id="pypaw.convert.create_simple_inventory">
 <tt class="descclassname">pypaw.convert.</tt><tt class="descname">create_simple_inventory</tt><big>(</big><em>network</em>, <em>station</em>, <em>latitude=None</em>, <em>longitude=None</em>, <em>elevation=None</em>, <em>depth=None</em>, <em>start_date=None</em>, <em>end_date=None</em>, <em>location_code='S3'</em><big>)</big><a class="reference internal" href="_modules/pypaw/convert.html#create_simple_inventory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.convert.create_simple_inventory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create simple inventory for synthetic data</p>
@@ -406,6 +400,19 @@ and parallel I/O so they are invisible to users.</p>
 <dt id="pypaw.procbase.ProcASDFBase">
 <em class="property">class </em><tt class="descclassname">pypaw.procbase.</tt><tt class="descname">ProcASDFBase</tt><big>(</big><em>path</em>, <em>param</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/pypaw/procbase.html#ProcASDFBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.procbase.ProcASDFBase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="http://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></a></p>
+<dl class="method">
+<dt id="pypaw.procbase.ProcASDFBase.check_input_file">
+<tt class="descname">check_input_file</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/pypaw/procbase.html#ProcASDFBase.check_input_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.procbase.ProcASDFBase.check_input_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check existance of input file. If not, raise ValueError</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pypaw.procbase.ProcASDFBase.check_output_file">
+<tt class="descname">check_output_file</tt><big>(</big><em>filename</em>, <em>remove_flag=True</em><big>)</big><a class="reference internal" href="_modules/pypaw/procbase.html#ProcASDFBase.check_output_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.procbase.ProcASDFBase.check_output_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check existance of output file. If directory of output file
+not exists, raise ValueError; If output file exists, remove it</p>
+</dd></dl>
+
 <dl class="staticmethod">
 <dt id="pypaw.procbase.ProcASDFBase.clean_memory">
 <em class="property">static </em><tt class="descname">clean_memory</tt><big>(</big><em>asdf_ds</em><big>)</big><a class="reference internal" href="_modules/pypaw/procbase.html#ProcASDFBase.clean_memory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.procbase.ProcASDFBase.clean_memory" title="Permalink to this definition">¶</a></dt>
@@ -584,18 +591,18 @@ tolerance level</p>
 <dd></dd></dl>
 
 <dl class="function">
-<dt id="pypaw.utils.smart_check_file">
-<tt class="descclassname">pypaw.utils.</tt><tt class="descname">smart_check_file</tt><big>(</big><em>filename</em>, <em>mpi_mode=False</em>, <em>comm=None</em><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#smart_check_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.smart_check_file" title="Permalink to this definition">¶</a></dt>
+<dt id="pypaw.utils.smart_check_path">
+<tt class="descclassname">pypaw.utils.</tt><tt class="descname">smart_check_path</tt><big>(</big><em>path</em>, <em>mpi_mode=True</em>, <em>comm=None</em><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#smart_check_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.smart_check_path" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="pypaw.utils.smart_mkdir">
-<tt class="descclassname">pypaw.utils.</tt><tt class="descname">smart_mkdir</tt><big>(</big><em>dirname</em>, <em>mpi_mode=False</em>, <em>comm=None</em><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#smart_mkdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.smart_mkdir" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">pypaw.utils.</tt><tt class="descname">smart_mkdir</tt><big>(</big><em>dirname</em>, <em>mpi_mode=True</em>, <em>comm=None</em><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#smart_mkdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.smart_mkdir" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="pypaw.utils.smart_read_json">
-<tt class="descclassname">pypaw.utils.</tt><tt class="descname">smart_read_json</tt><big>(</big><em>json_file</em>, <em>mpi_mode=False</em>, <em>comm=None</em>, <em>object_hook=False</em><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#smart_read_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.smart_read_json" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">pypaw.utils.</tt><tt class="descname">smart_read_json</tt><big>(</big><em>json_file</em>, <em>mpi_mode=True</em>, <em>comm=None</em>, <em>object_hook=False</em><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#smart_read_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.smart_read_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>read json file under mpi and multi-processing environment.
 Hook it to an JSONObject(not the conventional way to
 read it as object)</p>
@@ -603,13 +610,13 @@ read it as object)</p>
 
 <dl class="function">
 <dt id="pypaw.utils.smart_read_yaml">
-<tt class="descclassname">pypaw.utils.</tt><tt class="descname">smart_read_yaml</tt><big>(</big><em>yaml_file</em>, <em>mpi_mode=False</em>, <em>comm=None</em><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#smart_read_yaml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.smart_read_yaml" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">pypaw.utils.</tt><tt class="descname">smart_read_yaml</tt><big>(</big><em>yaml_file</em>, <em>mpi_mode=True</em>, <em>comm=None</em><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#smart_read_yaml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.smart_read_yaml" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read yaml file into python dict, in mpi_mode or not</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="pypaw.utils.smart_remove_file">
-<tt class="descclassname">pypaw.utils.</tt><tt class="descname">smart_remove_file</tt><big>(</big><em>filename</em>, <em>mpi_mode=False</em>, <em>comm=None</em><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#smart_remove_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.smart_remove_file" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">pypaw.utils.</tt><tt class="descname">smart_remove_file</tt><big>(</big><em>filename</em>, <em>mpi_mode=True</em>, <em>comm=None</em><big>)</big><a class="reference internal" href="_modules/pypaw/utils.html#smart_remove_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypaw.utils.smart_remove_file" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">

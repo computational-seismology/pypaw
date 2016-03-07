@@ -155,7 +155,6 @@
 <span class="kn">from</span> <span class="nn">pytomo3d.window.window</span> <span class="kn">import</span> <span class="n">window_on_stream</span>
 <span class="kn">from</span> <span class="nn">.adjoint_util</span> <span class="kn">import</span> <span class="n">calculate_chan_weight</span><span class="p">,</span> <span class="n">reshape_adj</span>
 <span class="kn">from</span> <span class="nn">.adjoint_util</span> <span class="kn">import</span> <span class="n">smart_transform_window</span>
-<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">smart_check_file</span><span class="p">,</span> <span class="n">smart_remove_file</span>
 <span class="kn">import</span> <span class="nn">pyflex</span>
 <span class="kn">import</span> <span class="nn">pyadjoint</span>
 <span class="kn">import</span> <span class="nn">copy</span>
@@ -222,6 +221,10 @@
                                <span class="n">station</span><span class="o">=</span><span class="n">synt_staxml</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="n">event</span><span class="p">,</span>
                                <span class="n">figure_mode</span><span class="o">=</span><span class="n">figure_mode</span><span class="p">,</span> <span class="n">figure_dir</span><span class="o">=</span><span class="n">figure_dir</span><span class="p">,</span>
                                <span class="n">_verbose</span><span class="o">=</span><span class="n">_verbose</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">windows</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># No windows selected</span>
+        <span class="k">return</span>
+
     <span class="n">windows</span> <span class="o">=</span> <span class="n">smart_transform_window</span><span class="p">(</span><span class="n">windows</span><span class="p">)</span>
 
     <span class="n">adj_config</span><span class="p">,</span> <span class="n">adj_src_type</span> <span class="o">=</span> <span class="n">load_adjoint_config</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="s2">&quot;adjsrc_param&quot;</span><span class="p">])</span>
@@ -245,7 +248,7 @@
 
     <span class="n">origin</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">preferred_origin</span><span class="p">()</span> <span class="ow">or</span> <span class="n">event</span><span class="o">.</span><span class="n">origins</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">time_offset</span> <span class="o">=</span> <span class="n">interp_starttime</span> <span class="o">-</span> <span class="n">origin</span><span class="o">.</span><span class="n">time</span>
-    <span class="n">results</span> <span class="o">=</span> <span class="n">reshape_adj</span><span class="p">(</span><span class="n">new_adjsrcs</span><span class="p">,</span> <span class="n">time_offset</span><span class="p">)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">reshape_adj</span><span class="p">(</span><span class="n">new_adjsrcs</span><span class="p">,</span> <span class="n">time_offset</span><span class="p">,</span> <span class="n">synt_staxml</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">results</span>
 
@@ -330,17 +333,16 @@
 
         <span class="n">obsd_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;obsd_asdf&quot;</span><span class="p">]</span>
         <span class="n">synt_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;synt_asdf&quot;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">smart_check_file</span><span class="p">(</span><span class="n">obsd_file</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
-                                <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No file: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">obsd_file</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">smart_check_file</span><span class="p">(</span><span class="n">synt_file</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
-                                <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No file: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">synt_file</span><span class="p">)</span>
+        <span class="n">output_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;output_asdf&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_input_file</span><span class="p">(</span><span class="n">obsd_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_input_file</span><span class="p">(</span><span class="n">synt_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_output_file</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
+
         <span class="n">obsd_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_asdf</span><span class="p">(</span><span class="n">obsd_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
         <span class="n">synt_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_asdf</span><span class="p">(</span><span class="n">synt_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
         <span class="n">synt_tag</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;synt_tag&quot;</span><span class="p">]</span>
         <span class="n">obsd_tag</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;obsd_tag&quot;</span><span class="p">]</span>
-        <span class="n">output_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;output_asdf&quot;</span><span class="p">]</span>
 
         <span class="n">event</span> <span class="o">=</span> <span class="n">obsd_ds</span><span class="o">.</span><span class="n">events</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -348,8 +350,6 @@
 
         <span class="n">proc_func</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">func_wrapper</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="n">event</span><span class="p">,</span> <span class="n">obsd_tag</span><span class="o">=</span><span class="n">obsd_tag</span><span class="p">,</span>
                             <span class="n">synt_tag</span><span class="o">=</span><span class="n">synt_tag</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="n">param</span><span class="p">)</span>
-
-        <span class="n">smart_remove_file</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">)</span>
 
         <span class="n">obsd_ds</span><span class="o">.</span><span class="n">process_two_files</span><span class="p">(</span>
             <span class="n">synt_ds</span><span class="p">,</span> <span class="n">proc_func</span><span class="p">,</span> <span class="n">output_filename</span><span class="o">=</span><span class="n">output_file</span><span class="p">)</span></div>

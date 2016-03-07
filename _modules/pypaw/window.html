@@ -148,7 +148,7 @@
 <span class="kn">from</span> <span class="nn">.procbase</span> <span class="kn">import</span> <span class="n">ProcASDFBase</span>
 <span class="kn">from</span> <span class="nn">pytomo3d.window.window</span> <span class="kn">import</span> <span class="n">window_on_stream</span>
 <span class="kn">import</span> <span class="nn">pyflex</span>
-<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">smart_read_yaml</span><span class="p">,</span> <span class="n">smart_mkdir</span><span class="p">,</span> <span class="n">smart_check_file</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">smart_read_yaml</span><span class="p">,</span> <span class="n">smart_mkdir</span>
 <span class="kn">from</span> <span class="nn">.write_window</span> <span class="kn">import</span> <span class="n">write_window_json</span>
 
 
@@ -248,22 +248,20 @@
 
         <span class="n">obsd_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;obsd_asdf&quot;</span><span class="p">]</span>
         <span class="n">synt_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;synt_asdf&quot;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">smart_check_file</span><span class="p">(</span><span class="n">obsd_file</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
-                                <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input obsd file not exists: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">obsd_file</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">smart_check_file</span><span class="p">(</span><span class="n">synt_file</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
-                                <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input obsd file not exists: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">synt_file</span><span class="p">)</span>
-        <span class="n">obsd_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_asdf</span><span class="p">(</span><span class="n">obsd_file</span><span class="p">)</span>
-        <span class="n">synt_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_asdf</span><span class="p">(</span><span class="n">synt_file</span><span class="p">)</span>
+        <span class="n">output_dir</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;output_dir&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_input_file</span><span class="p">(</span><span class="n">obsd_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_input_file</span><span class="p">(</span><span class="n">synt_file</span><span class="p">)</span>
+        <span class="n">smart_mkdir</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
+                    <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">)</span>
+
         <span class="n">obsd_tag</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;obsd_tag&quot;</span><span class="p">]</span>
         <span class="n">synt_tag</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;synt_tag&quot;</span><span class="p">]</span>
         <span class="n">figure_mode</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;figure_mode&quot;</span><span class="p">]</span>
         <span class="n">figure_dir</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;output_dir&quot;</span><span class="p">]</span>
-        <span class="n">output_dir</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;output_dir&quot;</span><span class="p">]</span>
 
-        <span class="n">smart_mkdir</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
-                    <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">)</span>
+        <span class="n">obsd_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_asdf</span><span class="p">(</span><span class="n">obsd_file</span><span class="p">)</span>
+        <span class="n">synt_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_asdf</span><span class="p">(</span><span class="n">synt_file</span><span class="p">)</span>
 
         <span class="n">event</span> <span class="o">=</span> <span class="n">obsd_ds</span><span class="o">.</span><span class="n">events</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 

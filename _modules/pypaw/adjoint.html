@@ -150,7 +150,7 @@
 <span class="kn">from</span> <span class="nn">.procbase</span> <span class="kn">import</span> <span class="n">ProcASDFBase</span>
 <span class="kn">from</span> <span class="nn">.adjoint_util</span> <span class="kn">import</span> <span class="n">reshape_adj</span><span class="p">,</span> <span class="n">calculate_chan_weight</span>
 <span class="kn">from</span> <span class="nn">.adjoint_util</span> <span class="kn">import</span> <span class="n">smart_transform_window</span>
-<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">smart_read_json</span><span class="p">,</span> <span class="n">smart_remove_file</span><span class="p">,</span> <span class="n">smart_check_file</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">smart_read_json</span>
 
 
 <div class="viewcode-block" id="adjoint_wrapper"><a class="viewcode-back" href="../../pypaw.html#pypaw.adjoint.adjoint_wrapper">[docs]</a><span class="k">def</span> <span class="nf">adjoint_wrapper</span><span class="p">(</span><span class="n">obsd_station_group</span><span class="p">,</span> <span class="n">synt_station_group</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
@@ -321,26 +321,19 @@
         <span class="n">obsd_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;obsd_asdf&quot;</span><span class="p">]</span>
         <span class="n">synt_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;synt_asdf&quot;</span><span class="p">]</span>
         <span class="n">window_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;window_file&quot;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">smart_check_file</span><span class="p">(</span><span class="n">obsd_file</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
-                                <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input obsd_asdf not exists: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">obsd_file</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">smart_check_file</span><span class="p">(</span><span class="n">synt_file</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
-                                <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input synt_asdf not exists: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">synt_file</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">smart_check_file</span><span class="p">(</span><span class="n">window_file</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
-                                <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input window_file not exists: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">window_file</span><span class="p">)</span>
+        <span class="n">output_filename</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;output_file&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_input_file</span><span class="p">(</span><span class="n">obsd_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_input_file</span><span class="p">(</span><span class="n">synt_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_input_file</span><span class="p">(</span><span class="n">window_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_output_file</span><span class="p">(</span><span class="n">output_filename</span><span class="p">)</span>
 
         <span class="n">obsd_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_asdf</span><span class="p">(</span><span class="n">obsd_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
         <span class="n">obsd_tag</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;obsd_tag&quot;</span><span class="p">]</span>
         <span class="n">synt_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_asdf</span><span class="p">(</span><span class="n">synt_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
         <span class="n">synt_tag</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;synt_tag&quot;</span><span class="p">]</span>
-        <span class="n">output_filename</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;output_file&quot;</span><span class="p">]</span>
         <span class="n">figure_mode</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;figure_mode&quot;</span><span class="p">]</span>
         <span class="n">figure_dir</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s2">&quot;figure_dir&quot;</span><span class="p">]</span>
-
-        <span class="n">smart_remove_file</span><span class="p">(</span><span class="n">output_filename</span><span class="p">,</span> <span class="n">mpi_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_mode</span><span class="p">,</span>
-                          <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">)</span>
 
         <span class="n">event</span> <span class="o">=</span> <span class="n">obsd_ds</span><span class="o">.</span><span class="n">events</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">windows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_windows</span><span class="p">(</span><span class="n">window_file</span><span class="p">)</span>

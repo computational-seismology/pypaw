@@ -281,7 +281,8 @@
         <span class="n">tr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s2">&quot;SAC&quot;</span><span class="p">)</span>
 
 </div>
-<div class="viewcode-block" id="convert_from_asdf"><a class="viewcode-back" href="../../pypaw.html#pypaw.convert.convert_from_asdf">[docs]</a><span class="k">def</span> <span class="nf">convert_from_asdf</span><span class="p">(</span><span class="n">asdf_fn</span><span class="p">,</span> <span class="n">outputdir</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="s2">&quot;sac&quot;</span><span class="p">,</span>
+<span class="nd">@timing</span>
+<span class="k">def</span> <span class="nf">convert_from_asdf</span><span class="p">(</span><span class="n">asdf_fn</span><span class="p">,</span> <span class="n">outputdir</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="s2">&quot;sac&quot;</span><span class="p">,</span>
                       <span class="n">output_staxml</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">output_quakeml</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                       <span class="n">_verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -299,15 +300,19 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">tag_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">tag</span><span class="p">]</span>
 
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Input ASDF: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">asdf_fn</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Output dir: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">outputdir</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Output StationXML and Quakeml: [</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">output_staxml</span><span class="p">,</span>
+                                                       <span class="n">output_quakeml</span><span class="p">))</span>
+
     <span class="n">ds</span> <span class="o">=</span> <span class="n">ASDFDataSet</span><span class="p">(</span><span class="n">asdf_fn</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">output_quakeml</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">events</span><span class="p">:</span>
-            <span class="n">event_id</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">event_descriptions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span>
-            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputdir</span><span class="p">,</span> <span class="s2">&quot;CMT_</span><span class="si">%s</span><span class="s2">.xml&quot;</span> <span class="o">%</span> <span class="n">event_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">events</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputdir</span><span class="p">,</span> <span class="s2">&quot;Quakeml.xml&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">_verbose</span><span class="p">:</span>
                 <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Quakeml file: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
-            <span class="n">event</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s2">&quot;QUAKEML&quot;</span><span class="p">)</span>
+            <span class="n">ds</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s2">&quot;QUAKEML&quot;</span><span class="p">)</span>
 
     <span class="n">sta_list</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">waveforms</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
 
@@ -316,9 +321,14 @@
             <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Convert station: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">station_name</span><span class="p">)</span>
         <span class="n">station_name2</span> <span class="o">=</span> <span class="n">station_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
         <span class="n">station</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">waveforms</span><span class="p">,</span> <span class="n">station_name2</span><span class="p">)</span>
+        <span class="n">default_tag_list</span> <span class="o">=</span> <span class="n">station</span><span class="o">.</span><span class="n">get_waveform_tags</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">tag</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">tag_list</span> <span class="o">=</span> <span class="n">station</span><span class="o">.</span><span class="n">get_waveform_tags</span><span class="p">()</span>
+            <span class="n">tag_list</span> <span class="o">=</span> <span class="n">default_tag_list</span>
         <span class="k">for</span> <span class="n">_tag</span> <span class="ow">in</span> <span class="n">tag_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">_tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">default_tag_list</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Tag(</span><span class="si">%s</span><span class="s2">) not in Station(</span><span class="si">%s</span><span class="s2">) taglist(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span>
+                      <span class="p">(</span><span class="n">_tag</span><span class="p">,</span> <span class="n">station_name2</span><span class="p">,</span> <span class="n">default_tag_list</span><span class="p">))</span>
+                <span class="k">continue</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">stream</span><span class="p">,</span> <span class="n">inv</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get_data_for_tag</span><span class="p">(</span><span class="n">station_name2</span><span class="p">,</span> <span class="n">_tag</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
@@ -339,7 +349,7 @@
 
     <span class="k">del</span> <span class="n">ds</span>
 
-</div>
+
 <div class="viewcode-block" id="ConvertASDF"><a class="viewcode-back" href="../../pypaw.html#pypaw.convert.ConvertASDF">[docs]</a><span class="k">class</span> <span class="nc">ConvertASDF</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">status_bar</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
