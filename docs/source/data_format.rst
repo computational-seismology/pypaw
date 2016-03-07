@@ -83,4 +83,20 @@ Save this as `convert_asdf.py` and you can use it::
 
 Examples of data conversion is located at `'examples/converter'`.
 
+**3. Conversion to SAC from ASDF**
 
+You can also convert ASDF to sac files. The script is located at ``examples/converter_to_sac/convert_to_sac.py``. Type::
+
+  convert_to_sac.py --help
+
+to check the usages.
+
+**4. Genarate station file from ASDF**
+
+Station file(used in SPECFEM3D_GLOBE) could be generated from ASDF file. The script is located at ``scripts/bins/generate_stations_asdf.py``. Type::
+
+  generate_stations_asdf.py --help
+
+to check the usage.
+
+* You could add `'scripts/bins'` to your `~/.bashrc`. So you can directly use scripts inside pypaw.

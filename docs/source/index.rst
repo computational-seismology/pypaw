@@ -18,7 +18,6 @@ Welcome to pypaw's documentation!
    examples
 
 
-
 Indices and tables
 ==================
 

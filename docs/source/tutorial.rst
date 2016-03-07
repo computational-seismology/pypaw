@@ -1,7 +1,12 @@
 Tutorial
 ========
 
-This tutorial requires you to have some basic knowledge about `Obspy <https://github.com/obspy/obspy/wiki>`_ and `Pyasdf <http://seismicdata.github.io/pyasdf/>`_.
+** This tutorial requires you to have some basic knowledge about `Obspy <https://github.com/obspy/obspy/wiki>`_ and `Pyasdf <http://seismicdata.github.io/pyasdf/>`_.  
+
+If you hava difficulty plotting figures on cluster, check you X11 settings. Also, if you don't want to use X11 environment, please add add these two lines at the top of your python job script::
+  
+  import matplotlib as mpl
+  mpl.use('Agg')  # NOQA 
 
 1. Singal Processing
 --------------------
@@ -118,6 +123,7 @@ One tip, if you set the ``figure_mode`` as ``True``, then don't use too many cor
 3. Adjoint Sources
 ------------------
 Path and parameter files should be specified. For input, it requires an observed and synthetic asdf file, a window file. The output is an adjoint asdf file. A example of 'path.json' file::
+
   {
     "obsd_asdf": "/path/to/obsd/asdf/file",
     "obsd_tag": "obsd_tag",
@@ -236,6 +242,6 @@ Job scripts::
       proc = AdjPreASDF(args.path_file, args.params_file, verbose=args.verbose)
       proc.smart_run()
 
-Save it as 'adjproc.py' and launch the job on 16 cores:
+Save it as 'adjproc.py' and launch the job on 16 cores::
   
   mpiexec -n 16 python adjproc.py -f path.json -p param.yml -v
