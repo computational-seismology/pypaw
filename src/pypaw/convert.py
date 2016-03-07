@@ -148,6 +148,7 @@ def write_stream_to_sac(stream, outputdir, tag=""):
         tr.write(filename, format="SAC")
 
 
+@timing
 def convert_from_asdf(asdf_fn, outputdir, tag=None, filetype="sac",
                       output_staxml=True, output_quakeml=True,
                       _verbose=True):
@@ -174,12 +175,11 @@ def convert_from_asdf(asdf_fn, outputdir, tag=None, filetype="sac",
     ds = ASDFDataSet(asdf_fn)
 
     if output_quakeml:
-        for event in ds.events:
-            event_id = event.event_descriptions[0].text
-            filename = os.path.join(outputdir, "CMT_%s.xml" % event_id)
+        if len(ds.events) >= 1:
+            filename = os.path.join(outputdir, "Quakeml.xml")
             if _verbose:
                 print("Quakeml file: %s" % filename)
-            event.write(filename, format="QUAKEML")
+            ds.events.write(filename, format="QUAKEML")
 
     sta_list = ds.waveforms.list()
 
