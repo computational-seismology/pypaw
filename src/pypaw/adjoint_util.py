@@ -74,7 +74,7 @@ def reshape_adj(adjsrcs, time_offset, staxml):
     sta_dep = staxml[0][0][0].depth
 
     for adj in adjsrcs:
-        adj_array = adj.adjoint_source
+        adj_array = adj.adjoint_source[::-1]
 
         station_id = "%s.%s" % (adj.network, adj.station)
 
