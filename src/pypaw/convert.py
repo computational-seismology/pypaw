@@ -12,6 +12,7 @@ Methods that contains utils for adjoint sources
 from __future__ import (absolute_import, division, print_function)
 import os
 import glob
+import numpy as np
 from .utils import smart_read_json, drawProgressBar, timing
 from pyasdf import ASDFDataSet
 import obspy
@@ -215,6 +216,42 @@ def convert_from_asdf(asdf_fn, outputdir, tag=None, filetype="sac",
                     print("Error creating STATIONXML: %f" % filename)
 
     del ds
+
+
+@timing
+def convert_adjsrcs_from_asdf(asdf_fn, outputdir, _verbose=True):
+    """
+    Convert adjoint sources from asdf to ASCII file(for specfem3d_globe use)
+    """
+    if not os.path.exists(asdf_fn):
+        raise ValueError("No asdf file: %s" % asdf_fn)
+    if not os.path.exists(outputdir):
+        os.makedirs(outputdir)
+
+    print("Input ASDF: %s" % asdf_fn)
+    print("Output dir: %s" % outputdir)
+
+    ds = ASDFDataSet(asdf_fn)
+    if "AdjointSources" not in ds.auxiliary_data:
+        print("No adjoint source exists in asdf file: %s" % asdf_fn)
+        return
+    adjsrcs = ds.auxiliary_data.AdjointSources
+    nadj = len(adjsrcs)
+    print("Number of adjoint sources: %d" % nadj)
+
+    for idx, adj in enumerate(adjsrcs):
+        if _verbose:
+            print("Adjoint sources(%d/%d) from: %s" % (idx, nadj, adj.path))
+        time_offset = adj.parameters["time_offset"]
+        dt = adj.parameters['dt']
+        npts = len(adj.data)
+        times = np.array([time_offset + i * dt for i in range(npts)])
+        _data = np.zeros([npts, 2])
+        _data[:, 0] = times[:]
+        _data[:, 1] = adj.data[:]
+        adj_path = adj.path.replace("_", ".")
+        filename = os.path.join(outputdir, "%s.adj" % adj_path)
+        np.savetxt(filename, _data)
 
 
 class ConvertASDF(object):
