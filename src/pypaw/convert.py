@@ -24,7 +24,8 @@ def create_simple_inventory(network, station, latitude=None, longitude=None,
                             elevation=None, depth=None, start_date=None,
                             end_date=None, location_code="S3"):
     """
-    Create simple inventory for synthetic data
+    Create simple inventory for synthetic data with only location
+    information, for ZNE component
     """
     azi_dict = {"MXZ": 0.0,  "MXN": 0.0, "MXE": 90.0}
     dip_dict = {"MXZ": 90.0, "MXN": 0.0, "MXE": 0.0}
@@ -94,8 +95,12 @@ def convert_to_asdf(asdf_fn, waveform_filelist, tag, quakemlfile=None,
             raise ValueError("File not exist %i of %i: %s"
                              % (_i, nwaveform, filename))
 
-        st = obspy.read(filename)
-        ds.add_waveforms(st, tag=tag, event_id=event)
+        try:
+            st = obspy.read(filename)
+            ds.add_waveforms(st, tag=tag, event_id=event)
+        except Exception as err:
+            print("Error converting(%s) due to:" % (filename, err))
+            continue
         if create_simple_inv:
             for tr in st:
                 sta_tag = "%s_%s" % (tr.stats.network, tr.stats.station)
@@ -129,7 +134,10 @@ def convert_to_asdf(asdf_fn, waveform_filelist, tag, quakemlfile=None,
                 if not os.path.exists(filename):
                     raise ValueError("Staxml not exist %i of %i: %s"
                                      % (_i, nstaxml, filename))
-                ds.add_stationxml(filename)
+                try:
+                    ds.add_stationxml(filename)
+                except Exception as err:
+                    print("Error convert(%s) due to:%s" % (filename, err))
                 if status_bar > 0:
                     drawProgressBar((_i+1)/nstaxml, "Adding StationXML data")
         else:
