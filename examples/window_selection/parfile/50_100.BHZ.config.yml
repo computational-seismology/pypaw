@@ -52,3 +52,10 @@
 
 # window merge strategy
 "resolution_strategy": "interval_scheduling"
+
+# This flag works on multiple instrument, for example, if there are
+# ["II.AAK.00.BHZ" and "II.AAK.10.BHZ", "II.AAK.20.BHZ", ...], you 
+# only want to keep one of them, please set this flag to true. Then
+# it will keep only one instrument with the most windows. If set to
+# False, then it will write all windows out without any selection.
+"instrument_merge_flag": True

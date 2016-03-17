@@ -12,6 +12,9 @@ so they are invisible to users.
 """
 from __future__ import (absolute_import, division, print_function)
 from functools import partial
+import os
+import json
+import numpy as np
 from .procbase import ProcASDFBase
 from pytomo3d.window.window import window_on_stream
 import pyflex
@@ -99,11 +102,67 @@ class WindowASDF(ProcASDFBase):
                                  "(%6.2f)" % (minp, maxp))
 
     @staticmethod
+    def _merge_multiple_instruments(windows):
+        """
+        Merge windows from multiple instruments by picking the one
+        with most number of windows(thus keep only one)
+        """
+        new_windows = {}
+
+        for sta, sta_win in windows.iteritems():
+            sort_dict = {}
+            if sta_win is None:
+                continue
+            for idx, chan in enumerate(sta_win):
+                chan_id = chan[0].channel_id
+                comp = chan_id.split('.')[-1]
+                if comp not in sort_dict:
+                    sort_dict[comp] = []
+                sort_dict[comp].append([idx, len(chan)])
+
+            choosen_list = []
+            for comp, comp_info in sort_dict.iteritems():
+                _max_idx = np.array(comp_info)[:, 1].argmax()
+                choosen_list.append(sta_win[comp_info[_max_idx][0]])
+
+            new_windows[sta] = choosen_list
+        return new_windows
+
+    @staticmethod
+    def _stats_all_windows(windows, obsd_tag, synt_tag, outputdir):
+        window_stats = {"obsd_tag": obsd_tag, "synt_tag": synt_tag}
+        for sta_name, sta_win in windows.iteritems():
+            if sta_win is None:
+                continue
+            for channel_win in sta_win:
+                channel_id = channel_win[0].channel_id
+                comp = channel_id.split(".")[-1]
+                if comp not in window_stats:
+                    window_stats[comp] = {"window": 0, "station": 0}
+                window_stats[comp]["window"] += len(channel_win)
+                window_stats[comp]["station"] += 1
+
+        filename = os.path.join(outputdir, "windows.stats.json")
+        with open(filename, "w") as fh:
+            json.dump(window_stats, fh, indent=2, sort_keys=True)
+
+    @staticmethod
     def load_window_config(param):
         config_dict = {}
+        flag_list = []
         for key, value in param.iteritems():
+            # pop the "instrument_merge_flag" value out
+            flag_list.append(value["instrument_merge_flag"])
+            value.pop("instrument_merge_flag")
+
             config_dict[key] = pyflex.Config(**value)
-        return config_dict
+
+        if not all(_e == flag_list[0] for _e in flag_list):
+            raise ValueError("Instrument_merge_flag not consistent amonge"
+                             "different parameter yaml files(%s). Check!"
+                             % flag_list)
+
+        return config_dict, flag_list[0]
 
     def _core(self, path, param):
 
@@ -132,7 +191,7 @@ class WindowASDF(ProcASDFBase):
 
         event = obsd_ds.events[0]
 
-        config_dict = self.load_window_config(param)
+        config_dict, instrument_merge_flag = self.load_window_config(param)
 
         winfunc = partial(window_wrapper, config_dict=config_dict,
                           obsd_tag=obsd_tag, synt_tag=synt_tag,
@@ -141,6 +200,14 @@ class WindowASDF(ProcASDFBase):
 
         results = \
             obsd_ds.process_two_files(synt_ds, winfunc)
+
+        if self.rank == 0:
+            if instrument_merge_flag:
+                # merge multiple instruments
+                results = self._merge_multiple_instruments(results)
+            # stats windows on rand 0
+            self._stats_all_windows(results, obsd_tag, synt_tag,
+                                    path["output_dir"])
 
         if self.rank == 0:
             write_window_json(results, output_dir)
