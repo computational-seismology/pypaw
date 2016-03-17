@@ -18,8 +18,8 @@ echo "process observed file..."
 #  -v
 
 # mpi
-mpiexec -n 2 python process_observed.py \
-  -p ./parfile/proc_obsd.50_100.yml \
+mpiexec -n 2 python process_asdf.py \
+  -p ./parfile/proc_obsd.50_100.param.yml \
   -f ./parfile/proc_obsd.path.json \
   -v
 
@@ -32,24 +32,7 @@ mpiexec -n 2 python process_observed.py \
 
 echo "++++++"
 echo "process synthetic file..."
-# multi-processing
-#python process_synthetic.py \
-#  -p ./parfile/proc_synt.params.json \
-#  -f ./parfile/proc_synt.dirs.json \
-#  -v
-
-#python process_synthetic.py \
-#  -p ./parfile/proc_synt.params.json.2 \
-#  -f ./parfile/proc_synt.dirs.json.2 \
-#  -v
-
-# mpi
-mpiexec -n 2 python process_synthetic.py \
-  -p ./parfile/proc_synt.50_100.yml \
+mpiexec -n 2 python process_asdf.py \
+  -p ./parfile/proc_synt.50_100.param.yml \
   -f ./parfile/proc_synt.path.json \
   -v
-
-#mpiexec -n 2 python ../process_synthetic.py \
-#  -p ./parfile/proc_synt.params.json.2 \
-#  -f ./parfile/proc_synt.dirs.json.2 \
-#  -v

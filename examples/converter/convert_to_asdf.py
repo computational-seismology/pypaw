@@ -1,0 +1,1 @@
+../../scripts/bins/convert_to_asdf.py

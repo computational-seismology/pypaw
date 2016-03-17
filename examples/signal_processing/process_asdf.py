@@ -1,0 +1,1 @@
+../../scripts/bins/process_asdf.py

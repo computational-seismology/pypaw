@@ -6,7 +6,7 @@
 # cores since every core will write large figure files.
 # Since the test file only contains 4 stream, please
 # the numproc=2 and do not change it.
-mpiexec -n 2 python window_selection.py \
+mpiexec -n 2 python window_selection_asdf.py \
   -p ./parfile/window.param.yml \
   -f ./parfile/window.path.json \
   -v

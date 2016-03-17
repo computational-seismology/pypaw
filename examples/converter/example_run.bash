@@ -13,12 +13,12 @@ echo "Running examples..."
 # convert observed mseed files into hdf5 file
 echo "++++++++++"
 echo "Convert obsd files into asdf..."
-python convert_asdf.py -f ./parfile/convert.obsd.json -v -s
+python convert_to_asdf.py -f ./parfile/convert.obsd.json -v -s
 
 # convert synthetic mseed files into hdf5 file
 echo "+++++++++"
 echo "Convert synt files into hdf5"
-python convert_asdf.py -f ./parfile/convert.synt.json -v -s
+python convert_to_asdf.py -f ./parfile/convert.synt.json -v -s
 
 
 
