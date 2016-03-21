@@ -12,8 +12,9 @@ Class that calculate adjoint source using asdf
 from __future__ import (absolute_import, division, print_function)
 from functools import partial
 import pyadjoint
+from pyasdf import ASDFDataSet
 from pytomo3d.adjoint.adjsrc import calculate_adjsrc_on_stream
-from pytomo3d.adjoint.adjsrc import postprocess_adjsrc
+from pytomo3d.adjoint.process_adjsrc import process_adjoint
 from .procbase import ProcASDFBase
 from .adjoint_util import reshape_adj, calculate_chan_weight
 from .adjoint_util import smart_transform_window
@@ -100,9 +101,10 @@ def adjoint_wrapper(obsd_station_group, synt_station_group, config=None,
     time_offset = -1.5 * hdr
     # according to SPECFEM starttime convention
     interp_starttime = origin.time + time_offset
-    new_adjsrcs = postprocess_adjsrc(
-        adjsrcs, interp_starttime, interp_delta,
-        interp_npts, rotate_flag=True, inventory=synt_staxml,
+    new_adjsrcs = process_adjoint(
+        adjsrcs, interp_flag=True, interp_starttime=interp_starttime,
+        interp_delta=interp_delta, interp_npts=interp_npts,
+        rotate_flag=True, inventory=synt_staxml,
         event=event, sum_over_comp_flag=True, weight_flag=True,
         weight_dict=chan_weight_dict, filter_flag=False)
 
@@ -213,6 +215,14 @@ class AdjointASDF(ProcASDFBase):
         param.pop("interp_npts", None)
 
         config = self.load_adjoint_config(param)
+
+        if self.mpi_mode and self.rank == 0:
+            output_ds = ASDFDataSet(output_filename, mpi=False)
+            if output_ds.events:
+                output_ds.events = obsd_ds.events
+            del output_ds
+        if self.mpi_mode:
+            self.comm.barrier()
 
         adjsrc_func = \
             partial(adjoint_wrapper, config=config,

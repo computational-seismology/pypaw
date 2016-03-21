@@ -1,0 +1,14 @@
+{
+  "input_file":[
+    {
+      "asdf_file": "../../tests/data/asdf/adjoint/C200912240023A.adjoint.50_100.h5",
+      "weight": {"Z":1.0, "R": 1.0, "T":1.0}
+    },
+    {
+      "asdf_file": "../../tests/data/asdf/adjoint/test.h5",
+      "weight": {"Z":1.0, "R": 1.0, "T":1.0}
+    }
+  ],
+  "rotate_flag": true,
+  "output_file": "../../tests/data/asdf/adjoint/sum.h5"
+}

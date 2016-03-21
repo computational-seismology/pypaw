@@ -18,7 +18,7 @@ from functools import partial
 from .procbase import ProcASDFBase
 from pytomo3d.signal.process import process
 from pytomo3d.adjoint.adjsrc import calculate_adjsrc_on_stream
-from pytomo3d.adjoint.adjsrc import postprocess_adjsrc
+from pytomo3d.adjoint.process_adjsrc import process_adjoint
 from pytomo3d.window.window import window_on_stream
 from .adjoint_util import calculate_chan_weight, reshape_adj
 from .adjoint_util import smart_transform_window
@@ -106,7 +106,7 @@ def func_wrapper(obsd_station_group, synt_station_group, obsd_tag=None,
     interp_delta = _raw_synt_tr.stats.delta
     interp_npts = _raw_synt_tr.stats.npts
     pre_filt = obsd_param["pre_filt"]
-    new_adjsrcs = postprocess_adjsrc(
+    new_adjsrcs = process_adjoint(
         adjsrcs, interp_starttime, interp_delta, interp_npts,
         rotate_flag=True, inventory=synt_staxml, event=event,
         sum_over_comp_flag=True, weight_flag=True,

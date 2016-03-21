@@ -129,8 +129,11 @@ class WindowASDF(ProcASDFBase):
         return new_windows
 
     @staticmethod
-    def _stats_all_windows(windows, obsd_tag, synt_tag, outputdir):
-        window_stats = {"obsd_tag": obsd_tag, "synt_tag": synt_tag}
+    def _stats_all_windows(windows, obsd_tag, synt_tag,
+                           instrument_merge_flag,
+                           outputdir):
+        window_stats = {"obsd_tag": obsd_tag, "synt_tag": synt_tag,
+                        "instrument_merge_flag": instrument_merge_flag}
         for sta_name, sta_win in windows.iteritems():
             if sta_win is None:
                 continue
@@ -207,7 +210,8 @@ class WindowASDF(ProcASDFBase):
                 results = self._merge_multiple_instruments(results)
             # stats windows on rand 0
             self._stats_all_windows(results, obsd_tag, synt_tag,
-                                    path["output_dir"])
+                                    instrument_merge_flag,
+                                    path["output_dir"],)
 
         if self.rank == 0:
             write_window_json(results, output_dir)
