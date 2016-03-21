@@ -63,3 +63,6 @@ target/
 
 # pycharm settings
 .idea
+
+# temp files
+*.sw*

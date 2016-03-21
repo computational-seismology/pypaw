@@ -10,6 +10,7 @@ Methods that contains utils for adjoint sources
     (http://www.gnu.org/copyleft/gpl.html)
 """
 from __future__ import (absolute_import, division, print_function)
+import numpy as np
 from pyadjoint import AdjointSource
 from pytomo3d.window.write_window import get_json_content
 from pyflex.window import Window
@@ -56,7 +57,7 @@ def ensemble_fake_adj(stream, time_offset=0.0):
     return adjsrc_dict, nwin_dict
 
 
-def reshape_adj(adjsrcs, time_offset, staxml):
+def reshape_adj(adjsrcs, time_offset, staxml, dtype=np.float32):
     """
     Reshape adjsrcs to a certain structure required by pyasdf writer
     """
@@ -74,7 +75,7 @@ def reshape_adj(adjsrcs, time_offset, staxml):
     sta_dep = staxml[0][0][0].depth
 
     for adj in adjsrcs:
-        adj_array = adj.adjoint_source[::-1]
+        adj_array = np.asarray(adj.adjoint_source[::-1], dtype=dtype)
 
         station_id = "%s.%s" % (adj.network, adj.station)
 
