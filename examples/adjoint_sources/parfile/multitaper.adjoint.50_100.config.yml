@@ -1,0 +1,49 @@
+# adjoint source type
+adj_src_type: "multitaper_misfit"
+
+# min and max period(unit: second)
+min_period: 50.0
+max_period: 100.0
+
+# adjoint config parameter
+lnpt: 15
+transfunc_waterlevel: 1.0E-10
+ipower_costaper: 10
+min_cycle_in_window: 3
+taper_percentage: 0.3
+mt_nw: 4.0
+num_taper: 5
+phase_step: 1.5
+dt_fac: 2.0
+err_fac: 2.5
+dt_max_scale: 3.5
+measure_type: 'dt'
+taper_type: 'hann'
+use_cc_error: True
+use_mt_error: False
+
+---
+# for postprocessing adjoint sources
+# interpolation. Starttime will be automatically set as cmt_time - 1.5 * hdur
+# to fit the SPECFEM behaviour
+interp_flag: True
+interp_delta: 0.1425
+interp_npts: 42000
+
+# for sum multiple insturments, like "II.AAK.00.BHZ" and "II.AAK.10.BHZ". if you turn
+# the weight_flag to be true, then you need also provide the weight_dict in the code
+sum_over_comp_flag: True
+weight_flag: False
+
+# filter the adjoint source
+filter_flag: True
+pre_filt: [0.0067, 0.01, 0.02, 0.025]
+
+# add missing components with zero trace(to prepare rotate)
+# If set to False, only rotate those with Both "R" and "T"
+# components. Set to True highly recommended unless you are
+# sreu what you are doing
+add_missing_comp_flag: True
+
+# rotate the adjoint source
+rotate_flag: False

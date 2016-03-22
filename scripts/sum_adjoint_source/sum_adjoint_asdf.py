@@ -3,13 +3,16 @@
 Class that sums the several adjoint source files together based
 on certain weights provided by the user
 """
+from __future__ import (print_function, division)
 import os
+import numpy as np
 import json
 import argparse
 from obspy import Stream, Trace
 from pyasdf import ASDFDataSet
 from pytomo3d.signal.rotate import rotate_one_station_stream
 from pytomo3d.adjoint.process_adjsrc import convert_stream_to_adjs
+from pprint import pprint
 
 
 class PostAdjASDF(object):
@@ -32,14 +35,15 @@ class PostAdjASDF(object):
             station_id = "%s_%s_%s" % (nw, sta, comp)
             if station_id not in self.adjoint_sources:
                 self.adjoint_sources[station_id] = adj
-                self.adjoint_sources[station_id].data *= comp_weight
+                _array = np.array(self.adjoint_sources[station_id].data)
+                self.adjoint_sources[station_id].data = comp_weight * _array
             else:
                 adj_base = self.adjoint_sources[station_id]
                 if len(adj_base.data) != len(adj.data):
                     raise ValueError("Dimension of current adjoint_source(%d)"
                                      "and new adj(%d) not the same" %
                                      (len(adj_base.data), len(adj.data)))
-                adj_base.data += comp_weight * adj.data
+                adj_base.data += comp_weight * np.array(adj.data)
 
     def check_all_event_info(self):
         """
@@ -66,6 +70,7 @@ class PostAdjASDF(object):
         """
         Sum different asdf files
         """
+        print("="*15 + "\nSumming asdf files...")
         self.check_all_event_info()
         # then sum
         for _file_info in self.path["input_file"]:
@@ -75,25 +80,41 @@ class PostAdjASDF(object):
                 raise ValueError("AdjointSources not exists in the file: %s"
                                  % filename)
             _weight = _file_info["weight"]
+            if self.verbose:
+                print("Adding asdf file(%s) using assigned weight(%s)"
+                      % (filename, _weight))
             self.add_adjoint_dataset(ds, _weight)
 
+    @staticmethod
+    def print_info(content, extra_info=""):
+        print("="*20 + extra_info + "="*20)
+        if not isinstance(content, dict):
+            raise TypeError("Type of content(%s) must by dict" % type(content))
+        pprint(content)
+
     def _convert_adjs_to_stream(self, sta_adjs):
+        """
+        Convert adjoint source from hdf5 file into stream object.
+        Attention: this adjoint source is different from the AdjointSource
+            defined in pyadjoint
+        """
         meta_info = {}
         stream = Stream()
         for adj in sta_adjs:
             tr = Trace()
             tr.data = adj.data
             tr.starttime = self.event_time + adj.parameters["time_offset"]
-            tr.stats.delta = adj.dt
+            tr.stats.delta = adj.parameters["dt"]
             tr.stats.channel = adj.parameters["component"]
             tr.stats.station = adj.parameters["station_id"].split(".")[1]
             tr.stats.network = adj.parameters["station_id"].split(".")[0]
 
             stream.append(tr)
-            meta_info[tr.id] = {"adj_src_type": adj.adj_src_type,
-                                "misfit": adj.misfit,
-                                "min_period": adj.min_period,
-                                "max_period": adj.max_period}
+            meta_info[tr.id] = \
+                {"adj_src_type": adj.parameters["adjoint_source_type"],
+                 "misfit": adj.parameters["misfit"],
+                 "min_period": adj.parameters["min_period"],
+                 "max_period": adj.parameters["max_period"]}
         return stream, meta_info
 
     def _rotate_one_station(self, sta_adjs, slat, slon):
@@ -118,17 +139,19 @@ class PostAdjASDF(object):
         self.event_longitude = origin.longitude
         self.event_time = origin.time
 
-    def rotate_asdf(self, event):
+    def rotate_asdf(self):
         """
         Rotate self.adjoint_sources
         """
+        print("="*15 + "\nRotate adjoint sources from RT to EN")
         done_sta_list = []
         old_adjs = self.adjoint_sources
         new_adjs = {}
         station_locations = {}
 
         for adj_id, adj in old_adjs.iteritems():
-            sta_tag = "%s_%s" % (adj.network, adj.station)
+            network, station = adj.parameters["station_id"].split(".")
+            sta_tag = "%s_%s" % (network, station)
             slat = adj.parameters["latitude"]
             slon = adj.parameters["longitude"]
             station_locations[sta_tag] = \
@@ -147,16 +170,24 @@ class PostAdjASDF(object):
         self.station_locations = station_locations
         self.adjoint_sources = new_adjs
 
-    def dump_to_asdf(self, outputfile):
+    def dump_to_asdf(self, outputfile, dtype=np.float32):
         """
         Dump self.adjoin_sources into adjoint file
         """
+        print("="*15 + "\nWrite to file: %s" % outputfile)
+        if os.path.exists(outputfile):
+            print("Output file exists and removed:%s" % outputfile)
+            os.remove(outputfile)
+
         ds = ASDFDataSet(outputfile)
         event = self.events[0]
         origin = event.preferred_origin()
         event_time = origin.time
 
-        for adj_id, adj in self.adjoint_sources.iteritems():
+        for adj_id in sorted(self.adjoint_sources):
+            adj = self.adjoint_sources[adj_id]
+            adj_array = np.asarray(adj.adjoint_source, dtype=dtype)
+
             time_offset = adj.starttime - event_time
             sta_tag = "%s_%s" % (adj.network, adj.station)
             sta_info = self.station_locations[sta_tag]
@@ -173,14 +204,19 @@ class PostAdjASDF(object):
                  "station_id": adj_id, "component": adj.component,
                  "units": "m"}
             adj_path = "AdjointSources/%s" % adj_id
+            if self.verbose:
+                print("adj_path:", adj_path)
 
-            ds.add_auxiliary_data(adj.data, data_type="auxiliary_data",
+            ds.add_auxiliary_data(adj_array, data_type="AuxiliaryData",
                                   path=adj_path, parameters=parameters)
 
     def smart_run(self):
+
         if isinstance(self.path, str):
             with open(self.path) as fh:
                 self.path = json.load(fh)
+        self.print_info(self.path, extra_info="Input Parameter")
+
         # sum asdf files
         self.sum_asdf()
 
@@ -189,12 +225,9 @@ class PostAdjASDF(object):
             self._extract_event_info()
             self.rotate_asdf()
 
-        # write out adjoint asdf file
         outputfile = self.path["output_file"]
-        if os.path.exists(outputfile):
-            print("Output file exists and removed:%s" % outputfile)
-            os.remove(outputfile)
-        # self.dump_to_asdf(outputfile)
+        # write out adjoint asdf file
+        self.dump_to_asdf(outputfile)
 
 
 if __name__ == '__main__':

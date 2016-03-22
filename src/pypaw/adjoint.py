@@ -24,7 +24,7 @@ from .utils import smart_read_json
 def adjoint_wrapper(obsd_station_group, synt_station_group, config=None,
                     obsd_tag=None, synt_tag=None, windows=None, event=None,
                     adj_src_type="multitaper_misfit",
-                    interp_delta=None, interp_npts=None,
+                    postproc_param=None,
                     figure_mode=False, figure_dir=False,
                     adjoint_src_flag=True):
 
@@ -98,15 +98,15 @@ def adjoint_wrapper(obsd_station_group, synt_station_group, config=None,
     origin = event.preferred_origin() or event.origins[0]
     focal = event.preferred_focal_mechanism()
     hdr = focal.moment_tensor.source_time_function.duration
-    time_offset = -1.5 * hdr
     # according to SPECFEM starttime convention
-    interp_starttime = origin.time + time_offset
+    time_offset = -1.5 * hdr
+    starttime = origin.time + time_offset
+
     new_adjsrcs = process_adjoint(
-        adjsrcs, interp_flag=True, interp_starttime=interp_starttime,
-        interp_delta=interp_delta, interp_npts=interp_npts,
-        rotate_flag=True, inventory=synt_staxml,
-        event=event, sum_over_comp_flag=True, weight_flag=True,
-        weight_dict=chan_weight_dict, filter_flag=False)
+        adjsrcs, interp_starttime=starttime,
+        inventory=synt_staxml, event=event,
+        weight_dict=chan_weight_dict,
+        **postproc_param)
 
     _final = reshape_adj(new_adjsrcs, time_offset, synt_staxml)
 
@@ -180,12 +180,16 @@ class AdjointASDF(ProcASDFBase):
         :type param: dict
         :return:
         """
-
+        adjoint_param = param[0]
+        postproc_param = param[1]
         self._validate_path(path)
-        self._validate_param(param)
+        self._validate_param(adjoint_param)
 
         self.print_info(path, extra_info="Path information")
-        self.print_info(param, extra_info="Param information")
+        self.print_info(adjoint_param,
+                        extra_info="Adjoint parameter information")
+        self.print_info(postproc_param,
+                        extra_info="Postprocess parameter information")
 
         obsd_file = path["obsd_asdf"]
         synt_file = path["synt_asdf"]
@@ -207,14 +211,10 @@ class AdjointASDF(ProcASDFBase):
         event = obsd_ds.events[0]
         windows = self.load_windows(window_file)
 
-        adj_src_type = param["adj_src_type"]
-        interp_delta = param["interp_delta"]
-        interp_npts = param["interp_npts"]
-        param.pop("adj_src_type", None)
-        param.pop("interp_delta", None)
-        param.pop("interp_npts", None)
+        adj_src_type = adjoint_param["adj_src_type"]
+        adjoint_param.pop("adj_src_type", None)
 
-        config = self.load_adjoint_config(param)
+        config = self.load_adjoint_config(adjoint_param)
 
         if self.mpi_mode and self.rank == 0:
             output_ds = ASDFDataSet(output_filename, mpi=False)
@@ -229,7 +229,7 @@ class AdjointASDF(ProcASDFBase):
                     obsd_tag=obsd_tag, synt_tag=synt_tag,
                     windows=windows, event=event,
                     adj_src_type=adj_src_type,
-                    interp_delta=interp_delta, interp_npts=interp_npts,
+                    postproc_param=postproc_param,
                     figure_mode=figure_mode, figure_dir=figure_dir)
 
         results = obsd_ds.process_two_files(synt_ds, adjsrc_func,

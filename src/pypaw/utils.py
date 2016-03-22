@@ -87,7 +87,12 @@ def smart_read_json(json_file, mpi_mode=True, comm=None, object_hook=False):
 
 def read_yaml_file(filename):
     with open(filename) as fh:
-        return yaml.load(fh)
+        content = yaml.load_all(fh)
+        content = list(content)
+    if len(content) == 1:
+        return content[0]
+    else:
+        return content
 
 
 def smart_read_yaml(yaml_file, mpi_mode=True, comm=None):
