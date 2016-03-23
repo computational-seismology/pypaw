@@ -26,8 +26,7 @@ def test_flake8():
     # Possibility to ignore some files and paths.
     ignore_paths = [
         os.path.join(basedir, "doc"),
-        os.path.join(basedir, ".git"),
-        os.path.join(basedir, "scripts")]
+        os.path.join(basedir, ".git")]
     files = []
 
     for dirpath, _, filenames in os.walk(basedir):

@@ -17,11 +17,18 @@ import numpy as np
 
 
 def get_json_content(window):
+    # to be compatable with old version of pyflex, which doesn't
+    # have window.channel_id_2
+    try:
+        synt_id = window.channel_id_2
+    except:
+        synt_id = "UNKNOWN"
     info = {
         "left_index": window.left,
         "right_index": window.right,
         "center_index": window.center,
         "channel_id": window.channel_id,
+        "channel_id_2": synt_id,
         "time_of_first_sample": window.time_of_first_sample,
         "max_cc_value":  window.max_cc_value,
         "cc_shift_in_samples":  window.cc_shift,
