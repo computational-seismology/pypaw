@@ -81,8 +81,13 @@ Pypaw has dependancies on the following packages:
   ```
 
 10. install h5py
-
+  Down load the code using:
   ```
+  git clone https://github.com/h5py/h5py
+  ```
+  and then install the code.
+  ```
+  cd h5py
   export CC=mpicc
   python setup.py configure --mpi
   python setup.py configure --hdf5=/path/to/hdf5/install/dir
