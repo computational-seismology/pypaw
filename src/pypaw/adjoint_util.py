@@ -57,7 +57,47 @@ def ensemble_fake_adj(stream, time_offset=0.0):
     return adjsrc_dict, nwin_dict
 
 
-def reshape_adj(adjsrcs, time_offset, staxml, dtype=np.float32):
+def change_channel_name(adjsrcs, channel):
+    """
+    Change adjoint source channel name
+    """
+    for adj in adjsrcs:
+        adj.component = channel + adj.component[-1]
+
+
+def check_multiple_instruments(adjsrcs):
+    """
+    Check if there are mutiple instruments for one component
+    This is very important because if there is only one instrument
+    for one component, we can define the path shorter and change
+    channel name to "MX" to follow the specfem style
+    """
+    name_list = []
+    adj_dict = {}
+    for adj in adjsrcs:
+        cat = adj.component[-1]
+        if cat not in adj_dict:
+            adj_dict[cat] = []
+        adj_id = "%s.%s.%s.%s" % (adj.network, adj.station,
+                                  adj.location, adj.component)
+        adj_dict[cat].append(adj_id)
+        name_list.append(adj_id)
+
+    if len(set(name_list)) != len(name_list):
+        raise ValueError("Error on adjoint source(%s.%s) since it has"
+                         "duplicate name on adjoint source: %s"
+                         % (adj.network, adj.station, name_list))
+
+    _flag = False
+    for cat_info in adj_dict.itervalues():
+        if len(cat_info) > 1:
+            _flag = True
+            break
+    return _flag
+
+
+def reshape_adj(adjsrcs, time_offset, staxml, dtype=np.float32,
+                default_specfem_channel="MX"):
     """
     Reshape adjsrcs to a certain structure required by pyasdf writer
     """
@@ -74,6 +114,12 @@ def reshape_adj(adjsrcs, time_offset, staxml, dtype=np.float32):
     sta_ele = staxml[0][0].elevation
     sta_dep = staxml[0][0][0].depth
 
+    # sanity check to see if there are multiple instruments
+    _multiple_flag = check_multiple_instruments(adjsrcs)
+
+    if not _multiple_flag:
+        change_channel_name(adjsrcs, default_specfem_channel)
+
     for adj in adjsrcs:
         adj_array = np.asarray(adj.adjoint_source, dtype=dtype)
 
@@ -87,9 +133,15 @@ def reshape_adj(adjsrcs, time_offset, staxml, dtype=np.float32):
                       "latitude": sta_lat, "longitude": sta_lon,
                       "elevation_in_m": sta_ele, "depth_in_m": sta_dep,
                       "station_id": station_id, "component": adj.component,
+                      "location": adj.location,
                       "units": "m"}
 
-        tag = "%s_%s_%s" % (adj.network, adj.station, adj.component)
+        if _multiple_flag:
+            tag = "%s_%s_%s_%s" % (adj.network, adj.station,
+                                   adj.location, adj.component)
+        else:
+            tag = "%s_%s_%s" % (adj.network, adj.station, adj.component)
+
         tag_list.append(tag)
 
         dataset_path = "AdjointSources/%s" % tag
@@ -119,7 +171,9 @@ def _stats_channel_window(adjsrcs, windows):
         adj_dict[adj_id] = idx
 
     adj_win_dict = {}
-    for chan_win in windows:
+    for chan_win in windows.itervalues():
+        if len(chan_win) == 0:
+            continue
         chan_id = chan_win[0]["channel_id"]
         adj_win_dict[chan_id] = len(chan_win)
 

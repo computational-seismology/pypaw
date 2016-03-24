@@ -19,16 +19,11 @@ import numpy as np
 def get_json_content(window):
     # to be compatable with old version of pyflex, which doesn't
     # have window.channel_id_2
-    try:
-        synt_id = window.channel_id_2
-    except:
-        synt_id = "UNKNOWN"
     info = {
         "left_index": window.left,
         "right_index": window.right,
         "center_index": window.center,
         "channel_id": window.channel_id,
-        "channel_id_2": synt_id,
         "time_of_first_sample": window.time_of_first_sample,
         "max_cc_value":  window.max_cc_value,
         "cc_shift_in_samples":  window.cc_shift,
@@ -42,6 +37,9 @@ def get_json_content(window):
         "relative_starttime": window.relative_starttime,
         "relative_endtime": window.relative_endtime,
         "window_weight": window.weight}
+
+    if "channel_id_2" in dir(window):
+        info["channel_id_2"] = window.channel_id_2
 
     return info
 
@@ -68,15 +66,15 @@ def write_window_json(results, outputdir):
     output_json = os.path.join(outputdir, "windows.json")
     print("Output window file: %s" % output_json)
     window_all = {}
-    for key, sta_win in results.iteritems():
-        if sta_win is None or len(sta_win) == 0:
+    for station, sta_win in results.iteritems():
+        if sta_win is None:
             continue
-        window_all[key] = {}
-        _window_comp = []
-        for _comp in sta_win:
-            _window = [get_json_content(_i) for _i in _comp]
-            _window_comp.append(_window)
-        window_all[key] = _window_comp
+        window_all[station] = {}
+        _window_comp = {}
+        for trace_id, trace_win in sta_win.iteritems():
+            _window = [get_json_content(_i) for _i in trace_win]
+            _window_comp[trace_id] = _window
+        window_all[station] = _window_comp
 
     with open(output_json, 'w') as fh:
         j = json.dumps(window_all, cls=WindowEncoder, sort_keys=True,

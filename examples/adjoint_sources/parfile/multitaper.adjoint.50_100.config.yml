@@ -32,8 +32,8 @@ interp_npts: 42000
 
 # for sum multiple insturments, like "II.AAK.00.BHZ" and "II.AAK.10.BHZ". if you turn
 # the weight_flag to be true, then you need also provide the weight_dict in the code
-sum_over_comp_flag: True
-weight_flag: False
+sum_over_comp_flag: False
+weight_flag: True
 
 # filter the adjoint source
 filter_flag: True
@@ -43,7 +43,7 @@ pre_filt: [0.0067, 0.01, 0.02, 0.025]
 # If set to False, only rotate those with Both "R" and "T"
 # components. Set to True highly recommended unless you are
 # sreu what you are doing
-add_missing_comp_flag: True
+add_missing_comp_flag: False
 
 # rotate the adjoint source
 rotate_flag: False

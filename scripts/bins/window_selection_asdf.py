@@ -15,5 +15,7 @@ if __name__ == '__main__':
                         help="verbose")
     args = parser.parse_args()
 
-    proc = WindowASDF(args.path_file, args.params_file, verbose=args.verbose)
+    proc = WindowASDF(args.path_file, args.params_file,
+                      components=["BHZ", "BHR", "BHT"],
+                      verbose=args.verbose)
     proc.smart_run()

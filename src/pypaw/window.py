@@ -102,48 +102,123 @@ class WindowASDF(ProcASDFBase):
                                  "(%6.2f)" % (minp, maxp))
 
     @staticmethod
-    def _merge_multiple_instruments(windows):
+    def __merge_instruments_window(sta_win):
+        """
+        Merge windows from the same channel, for example, if
+        there are windows from 00.BHZ and 10.BHZ, kepy only one
+        with the most windows
+        """
+        sort_dict = {}
+        for trace_id, trace_win in sta_win.iteritems():
+            chan = trace_id.split('.')[-1][0:2]
+            loc = trace_id.split('.')[-2]
+            if chan not in sort_dict:
+                sort_dict[chan] = {}
+            if loc not in sort_dict[chan]:
+                sort_dict[chan][loc] = {"traces": [], "nwins": 0}
+            sort_dict[chan][loc]["traces"].append(trace_id)
+            sort_dict[chan][loc]["nwins"] += len(trace_win)
+
+        choosen_wins = {}
+        for chan, chan_info in sort_dict.iteritems():
+            if len(chan_info.keys()) <= 1:
+                choosen_loc = chan_info.keys()[0]
+            else:
+                _locs = []
+                _nwins = []
+                for loc, loc_info in chan_info.iteritems():
+                    _locs.append(loc)
+                    _nwins.append(loc_info["nwins"])
+                _max_idx = np.array(_nwins).argmax()
+                choosen_loc = _locs[_max_idx]
+
+            choosen_traces = sort_dict[chan][choosen_loc]["traces"]
+            for _trace_id in choosen_traces:
+                choosen_wins[_trace_id] = sta_win[_trace_id]
+
+        return choosen_wins
+
+    @staticmethod
+    def __merge_channels_window(sta_win):
+        """
+        Merge windows from different channels.
+        This step should be done after merge instruments windows
+        because after that there will only one instrument left
+        on one channel
+        """
+        sort_dict = {}
+
+        for trace_id, trace_win in sta_win.iteritems():
+            chan = trace_id.split(".")[-1][0:2]
+            if chan not in sort_dict:
+                sort_dict[chan] = {"traces": [], "nwins": 0}
+            sort_dict[chan]["traces"].append(trace_id)
+            sort_dict[chan]["nwins"] += len(trace_win)
+
+        choosen_wins = {}
+        if len(sort_dict.keys()) <= 1:
+            choosen_chan = sort_dict.keys()[0]
+        else:
+            _chans = []
+            _nwins = []
+            for chan, chan_info in sort_dict.iteritems():
+                _chans.append(chan)
+                _nwins.append(chan_info["nwins"])
+            _max_idx = np.array(_nwins).argmax()
+            choosen_chan = _chans[_max_idx]
+
+        choosen_traces = sort_dict[choosen_chan]["traces"]
+        for _trace_id in choosen_traces:
+            choosen_wins[_trace_id] = sta_win[_trace_id]
+
+        return choosen_wins
+
+    def _merge_multiple_instruments(self, windows):
         """
         Merge windows from multiple instruments by picking the one
-        with most number of windows(thus keep only one)
+        with most number of windows(thus keep only one), for example,
+        II.AAK.00.BHZ has 10 windows while II.AAK.10.BHZ has 5 windows.
+        Then only II.AAK.00.BHZ will be kept.
+        Attention, this flag also merges different channel, for example,
+        BH and LH.
         """
         new_windows = {}
 
         for sta, sta_win in windows.iteritems():
-            sort_dict = {}
             if sta_win is None:
                 continue
-            for idx, chan in enumerate(sta_win):
-                chan_id = chan[0].channel_id
-                comp = chan_id.split('.')[-1]
-                if comp not in sort_dict:
-                    sort_dict[comp] = []
-                sort_dict[comp].append([idx, len(chan)])
+            sta_win = self.__merge_instruments_window(sta_win)
+            sta_win = self.__merge_channels_window(sta_win)
+            new_windows[sta] = sta_win
 
-            choosen_list = []
-            for comp, comp_info in sort_dict.iteritems():
-                _max_idx = np.array(comp_info)[:, 1].argmax()
-                choosen_list.append(sta_win[comp_info[_max_idx][0]])
-
-            new_windows[sta] = choosen_list
         return new_windows
 
     @staticmethod
     def _stats_all_windows(windows, obsd_tag, synt_tag,
                            instrument_merge_flag,
                            outputdir):
+
         window_stats = {"obsd_tag": obsd_tag, "synt_tag": synt_tag,
-                        "instrument_merge_flag": instrument_merge_flag}
+                        "instrument_merge_flag": instrument_merge_flag,
+                        "stations": 0, "stations_with_windows": 0}
         for sta_name, sta_win in windows.iteritems():
             if sta_win is None:
                 continue
-            for channel_win in sta_win:
-                channel_id = channel_win[0].channel_id
-                comp = channel_id.split(".")[-1]
+            nwin_sta = 0
+            for trace_id, trace_win in sta_win.iteritems():
+                comp = trace_id.split(".")[-1]
                 if comp not in window_stats:
-                    window_stats[comp] = {"window": 0, "station": 0}
-                window_stats[comp]["window"] += len(channel_win)
-                window_stats[comp]["station"] += 1
+                    window_stats[comp] = {"window": 0, "traces": 0,
+                                          "traces_with_windows": 0}
+                window_stats[comp]["window"] += len(trace_win)
+                if len(trace_win) > 0:
+                    window_stats[comp]["traces_with_windows"] += 1
+                window_stats[comp]["traces"] += 1
+                nwin_sta += len(trace_win)
+
+            window_stats["stations"] += 1
+            if nwin_sta > 0:
+                window_stats["stations_with_windows"] += 1
 
         filename = os.path.join(outputdir, "windows.stats.json")
         with open(filename, "w") as fh:

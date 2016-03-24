@@ -17,7 +17,6 @@ from pytomo3d.adjoint.adjsrc import calculate_adjsrc_on_stream
 from pytomo3d.adjoint.process_adjsrc import process_adjoint
 from .procbase import ProcASDFBase
 from .adjoint_util import reshape_adj, calculate_chan_weight
-from .adjoint_util import smart_transform_window
 from .utils import smart_read_json
 
 
@@ -86,14 +85,17 @@ def adjoint_wrapper(obsd_station_group, synt_station_group, config=None,
     except:
         return
 
-    window_sta = smart_transform_window(window_sta)
+    # window_sta = smart_transform_window(window_sta)
 
     adjsrcs = calculate_adjsrc_on_stream(
         observed, synthetic, window_sta, config, adj_src_type,
         figure_mode=figure_mode, figure_dir=figure_dir,
         adjoint_src_flag=adjoint_src_flag)
 
-    chan_weight_dict = calculate_chan_weight(adjsrcs, window_sta)
+    if postproc_param["weight_flag"]:
+        chan_weight_dict = calculate_chan_weight(adjsrcs, window_sta)
+    else:
+        chan_weight_dict = None
 
     origin = event.preferred_origin() or event.origins[0]
     focal = event.preferred_focal_mechanism()
