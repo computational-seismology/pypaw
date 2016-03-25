@@ -108,6 +108,9 @@ class WindowASDF(ProcASDFBase):
         there are windows from 00.BHZ and 10.BHZ, kepy only one
         with the most windows
         """
+        if len(sta_win) == 0:
+            return sta_win
+
         sort_dict = {}
         for trace_id, trace_win in sta_win.iteritems():
             chan = trace_id.split('.')[-1][0:2]
@@ -121,7 +124,7 @@ class WindowASDF(ProcASDFBase):
 
         choosen_wins = {}
         for chan, chan_info in sort_dict.iteritems():
-            if len(chan_info.keys()) <= 1:
+            if len(chan_info.keys()) == 1:
                 choosen_loc = chan_info.keys()[0]
             else:
                 _locs = []
@@ -148,6 +151,9 @@ class WindowASDF(ProcASDFBase):
         """
         sort_dict = {}
 
+        if len(sta_win) == 0:
+            return sta_win
+
         for trace_id, trace_win in sta_win.iteritems():
             chan = trace_id.split(".")[-1][0:2]
             if chan not in sort_dict:
@@ -156,7 +162,7 @@ class WindowASDF(ProcASDFBase):
             sort_dict[chan]["nwins"] += len(trace_win)
 
         choosen_wins = {}
-        if len(sort_dict.keys()) <= 1:
+        if len(sort_dict.keys()) == 1:
             choosen_chan = sort_dict.keys()[0]
         else:
             _chans = []
