@@ -12,6 +12,7 @@ from obspy import Stream, Trace
 from pyasdf import ASDFDataSet
 from pytomo3d.signal.rotate import rotate_one_station_stream
 from pytomo3d.adjoint.process_adjsrc import convert_stream_to_adjs
+from pytomo3d.adjoint.process_adjsrc import add_missing_components
 from pprint import pprint
 
 
@@ -119,6 +120,7 @@ class PostAdjASDF(object):
 
     def _rotate_one_station(self, sta_adjs, slat, slon):
         adj_stream, meta_info = self._convert_adjs_to_stream(sta_adjs)
+        add_missing_components(adj_stream)
         elat = self.event_latitude
         elon = self.event_longitude
         rotate_one_station_stream(adj_stream, elat, elon,
@@ -131,6 +133,16 @@ class PostAdjASDF(object):
             adj_id = "%s_%s_%s" % (_adj.network, _adj.station, _adj.component)
             adj_dict[adj_id] = _adj
         return adj_dict
+
+    @staticmethod
+    def _get_station_adjsrcs(adjsrcs, sta_tag):
+        comp_list = ["MXZ", "MXR", "MXT"]
+        adj_list = []
+        for comp in comp_list:
+            adj_name = "%s_%s" % (sta_tag, comp)
+            if adj_name in adjsrcs:
+                adj_list.append(adjsrcs[adj_name])
+        return adj_list
 
     def _extract_event_info(self):
         event = self.events[0]
@@ -152,18 +164,16 @@ class PostAdjASDF(object):
         for adj_id, adj in old_adjs.iteritems():
             network, station = adj.parameters["station_id"].split(".")
             sta_tag = "%s_%s" % (network, station)
-            slat = adj.parameters["latitude"]
-            slon = adj.parameters["longitude"]
-            station_locations[sta_tag] = \
-                {"latitude": slat, "longitude": slon,
-                 "depth_in_m": adj.parameters["depth_in_m"],
-                 "elevation_in_m": adj.parameters["elevation_in_m"]}
 
             if sta_tag not in done_sta_list:
-                zname = "%s_MXZ" % sta_tag
-                rname = "%s_MXR" % sta_tag
-                tname = "%s_MXT" % sta_tag
-                sta_adjs = [old_adjs[zname], old_adjs[rname], old_adjs[tname]]
+                slat = adj.parameters["latitude"]
+                slon = adj.parameters["longitude"]
+                station_locations[sta_tag] = \
+                    {"latitude": slat, "longitude": slon,
+                     "depth_in_m": adj.parameters["depth_in_m"],
+                     "elevation_in_m": adj.parameters["elevation_in_m"]}
+
+                sta_adjs = self._get_station_adjsrcs(old_adjs, sta_tag)
                 adj_dict = self._rotate_one_station(sta_adjs, slat, slon)
                 new_adjs.update(adj_dict)
 
