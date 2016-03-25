@@ -78,7 +78,7 @@ def adjoint_wrapper(obsd_station_group, synt_station_group, config=None,
 
     observed = getattr(obsd_station_group, obsd_tag)
     synthetic = getattr(synt_station_group, synt_tag)
-    synt_staxml = getattr(synt_station_group, "StationXML")
+    obsd_staxml = getattr(obsd_station_group, "StationXML")
 
     try:
         window_sta = windows[obsd_station_group._station_name]
@@ -106,11 +106,11 @@ def adjoint_wrapper(obsd_station_group, synt_station_group, config=None,
 
     new_adjsrcs = process_adjoint(
         adjsrcs, interp_starttime=starttime,
-        inventory=synt_staxml, event=event,
+        inventory=obsd_staxml, event=event,
         weight_dict=chan_weight_dict,
         **postproc_param)
 
-    _final = reshape_adj(new_adjsrcs, time_offset, synt_staxml)
+    _final = reshape_adj(new_adjsrcs, time_offset, obsd_staxml)
 
     if _final is None:
         return
