@@ -76,16 +76,21 @@ def adjoint_wrapper(obsd_station_group, synt_station_group, config=None,
         print("Missing tag 'STATIONXML' from synt_station_group %s. Skipped" %
               (synt_tag, synt_station_group._station_name))
 
-    observed = getattr(obsd_station_group, obsd_tag)
-    synthetic = getattr(synt_station_group, synt_tag)
-    obsd_staxml = getattr(obsd_station_group, "StationXML")
-
     try:
         window_sta = windows[obsd_station_group._station_name]
     except:
         return
+    # check total number of windows. If total number of
+    # window is 0, return None
+    nwin_total = 0
+    for value in window_sta.itervalues():
+        nwin_total += len(value)
+    if nwin_total == 0:
+        return
 
-    # window_sta = smart_transform_window(window_sta)
+    observed = getattr(obsd_station_group, obsd_tag)
+    synthetic = getattr(synt_station_group, synt_tag)
+    obsd_staxml = getattr(obsd_station_group, "StationXML")
 
     adjsrcs = calculate_adjsrc_on_stream(
         observed, synthetic, window_sta, config, adj_src_type,
