@@ -6,8 +6,8 @@ Methods that contains utils for adjoint sources
 :copyright:
     Wenjie Lei (lei@princeton.edu), 2016
 :license:
-    GNU General Public License, Version 3
-    (http://www.gnu.org/copyleft/gpl.html)
+    GNU Lesser General Public License, version 3 (LGPLv3)
+    (http://www.gnu.org/licenses/lgpl-3.0.en.html)
 """
 from __future__ import (absolute_import, division, print_function)
 import numpy as np
@@ -38,7 +38,7 @@ def smart_transform_window(windows):
 
 def ensemble_fake_adj(stream, time_offset=0.0):
     """
-    Ensemble fake adjoint sources from stream, for test purpose
+    Ensemble fake adjoint sources from stream, for test purpose.
     """
 
     adjsrc_dict = dict()
@@ -59,7 +59,9 @@ def ensemble_fake_adj(stream, time_offset=0.0):
 
 def change_channel_name(adjsrcs, channel):
     """
-    Change adjoint source channel name
+    Change adjoint source channel name to given string. For example,
+    as specfem input, the channel name is "MX". So before writing
+    adjoint source out, we need to change the channel name to "MX"
     """
     for adj in adjsrcs:
         adj.component = channel + adj.component[-1]
@@ -70,7 +72,11 @@ def check_multiple_instruments(adjsrcs):
     Check if there are mutiple instruments for one component
     This is very important because if there is only one instrument
     for one component, we can define the path shorter and change
-    channel name to "MX" to follow the specfem style
+    channel name to "MX" to follow the specfem style. For example,
+    in adjsrcs, if there are only "II.AAK.00.BHZ" in component Z,
+    then we can define the path as "II_AAK_MXZ". If there are
+    multiple instruments, then we define the whole path, as
+    "II_AAK_00_BHZ"
     """
     name_list = []
     adj_dict = {}
