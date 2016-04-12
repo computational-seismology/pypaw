@@ -20,7 +20,7 @@ from .utils import smart_check_path, smart_remove_file
 
 class ProcASDFBase(object):
 
-    def __init__(self, path, param, verbose=False):
+    def __init__(self, path, param, verbose=False, debug=False):
 
         self.comm = None
         self.rank = None
@@ -28,6 +28,7 @@ class ProcASDFBase(object):
         self.path = path
         self.param = param
         self._verbose = verbose
+        self._debug=debug
 
     def _parse_yaml(self, content):
         """
@@ -119,7 +120,7 @@ class ProcASDFBase(object):
         :return:
         """
         if self.mpi_mode:
-            return ASDFDataSet(filename, compression=None, debug=False,
+            return ASDFDataSet(filename, compression=None, debug=self._debug,
                                mode=mode)
         else:
             return ASDFDataSet(filename, mode=mode)

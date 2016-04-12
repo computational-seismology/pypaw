@@ -53,9 +53,10 @@ def window_wrapper(obsd_station_group, synt_station_group, config_dict=None,
 class WindowASDF(ProcASDFBase):
 
     def __init__(self, path, param, components=["Z", "R", "T"],
-                 verbose=False):
+                 verbose=False, debug=False):
 
-        ProcASDFBase.__init__(self, path, param, verbose=verbose)
+        ProcASDFBase.__init__(self, path, param, verbose=verbose,
+                              debug=debug)
         self.components = components
 
     def _parse_param(self):

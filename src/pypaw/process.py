@@ -30,8 +30,9 @@ def process_wrapper(stream, inv, param=None):
 
 class ProcASDF(ProcASDFBase):
 
-    def __init__(self, path, param, verbose=False):
-        ProcASDFBase.__init__(self, path, param, verbose=verbose)
+    def __init__(self, path, param, verbose=False, debug=False):
+        ProcASDFBase.__init__(self, path, param, verbose=verbose,
+                              debug=debug)
 
     def _validate_path(self, path):
         necessary_keys = ["input_asdf", "input_tag",
