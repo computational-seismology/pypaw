@@ -1,5 +1,5 @@
 # remove response flag to remove the instrument response from the
-# seismogram. For observed seismogram, you probably want to set this 
+# seismogram. For observed seismogram, you probably want to set this
 # flag to True to get real gound displacement. For synthetic data,
 # please set this flag to False
 remove_response_flag: False
@@ -28,3 +28,10 @@ taper_percentage: 0.05
 
 # rotate flag
 rotate_flag: True
+
+# sanity check the inventory
+# Check the orientation(dip and azimuth) of ZNE components during the
+# rotation. If it doesn't pass the sanity check, the component will
+# be thrown away.
+# True if processing observed data; False if processing synthetic data.
+sanity_check: False
