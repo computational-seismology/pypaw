@@ -16,7 +16,7 @@ from __future__ import (absolute_import, division, print_function)
 from functools import partial
 
 from .procbase import ProcASDFBase
-from pytomo3d.signal.process import process
+from pytomo3d.signal.process import process_stream
 from pytomo3d.adjoint.adjsrc import calculate_adjsrc_on_stream
 from pytomo3d.adjoint.process_adjsrc import process_adjoint
 from pytomo3d.window.window import window_on_stream
@@ -78,10 +78,10 @@ def func_wrapper(obsd_station_group, synt_station_group, obsd_tag=None,
     _raw_synt_tr = synthetic[0].copy()
 
     obsd_param = param["proc_obsd_param"]
-    new_obsd = process(observed, inventory=obsd_staxml, **obsd_param)
+    new_obsd = process_stream(observed, inventory=obsd_staxml, **obsd_param)
 
     synt_param = param["proc_synt_param"]
-    new_synt = process(synthetic, inventory=synt_staxml, **synt_param)
+    new_synt = process_stream(synthetic, inventory=synt_staxml, **synt_param)
 
     window_config = load_window_config(param["window_param"])
     windows = window_on_stream(new_obsd, new_synt, window_config,

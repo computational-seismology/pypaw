@@ -12,7 +12,7 @@ handles parallel I/O so they are invisible to users.
 """
 from __future__ import (print_function, division, absolute_import)
 from functools import partial
-from pytomo3d.signal.process import process
+from pytomo3d.signal.process import process_stream
 from .procbase import ProcASDFBase
 
 
@@ -25,7 +25,7 @@ def process_wrapper(stream, inv, param=None):
     :param param:
     :return:
     """
-    return process(stream, inventory=inv, **param)
+    return process_stream(stream, inventory=inv, **param)
 
 
 class ProcASDF(ProcASDFBase):
