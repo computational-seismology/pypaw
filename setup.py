@@ -17,7 +17,7 @@ class PyTest(TestCommand):
 
 setup(
     name="pypaw",
-    version="0.0.1",
+    version="0.1.0",
     license='GNU Lesser General Public License, version 3 (LGPLv3)',
     description="Seismic tomograpy and ASDF toolkts",
     author="Wenjie Lei",
@@ -47,7 +47,7 @@ setup(
         "seismology", "tomography", "adjoint", "signal", "inversion", "window"
     ],
     install_requires=[
-        "numpy", "obspy", "flake8", "pytest", "nose", "future>=0.14.1",
+        "numpy", "obspy>=1.0.0", "flake8", "pytest", "nose", "future>=0.14.1",
         "pytomo3d", "pyasdf"
     ],
     extras_require={
