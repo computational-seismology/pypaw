@@ -28,7 +28,7 @@ class ProcASDFBase(object):
         self.path = path
         self.param = param
         self._verbose = verbose
-        self._debug=debug
+        self._debug = debug
 
     def _parse_yaml(self, content):
         """

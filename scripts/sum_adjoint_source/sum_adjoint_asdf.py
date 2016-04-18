@@ -37,8 +37,17 @@ class PostAdjASDF(object):
         for adj in adjsrc_group:
             nw = adj.parameters["station_id"].split(".")[0]
             sta = adj.parameters["station_id"].split(".")[1]
+
             comp = adj.parameters["component"]
-            comp_weight = weight[comp[-1]]
+            # if len(weight.keys()[0]) == 1:
+            #    comp_weight = weight[comp[-1]]
+            # elif len(weight.keys()[0]) == 3:
+            #    comp_weight = weight[comp]
+            # else:
+            #    raise ValueError("Incorrect length of weight.keys(%s)"
+            #                     % weight.keys())
+            comp_weight = weight["BH%s" % comp[-1]]
+
             station_id = "%s_%s_%s" % (nw, sta, comp)
             if station_id not in self.adjoint_sources:
                 self.adjoint_sources[station_id] = adj
@@ -220,8 +229,6 @@ class PostAdjASDF(object):
                  "station_id": adj_id, "component": adj.component,
                  "units": "m"}
             adj_path = "AdjointSources/%s" % adj_id
-            if self.verbose:
-                print("adj_path:", adj_path)
 
             ds.add_auxiliary_data(adj_array, data_type="AuxiliaryData",
                                   path=adj_path, parameters=parameters)
