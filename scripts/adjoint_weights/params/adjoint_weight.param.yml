@@ -1,0 +1,7 @@
+# Adjoint source weighting yaml file
+
+# station location weighting
+station_weighting: True
+
+# source location weighting
+source_weighting: True

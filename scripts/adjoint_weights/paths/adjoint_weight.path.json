@@ -1,0 +1,28 @@
+{
+  "27_60":
+  {
+    [
+      "asdf": "/path/to/proc/synt/asdf/file/1",
+      "window": "/path/to/window/file/1"
+    ],
+    [
+      "asdf": "/path/to/proc/synt/asdf/file/2",
+      "window": "/path/to/window/file/2"
+    ],
+    [
+      "asdf": "/path/to/proc/synt/asdf/file/3",
+      "window": "/path/to/window/file/3"
+    ]
+  },
+  "60_120":
+  {
+    [
+      "asdf": "/path/to/proc/synt/asdf/file/1",
+      "window": "/path/to/window/file/1"
+    ],
+    [
+      "asdf": "/path/to/proc/synt/asdf/file/2",
+      "window": "/path/to/window/file/1"
+    ]
+  }
+}
