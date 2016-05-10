@@ -1,0 +1,11 @@
+# configuration yaml file for window weighting strategy
+
+# source weighting
+# If True, then the source weighting will be turned on
+# If False, the source weighting will be turned off
+source_weighting: True
+
+# receiver weighting
+# If True, then the receiver weighting will be turned on
+# If False, then the source weighting will be turned off
+receiver_weighting: True
