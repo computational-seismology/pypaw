@@ -30,7 +30,7 @@ def write_stations_file(sta_dict, filename="STATIONS"):
         for _sta_id, _sta in od.iteritems():
             network, station = _sta_id.split(".")
             fh.write("%-9s %5s %15.4f %12.4f %10.1f %6.1f\n"
-                     % (network, station, _sta[0], _sta[1], _sta[2], _sta[3]))
+                     % (station, network, _sta[0], _sta[1], _sta[2], _sta[3]))
 
 
 def generate_waveform_stations(asdf, outputdir="."):
