@@ -63,6 +63,8 @@ if __name__ == "__main__":
     parser.add_argument('filename', help="Input ASDF filename")
 
     args = parser.parse_args()
-    ds = pyasdf.ASDFDataSet(args.filename)
+    if not os.path.exists(args.filename):
+        raise ValueError("Input file not exists: %s" % args.filename)
+    ds = pyasdf.ASDFDataSet(args.filename, mode='r')
     generate_waveform_stations(ds, args.outputdir)
     generate_adjoint_stations(ds, args.outputdir)
