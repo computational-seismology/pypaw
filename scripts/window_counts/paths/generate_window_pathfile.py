@@ -3,11 +3,11 @@ import os
 import json
 import argparse
 
-# ###################
-superbase = "/lustre/atlas/proj-shared/geo111/rawdata/asdf/window/M15_NEX256"
-period_list = ["17_40", "40_100", "90_250", "90_150"]
+superbase = "/lustre/atlas/proj-shared/geo111/rawdata/asdf/window"
+
+period_list = ["27_60", "60_120"]
+
 output_fn = "window.stats.path.json"
-# ###################
 
 
 def read_txt_into_list(txtfile):
@@ -20,16 +20,12 @@ def read_txt_into_list(txtfile):
 def generate_window_paths(eventlist):
     paths = {}
 
-    for period in period_list:
-        paths[period] = {}
-        for event in eventlist:
-            winfile = \
+    for event in eventlist:
+        paths[event] = {}
+        for period in period_list:
+            paths[event][period] = \
                 os.path.join(superbase, "%s.%s" % (event, period),
-                             "windows.json")
-            if not os.path.exists(winfile):
-                print("No winfile found: %s" % winfile)
-            else:
-                paths[period][event] = winfile
+                             "windows.stats.json")
 
     print("Output filename:%s" % output_fn)
     with open(output_fn, 'w') as f:
