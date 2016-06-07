@@ -19,12 +19,11 @@ setup(
     name="pypaw",
     version="0.1.0",
     license='GNU Lesser General Public License, version 3 (LGPLv3)',
-    description="Seismic tomograpy and ASDF toolkts",
+    description="Seismic tomograpy and ASDF toolkits",
     author="Wenjie Lei",
     author_email="lei@princeton.edu",
     url="https://github.com/wjlei1990/pypaw",
-    packages=find_packages("src"),
-    package_dir={"": "src"},
+    packages=["pypaw"],
     tests_require=['pytest'],
     cmdclass={'test': PyTest},
     zip_safe=False,
@@ -50,6 +49,18 @@ setup(
         "numpy", "obspy>=1.0.0", "flake8", "pytest", "nose", "future>=0.14.1",
         "pytomo3d", "pyasdf"
     ],
+    entry_points={
+        'console_scripts':
+            ['pypaw-process_asdf=pypaw.scripts.bins.process_asdf:main',
+             'pypaw-adjoint_misfit_from_asdf=pypaw.scripts.bins.adjoint_misfit_from_asdf:main',
+             'pypaw-convert_adjsrcs_from_asdf=pypaw.scripts.bins.convert_adjsrcs_from_asdf:main',
+             'pypaw-convert_to_asdf=pypaw.scripts.bins.convert_to_asdf:main',
+             'pypaw-convert_to_sac=pypaw.scripts.bins.convert_to_sac:main',
+             'pypaw-generate_stations_asdf=pypaw.scripts.bins.generate_stations_asdf:main',
+             'pypaw-sum_adjoint_asdf=pypaw.scripts.bins.sum_adjoint_asdf:main',
+             'pypaw-window_selection_asdf=pypaw.scripts.bins.window_selection_asdf:main',
+             ]
+    },
     extras_require={
         "docs": ["sphinx", "ipython", "runipy"]
     }
