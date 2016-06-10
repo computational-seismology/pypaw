@@ -1,3 +1,7 @@
+
+
+[![DOI](https://zenodo.org/badge/22621/wjlei1990/pypaw.svg)](https://zenodo.org/badge/latestdoi/22621/wjlei1990/pypaw)
+
 # pypaw
 
 PYthon Process Asdf Wokflow, in short, pypaw.
