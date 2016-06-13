@@ -1,4 +1,5 @@
 from __future__ import print_function, division
+import os
 import json
 import numpy as np
 import argparse
@@ -47,15 +48,17 @@ def gather_windows(path):
         content = json.load(fh)
 
     results = {}
-    for period, period_info in content.iteritems():
+    for period, period_info in content["input"].iteritems():
         print("Gather on period: %s" % period)
+        if len(period_info) == 0:
+            continue
         period_wininfo = {}
         for event, event_info in period_info.iteritems():
             event_wininfo = extract_window_info(event_info)
             print("event wininfo:", event_wininfo.keys())
             add_event_to_period(event_wininfo, period_wininfo)
         results[period] = period_wininfo
-    return results
+    return results, content["outputdir"]
 
 
 def _stats_(windows, outputfn):
@@ -75,11 +78,12 @@ def _stats_(windows, outputfn):
         json.dump(stats_var, fh, indent=2, sort_keys=True)
 
 
-def plot_results(windows):
+def plot_results(windows, outputdir):
     keys = ["cc_shift", "dlnA"]
     #ps = ["17_40", "40_100", "90_250"]
-    ps = ["17_40", "40_100", "90_150", "90_250"]
+    #ps = ["17_40", "40_100", "90_150", "90_250"]
     #ps = ["90_250", ]
+    ps = ["90_150", ]
     cs = ["BHZ", "BHR", "BHT"]
     figsize = (8*len(cs), 8*len(ps))
 
@@ -91,7 +95,9 @@ def plot_results(windows):
                 array = np.array(windows[p][c][key])
                 plt.subplot(g[ip, ic])
                 plt.hist(array, 20, alpha=0.75)
-        plt.savefig("%s.stats.png" % key)
+                plt.xlabel("%s_%s" % (p, c))
+
+        plt.savefig(os.path.join(outputdir, "%s.stats.png" % key))
         plt.tight_layout()
         plt.close()
 
@@ -102,7 +108,11 @@ if __name__ == "__main__":
                         required=True)
     args = parser.parse_args()
 
-    results = gather_windows(args.path)
+    results, outputdir = gather_windows(args.path)
 
-    _stats_(results, outputfn="windows.stats_val.json")
-    plot_results(results)
+    if not os.path.exists(outputdir):
+        os.makedirs(outputdir)
+
+    fn = os.path.join(outputdir, "windows.stats_val.json")
+    _stats_(results, outputfn=fn)
+    plot_results(results, outputdir)
