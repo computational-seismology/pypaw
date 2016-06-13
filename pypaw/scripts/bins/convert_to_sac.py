@@ -6,8 +6,8 @@ import argparse
 
 from pypaw import convert_from_asdf
 
-if __name__ == '__main__':
 
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-o', action='store', dest='outputdir', default='.',
                         help="output directory")
@@ -24,3 +24,7 @@ if __name__ == '__main__':
         args.filename, args.outputdir, filetype="sac",
         output_staxml=args.stationxml, output_quakeml=args.quakeml,
         _verbose=args.verbose)
+
+
+if __name__ == '__main__':
+    main()
