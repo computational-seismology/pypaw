@@ -26,7 +26,7 @@ import matplotlib.pyplot as plt
 from spaceweight import SpherePoint
 from spaceweight import SphereDistRel
 from pyasdf import ASDFDataSet
-from pypaw import extract_waveform_stations
+from pypaw.stations import extract_waveform_stations
 
 
 def load_yaml(filename):
@@ -389,8 +389,7 @@ class WindowWeight(object):
         self.dump_weights()
 
 
-if __name__ == "__main__":
-
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', action='store', dest='path_file', required=True,
                         help="path file")
@@ -400,3 +399,7 @@ if __name__ == "__main__":
 
     weightobj = WindowWeight(args.path_file, args.param_file)
     weightobj.run()
+
+
+if __name__ == "__main__":
+    main()
