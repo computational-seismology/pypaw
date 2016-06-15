@@ -19,8 +19,8 @@ import os
 
 import pyasdf
 
-from pypaw import extract_adjoint_stations
-from pypaw import extract_waveform_stations
+from pypaw.stations import extract_adjoint_stations
+from pypaw.stations import extract_waveform_stations
 
 
 def write_stations_file(sta_dict, filename="STATIONS"):
