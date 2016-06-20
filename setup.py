@@ -51,7 +51,8 @@ setup(
     ],
     entry_points={
         'console_scripts':
-            ['pypaw-process_asdf=pypaw.scripts.bins.process_asdf:main',
+            ['pypaw-adjoint_asdf=pypaw.scripts.bins.adjoint_asdf:main',
+             'pypaw-process_asdf=pypaw.scripts.bins.process_asdf:main',
              'pypaw-adjoint_misfit_from_asdf=pypaw.scripts.bins.adjoint_misfit_from_asdf:main',
              'pypaw-convert_adjsrcs_from_asdf=pypaw.scripts.bins.convert_adjsrcs_from_asdf:main',
              'pypaw-convert_to_asdf=pypaw.scripts.bins.convert_to_asdf:main',
