@@ -58,7 +58,7 @@ setup(
              'pypaw-convert_to_asdf=pypaw.scripts.bins.convert_to_asdf:main',
              'pypaw-convert_to_sac=pypaw.scripts.bins.convert_to_sac:main',
              'pypaw-generate_stations_asdf=pypaw.scripts.bins.generate_stations_asdf:main',
-             'pypaw-sum_adjoint_asdf=pypaw.scripts.bins.sum_adjoint_asdf:main',
+             'pypaw-sum_adjoint_asdf=pypaw.scripts.sum_adjoint_source.sum_adjoint_asdf:main',
              'pypaw-window_selection_asdf=pypaw.scripts.bins.window_selection_asdf:main',
              'pypaw-calculate_window_weights=pypaw.scripts.window_weights.calculate_window_weights:main',
              ]
