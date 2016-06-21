@@ -22,7 +22,8 @@ from pytomo3d.adjoint.process_adjsrc import convert_adjs_to_stream
 from pytomo3d.adjoint.process_adjsrc import add_missing_components
 from pprint import pprint
 from pyadjoint import AdjointSource
-from utils import load_json, dump_json, check_adj_consistency
+from pypaw.scripts.sum_adjoint_source.utils \
+    import load_json, dump_json, check_adj_consistency
 
 
 def _rotate_one_station(sta_adjs, slat, slon, elat, elon):
