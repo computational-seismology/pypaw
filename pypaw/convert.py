@@ -15,26 +15,28 @@ import glob
 import numpy as np
 from .utils import smart_read_json, drawProgressBar, timing
 from pyasdf import ASDFDataSet
-import obspy
-from obspy.station import Channel, Station, Network, Inventory, Site
-# from obspy.core.inventory import Channel, Station, Network, Inventory, Site
+from obspy import UTCDateTime, read
+from obspy.core.inventory import Channel, Station, Network, Inventory, Site
 
 
 def create_simple_inventory(network, station, latitude=None, longitude=None,
                             elevation=None, depth=None, start_date=None,
-                            end_date=None, location_code="S3"):
+                            end_date=None, location_code="S3",
+                            channel_code="MX"):
     """
-    Create simple inventory for synthetic data with only location
-    information, for ZNE component
+    Create simple inventory with only location information,
+    for ZNE component, especially usefull for synthetic data
     """
     azi_dict = {"MXZ": 0.0,  "MXN": 0.0, "MXE": 90.0}
     dip_dict = {"MXZ": 90.0, "MXN": 0.0, "MXE": 0.0}
     channel_list = []
 
     if start_date is None:
-        start_date = obspy.UTCDateTime(0)
+        start_date = UTCDateTime(0)
 
-    for _chan_code in ["MXZ", "MXE", "MXN"]:
+    # specfem default channel code is MX
+    for _comp in ["Z", "E", "N"]:
+        _chan_code = "%s%s" % (channel_code, _comp)
         chan = Channel(_chan_code, location_code, latitude=latitude,
                        longitude=longitude, elevation=elevation,
                        depth=depth, azimuth=azi_dict[_chan_code],
@@ -52,9 +54,86 @@ def create_simple_inventory(network, station, latitude=None, longitude=None,
                  selected_number_of_stations=1)
 
     inv = Inventory([nw, ], source="SPECFEM3D_GLOBE", sender="Princeton",
-                    created=start_date)
+                    created=UTCDateTime.now())
 
     return inv
+
+
+def add_waveform_to_asdf(ds, waveform_filelist, tag, event=None,
+                         create_simple_inv=False, status_bar=False):
+
+    nwaveform = len(waveform_filelist)
+    sta_dict = {}
+    # Add waveforms.
+    for _i, filename in enumerate(waveform_filelist):
+        if not os.path.exists(filename):
+            raise ValueError("File not exist %i of %i: %s"
+                             % (_i, nwaveform, filename))
+
+        try:
+            st = read(filename)
+            ds.add_waveforms(st, tag=tag, event_id=event)
+        except Exception as err:
+            print("Error converting(%s) due to:" % (filename, err))
+            continue
+        if create_simple_inv:
+            for tr in st:
+                sta_tag = "%s_%s" % (tr.stats.network, tr.stats.station)
+                if sta_tag not in sta_dict.keys():
+                    try:
+                        _sac = tr.stats.sac
+                    except:
+                        raise ValueError("The original data format should be"
+                                         "sac format to extract station"
+                                         "information")
+                    sta_dict[sta_tag] = [tr.stats.network, tr.stats.station,
+                                         _sac["stla"], _sac["stlo"],
+                                         _sac["stel"], _sac["stdp"]]
+                else:
+                    continue
+
+        if status_bar:
+            drawProgressBar((_i+1)/nwaveform, "Adding Waveform data")
+    return sta_dict
+
+
+def add_stationxml_to_asdf(ds, staxml_filelist, event=None,
+                           create_simple_inv=False, sta_dict=None,
+                           status_bar=False):
+    # Add StationXML files.
+    if create_simple_inv:
+        if event is None:
+            start_date = UTCDateTime.now()
+        else:
+            origin = event.preferred_origin() or event.origins[0]
+            event_time = origin.time
+            start_date = event_time - 300.0
+        nstaxml = len(sta_dict)
+        count = 0
+        for tag, value in sta_dict.iteritems():
+            count += 1
+            inv = create_simple_inventory(
+                    value[0], value[1], latitude=value[2], longitude=value[3],
+                    elevation=value[4], depth=value[5], start_date=start_date)
+            ds.add_stationxml(inv)
+            if status_bar > 0:
+                drawProgressBar((count)/nstaxml,
+                                "Adding StationXML(created) data")
+    else:
+        nstaxml = len(staxml_filelist)
+        if staxml_filelist is not None and nstaxml > 0:
+            for _i, filename in enumerate(staxml_filelist):
+                if not os.path.exists(filename):
+                    raise ValueError("Staxml not exist %i of %i: %s"
+                                     % (_i, nstaxml, filename))
+                try:
+                    ds.add_stationxml(filename)
+                except Exception as err:
+                    print("Error convert(%s) due to:%s" % (filename, err))
+                if status_bar > 0:
+                    drawProgressBar((_i+1)/nstaxml, "Adding StationXML data")
+        else:
+            print("No stationxml added")
 
 
 @timing
@@ -75,7 +154,7 @@ def convert_to_asdf(asdf_fn, waveform_filelist, tag, quakemlfile=None,
     if os.path.exists(asdf_fn):
         raise Exception("File '%s' exists." % asdf_fn)
 
-    ds = ASDFDataSet(asdf_fn)
+    ds = ASDFDataSet(asdf_fn, mode='a')
 
     # Add event
     if quakemlfile:
@@ -88,60 +167,14 @@ def convert_to_asdf(asdf_fn, waveform_filelist, tag, quakemlfile=None,
     else:
         raise ValueError("No Event file")
 
-    sta_dict = {}
-    # Add waveforms.
-    for _i, filename in enumerate(waveform_filelist):
-        if not os.path.exists(filename):
-            raise ValueError("File not exist %i of %i: %s"
-                             % (_i, nwaveform, filename))
+    sta_dict = add_waveform_to_asdf(ds, waveform_filelist, tag, event=event,
+                                    create_simple_inv=create_simple_inv,
+                                    status_bar=status_bar)
 
-        try:
-            st = obspy.read(filename)
-            ds.add_waveforms(st, tag=tag, event_id=event)
-        except Exception as err:
-            print("Error converting(%s) due to:" % (filename, err))
-            continue
-        if create_simple_inv:
-            for tr in st:
-                sta_tag = "%s_%s" % (tr.stats.network, tr.stats.station)
-                if sta_tag not in sta_dict.keys():
-                    _sac = tr.stats.sac
-                    sta_dict[sta_tag] = [tr.stats.network, tr.stats.station,
-                                         _sac["stla"], _sac["stlo"],
-                                         _sac["stel"], _sac["stdp"]]
-        if status_bar:
-            drawProgressBar((_i+1)/nwaveform, "Adding Waveform data")
-
-    # Add StationXML files.
-    if create_simple_inv:
-        nstaxml = len(sta_dict)
-        count = 0
-        for tag, value in sta_dict.iteritems():
-            count += 1
-            origin = event.preferred_origin() or event.origins[0]
-            event_time = origin.time
-            start_date = event_time - 120.0
-            inv = create_simple_inventory(
-                    value[0], value[1], latitude=value[2], longitude=value[3],
-                    elevation=value[4], depth=value[5], start_date=start_date)
-            ds.add_stationxml(inv)
-            if status_bar > 0:
-                drawProgressBar((count)/nstaxml, "Adding StationXML data")
-    else:
-        nstaxml = len(staxml_filelist)
-        if staxml_filelist is not None and nstaxml > 0:
-            for _i, filename in enumerate(staxml_filelist):
-                if not os.path.exists(filename):
-                    raise ValueError("Staxml not exist %i of %i: %s"
-                                     % (_i, nstaxml, filename))
-                try:
-                    ds.add_stationxml(filename)
-                except Exception as err:
-                    print("Error convert(%s) due to:%s" % (filename, err))
-                if status_bar > 0:
-                    drawProgressBar((_i+1)/nstaxml, "Adding StationXML data")
-        else:
-            print("No stationxml added")
+    add_stationxml_to_asdf(ds, staxml_filelist, event=event,
+                           create_simple_inv=create_simple_inv,
+                           sta_dict=sta_dict,
+                           status_bar=status_bar)
 
     if verbose:
         print("ASDF filesize: %s" % ds.pretty_filesize)
@@ -162,7 +195,7 @@ def convert_from_asdf(asdf_fn, outputdir, tag=None, filetype="sac",
                       output_staxml=True, output_quakeml=True,
                       _verbose=True):
     """
-    Convert asdf to different types of file
+    Convert the waveform in asdf to different types of file
     """
     filetype = filetype.upper()
     if filetype not in ["SAC", "MSEED"]:
@@ -181,7 +214,7 @@ def convert_from_asdf(asdf_fn, outputdir, tag=None, filetype="sac",
     print("Output StationXML and Quakeml: [%s, %s]" % (output_staxml,
                                                        output_quakeml))
 
-    ds = ASDFDataSet(asdf_fn)
+    ds = ASDFDataSet(asdf_fn, mode='r')
 
     if output_quakeml:
         if len(ds.events) >= 1:
@@ -239,7 +272,7 @@ def convert_adjsrcs_from_asdf(asdf_fn, outputdir, _verbose=True):
     print("Input ASDF: %s" % asdf_fn)
     print("Output dir: %s" % outputdir)
 
-    ds = ASDFDataSet(asdf_fn)
+    ds = ASDFDataSet(asdf_fn, mode='r')
     if "AdjointSources" not in ds.auxiliary_data:
         print("No adjoint source exists in asdf file: %s" % asdf_fn)
         return
@@ -348,7 +381,6 @@ class ConvertASDF(object):
                         create_simple_inv=create_simple_inv)
 
     def run(self):
-
         path = smart_read_json(self.path, mpi_mode=False)
         if isinstance(path, list):
             for _path in path:
