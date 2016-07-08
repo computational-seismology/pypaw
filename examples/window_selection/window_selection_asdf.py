@@ -1,1 +1,0 @@
-../../scripts/bins/window_selection_asdf.py

@@ -6,7 +6,7 @@
 # cores since every core will write large figure files.
 # Since the test file only contains 4 stream, please
 # the numproc=2 and do not change it.
-mpiexec -n 2 python adjoint_asdf.py \
+mpiexec -n 2 pypaw-adjoint_asdf \
   -p ./parfile/multitaper.adjoint.50_100.config.yml \
   -f ./parfile/adjoint.path.json \
   -v

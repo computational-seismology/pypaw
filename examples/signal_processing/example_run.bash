@@ -18,7 +18,7 @@ echo "process observed file..."
 #  -v
 
 # mpi
-mpiexec -n 2 python process_asdf.py \
+mpiexec -n 2 pypaw-process_asdf \
   -p ./parfile/proc_obsd.50_100.param.yml \
   -f ./parfile/proc_obsd.path.json \
   -v
@@ -32,7 +32,7 @@ mpiexec -n 2 python process_asdf.py \
 
 echo "++++++"
 echo "process synthetic file..."
-mpiexec -n 2 python process_asdf.py \
+mpiexec -n 2 pypaw-process_asdf \
   -p ./parfile/proc_synt.50_100.param.yml \
   -f ./parfile/proc_synt.path.json \
   -v
