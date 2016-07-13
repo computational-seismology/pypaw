@@ -52,12 +52,10 @@ def window_wrapper(obsd_station_group, synt_station_group, config_dict=None,
 
 class WindowASDF(ProcASDFBase):
 
-    def __init__(self, path, param, components=["Z", "R", "T"],
-                 verbose=False, debug=False):
+    def __init__(self, path, param, verbose=False, debug=False):
 
         ProcASDFBase.__init__(self, path, param, verbose=verbose,
                               debug=debug)
-        self.components = components
 
     def _parse_param(self):
         """
@@ -75,11 +73,6 @@ class WindowASDF(ProcASDFBase):
                 "{'Z': pyflex.Config, 'R': pyflex.Config, 'T': pyflex.Config}")
 
         print("param:", param)
-
-        if set(param.keys()) != set(self.components):
-            raise ValueError("param should contains the same key(%s) as "
-                             "component keys(%s)" % (param.keys(),
-                                                     self.components))
 
         param_dict = {}
         for key, value in param.iteritems():

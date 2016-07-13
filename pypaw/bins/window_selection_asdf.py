@@ -16,7 +16,6 @@ def main():
     args = parser.parse_args()
 
     proc = WindowASDF(args.path_file, args.params_file,
-                      components=["BHZ", "BHR", "BHT"],
                       verbose=args.verbose)
     proc.smart_run()
 

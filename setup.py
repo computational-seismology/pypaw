@@ -15,6 +15,7 @@ class PyTest(TestCommand):
         errno = pytest.main(self.pytest_args)
         sys.exit(errno)
 
+
 setup(
     name="pypaw",
     version="0.1.0",
@@ -54,6 +55,7 @@ setup(
             ['pypaw-process_asdf=pypaw.bins.process_asdf:main',
              'pypaw-window_selection_asdf=pypaw.bins.window_selection_asdf:main',  # NOQA
              'pypaw-adjoint_asdf=pypaw.bins.adjoint_asdf:main',
+             'pypaw-extract_sensor_type=pypaw.bins.extract_sensor_type:main',
              'pypaw-calculate_window_weights=pypaw.bins.window_weights.calculate_window_weights:main',  # NOQA
              'pypaw-sum_adjoint_asdf=pypaw.bins.sum_adjoint_source.sum_adjoint_asdf:main',  # NOQA
              'pypaw-adjoint_misfit_from_asdf=pypaw.bins.adjoint_misfit_from_asdf:main',     # NOQA
