@@ -63,7 +63,8 @@ class ProcASDF(ProcASDFBase):
         self.check_input_file(input_asdf)
         self.check_output_file(output_asdf, remove_flag=True)
 
-        ds = self.load_asdf(input_asdf, mode='r')
+        # WJ: not sure why it needs 'w', if not, it will be wrong
+        ds = self.load_asdf(input_asdf, mode='a')
 
         # read in event
         event = ds.events[0]
