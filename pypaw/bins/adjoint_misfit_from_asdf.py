@@ -68,7 +68,7 @@ def main():
     parser.add_argument('-v', action='store_true', dest='verbose')
     args = parser.parse_args()
 
-    job = extract_adjoint_misfit(args.filename, args.outputdir, args.verbose)
+    extract_adjoint_misfit(args.filename, args.outputdir, args.verbose)
 
 
 if __name__ == '__main__':

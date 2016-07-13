@@ -1,5 +1,5 @@
 import sys
-from setuptools import setup, find_packages
+from setuptools import setup
 from setuptools.command.test import test as TestCommand
 
 
@@ -51,16 +51,16 @@ setup(
     ],
     entry_points={
         'console_scripts':
-            ['pypaw-adjoint_asdf=pypaw.scripts.bins.adjoint_asdf:main',
-             'pypaw-process_asdf=pypaw.scripts.bins.process_asdf:main',
-             'pypaw-adjoint_misfit_from_asdf=pypaw.scripts.bins.adjoint_misfit_from_asdf:main',
-             'pypaw-convert_adjsrcs_from_asdf=pypaw.scripts.bins.convert_adjsrcs_from_asdf:main',
-             'pypaw-convert_to_asdf=pypaw.scripts.bins.convert_to_asdf:main',
-             'pypaw-convert_to_sac=pypaw.scripts.bins.convert_to_sac:main',
-             'pypaw-generate_stations_asdf=pypaw.scripts.bins.generate_stations_asdf:main',
-             'pypaw-sum_adjoint_asdf=pypaw.scripts.sum_adjoint_source.sum_adjoint_asdf:main',
-             'pypaw-window_selection_asdf=pypaw.scripts.bins.window_selection_asdf:main',
-             'pypaw-calculate_window_weights=pypaw.scripts.window_weights.calculate_window_weights:main',
+            ['pypaw-process_asdf=pypaw.bins.process_asdf:main',
+             'pypaw-window_selection_asdf=pypaw.bins.window_selection_asdf:main',  # NOQA
+             'pypaw-adjoint_asdf=pypaw.bins.adjoint_asdf:main',
+             'pypaw-calculate_window_weights=pypaw.bins.window_weights.calculate_window_weights:main',  # NOQA
+             'pypaw-sum_adjoint_asdf=pypaw.bins.sum_adjoint_source.sum_adjoint_asdf:main',  # NOQA
+             'pypaw-adjoint_misfit_from_asdf=pypaw.bins.adjoint_misfit_from_asdf:main',     # NOQA
+             'pypaw-convert_adjsrcs_from_asdf=pypaw.bins.convert_adjsrcs_from_asdf:main',   # NOQA
+             'pypaw-convert_to_asdf=pypaw.bins.convert_to_asdf:main',
+             'pypaw-convert_to_sac=pypaw.bins.convert_to_sac:main',
+             'pypaw-generate_stations_asdf=pypaw.bins.generate_stations_asdf:main',        # NOQA
              ]
     },
     extras_require={

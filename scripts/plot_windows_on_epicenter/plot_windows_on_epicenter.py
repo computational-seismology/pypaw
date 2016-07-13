@@ -18,7 +18,7 @@ from matplotlib import cm
 from obspy.geodetics import locations2degrees
 from obspy.taup import TauPyModel
 import pyasdf
-from pypaw import extract_waveform_stations
+from pypaw.stations import extract_waveform_stations
 
 
 def load_json(filename):
