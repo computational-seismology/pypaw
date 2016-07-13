@@ -16,6 +16,22 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 
+consoles = [
+    'pypaw-process_asdf=pypaw.bins.process_asdf:main',
+    'pypaw-window_selection_asdf=pypaw.bins.window_selection_asdf:main',  # NOQA
+    'pypaw-adjoint_asdf=pypaw.bins.adjoint_asdf:main',
+    'pypaw-extract_sensor_type=pypaw.bins.extract_sensor_type:main',
+    'pypaw-filter_window_on_sensors=pypaw.bins.filter_window_on_sensors:main',
+    'pypaw-window_weights=pypaw.bins.window_weights.calculate_window_weights:main',  # NOQA
+    'pypaw-sum_adjoint_asdf=pypaw.bins.sum_adjoint_source.sum_adjoint_asdf:main',  # NOQA
+    'pypaw-adjoint_misfit_from_asdf=pypaw.bins.adjoint_misfit_from_asdf:main',     # NOQA
+    'pypaw-convert_adjsrcs_from_asdf=pypaw.bins.convert_adjsrcs_from_asdf:main',   # NOQA
+    'pypaw-convert_to_asdf=pypaw.bins.convert_to_asdf:main',
+    'pypaw-convert_to_sac=pypaw.bins.convert_to_sac:main',
+    'pypaw-generate_stations_asdf=pypaw.bins.generate_stations_asdf:main'
+]
+
+
 setup(
     name="pypaw",
     version="0.1.0",
@@ -51,19 +67,7 @@ setup(
         "pytomo3d", "pyasdf"
     ],
     entry_points={
-        'console_scripts':
-            ['pypaw-process_asdf=pypaw.bins.process_asdf:main',
-             'pypaw-window_selection_asdf=pypaw.bins.window_selection_asdf:main',  # NOQA
-             'pypaw-adjoint_asdf=pypaw.bins.adjoint_asdf:main',
-             'pypaw-extract_sensor_type=pypaw.bins.extract_sensor_type:main',
-             'pypaw-calculate_window_weights=pypaw.bins.window_weights.calculate_window_weights:main',  # NOQA
-             'pypaw-sum_adjoint_asdf=pypaw.bins.sum_adjoint_source.sum_adjoint_asdf:main',  # NOQA
-             'pypaw-adjoint_misfit_from_asdf=pypaw.bins.adjoint_misfit_from_asdf:main',     # NOQA
-             'pypaw-convert_adjsrcs_from_asdf=pypaw.bins.convert_adjsrcs_from_asdf:main',   # NOQA
-             'pypaw-convert_to_asdf=pypaw.bins.convert_to_asdf:main',
-             'pypaw-convert_to_sac=pypaw.bins.convert_to_sac:main',
-             'pypaw-generate_stations_asdf=pypaw.bins.generate_stations_asdf:main',        # NOQA
-             ]
+        'console_scripts': consoles
     },
     extras_require={
         "docs": ["sphinx", "ipython", "runipy"]

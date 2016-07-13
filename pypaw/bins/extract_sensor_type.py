@@ -4,20 +4,10 @@
 # and store in json file. This will save up time for re-parsing the
 # stationxml file
 from __future__ import print_function, division, absolute_import
-import json
 import argparse
 import pyasdf
 from pytomo3d.station import extract_sensor_type
-
-
-def load_json(filename):
-    with open(filename) as fh:
-        return json.load(fh)
-
-
-def dump_json(content, filename):
-    with open(filename, "w") as fh:
-        json.dump(content, fh, indent=2, sort_keys=True)
+from .utils import load_json, dump_json
 
 
 def extract_sensor_from_asdf(asdf_file, outputfn, verbose=False):
@@ -36,6 +26,9 @@ def extract_sensor_from_asdf(asdf_file, outputfn, verbose=False):
         except Exception as msg:
             print("Failed to extract due to: %s" % msg)
             continue
+
+    print("Number of stations and channels: %d, %d"
+          % (ntotal, len(asdf_sensors)))
 
     return asdf_sensors
 
