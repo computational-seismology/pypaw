@@ -36,40 +36,43 @@ def write_stations_file(sta_dict, filename="STATIONS"):
                      % (station, network, _sta[0], _sta[1], _sta[2], _sta[3]))
 
 
-def generate_waveform_stations(asdf, outputdir="."):
+def generate_waveform_stations(asdf, outputfn):
     print("Input asdf: %s" % asdf)
     sta_dict = extract_waveform_stations(asdf)
 
-    filename = os.path.join(outputdir, "STATIONS_waveforms")
-    print("Output file: %s" % filename)
+    print("Output file: %s" % outputfn)
     print("Number of stations: %d" % len(sta_dict))
     if len(sta_dict) > 0:
-        write_stations_file(sta_dict, filename)
+        write_stations_file(sta_dict, outputfn)
 
 
-def generate_adjoint_stations(asdf, outputdir="."):
+def generate_adjoint_stations(asdf, outputfn):
     print("Input asdf: %s" % asdf)
     sta_dict = extract_adjoint_stations(asdf)
 
-    filename = os.path.join(outputdir, "STATIONS_ADJOINT")
-    print("Output file: %s" % filename)
+    print("Output file: %s" % outputfn)
     print("Number of stations: %d" % len(sta_dict))
     if len(sta_dict) > 0:
-        write_stations_file(sta_dict, filename)
+        write_stations_file(sta_dict, outputfn)
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-o', action='store', dest="outputdir",
-                        default=".", help="output directory")
+    parser = argparse.ArgumentParser(
+        description="Generate SPECFEM-like STATION file")
+    parser.add_argument('-o', action='store', dest="outputfn",
+                        default="STATIONS",
+                        help="output station filename prefix")
     parser.add_argument('filename', help="Input ASDF filename")
 
     args = parser.parse_args()
     if not os.path.exists(args.filename):
         raise ValueError("Input file not exists: %s" % args.filename)
+
     ds = pyasdf.ASDFDataSet(args.filename, mode='r')
-    generate_waveform_stations(ds, args.outputdir)
-    generate_adjoint_stations(ds, args.outputdir)
+    generate_waveform_stations(ds, args.outputfn)
+
+    adjoint_fn = args.outputfn + ".ADJOINT"
+    generate_adjoint_stations(ds, adjoint_fn)
 
 
 if __name__ == '__main__':

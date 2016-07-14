@@ -74,7 +74,7 @@ def add_waveform_to_asdf(ds, waveform_filelist, tag, event=None,
             st = read(filename)
             ds.add_waveforms(st, tag=tag, event_id=event)
         except Exception as err:
-            print("Error converting(%s) due to:" % (filename, err))
+            print("Error converting(%s) due to: %s" % (filename, err))
             continue
         if create_simple_inv:
             for tr in st:
