@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env pythoiin
 # -*- coding: utf-8 -*-
 """
 Calculate the adjoint source weighting based on the station and source
@@ -12,58 +12,45 @@ distribution.
 """
 from __future__ import print_function, division, absolute_import
 
-import argparse
-import json
 import os
 from collections import defaultdict
-
-import matplotlib
 import numpy as np
-import yaml
-
-matplotlib.use('Agg')  # NOQA
 import matplotlib.pyplot as plt
+plt.switch_backend('agg')  # NOQA
+
 from spaceweight import SpherePoint
 from spaceweight import SphereDistRel
 from pyasdf import ASDFDataSet
-from pypaw.stations import extract_waveform_stations
+from pypaw.bins.utils import load_json, dump_json, load_yaml
 
 
-def load_yaml(filename):
-    with open(filename) as fh:
-        return yaml.load(fh)
-
-
-def load_json(filename):
-    with open(filename) as fh:
-        return json.load(fh)
-
-
-def dump_json(values, filename):
-    with open(filename, 'w') as fh:
-        json.dump(values, fh, indent=2, sort_keys=True)
-
-
-def extract_receiver_locations(asdf, windows):
+def extract_receiver_locations(station_file, windows):
     """
     Extract receiver location information from asdf file
     """
-    stations = [sta_id for sta_id, sta_win in windows.items()
-                if len(sta_win) > 0]
-    sta_dict = extract_waveform_stations(asdf, stations=stations)
-    return sta_dict
+    station_info = load_json(station_file)
+    return station_info
 
 
-def extract_source_location(asdf):
+def extract_source_location(input_info):
     """
     Extract source location information from asdf file
     """
-    event = asdf.events[0]
-    origin = event.preferred_origin()
-    event_latitude = origin.latitude
-    event_longitude = origin.longitude
-    event_depth = origin.depth
-    return [event_latitude, event_longitude, event_depth]
+    print("Extracting source location information")
+    src_info = defaultdict(dict)
+    for period, period_info in input_info.iteritems():
+        for eventname, event_info in period_info.iteritems():
+            asdf_fn = event_info["asdf_file"]
+            ds = ASDFDataSet(asdf_fn, mode='r')
+            event = ds.events[0]
+            origin = event.preferred_origin()
+            latitude = origin.latitude
+            longitude = origin.longitude
+            depth = origin.depth
+            src_info[period][eventname] = {
+                "latitude": latitude, "longitude": longitude,
+                "depth:": depth}
+    return src_info
 
 
 def _receiver_validator(weights, rec_wcounts, src_wcounts):
@@ -79,8 +66,9 @@ def _receiver_validator(weights, rec_wcounts, src_wcounts):
                              (wsum, src_wcounts[comp]))
 
 
-def determine_receiver_weighting(asdf_file, window_file, flag=True,
-                                 outputdir=None):
+def determine_receiver_weighting(src, stations, windows, max_ratio=0.35,
+                                 flag=True, plot=False,
+                                 figname_prefix=None):
     """
     Given one asdf file and window file, determine the receiver
     weighting
@@ -90,12 +78,8 @@ def determine_receiver_weighting(asdf_file, window_file, flag=True,
 
     :return:
     """
-    asdf_fh = ASDFDataSet(asdf_file)
-    windows = load_json(window_file)
-    recs = extract_receiver_locations(asdf_fh, windows)
-    src = extract_source_location(asdf_fh)
-
-    center = SpherePoint(src[0], src[1], tag="source")
+    center = SpherePoint(src["latitude"], src["longitude"],
+                         tag="source")
 
     # extract window information
     weights = {}
@@ -116,18 +100,20 @@ def determine_receiver_weighting(asdf_file, window_file, flag=True,
         points = []
         print("Components:%s" % comp)
         for chan in comp_info:
-            sta_id = ".".join(chan.split('.')[:2])
-            point = SpherePoint(recs[sta_id][0], recs[sta_id][1], tag=chan,
+            zchan = chan[:-3] + "BHZ"
+            point = SpherePoint(stations[zchan]["latitude"],
+                                stations[zchan]["longitude"],
+                                tag=chan,
                                 weight=1.0)
             points.append(point)
 
         if flag:
+            # calculate weight; otherwise, leave it as default value(1)
             weightobj = SphereDistRel(points, center=center)
-            weightobj.smart_scan(max_ratio=0.35)
-            figbase = os.path.basename(asdf_file).rstrip("h5") + \
-                "%s.png" % (comp)
-            figname = os.path.join(outputdir, figbase)
-            weightobj.plot_global_map(figname=figname, lon0=180.0)
+            weightobj.smart_scan(max_ratio=max_ratio)
+            if plot:
+                figname = figname_prefix + "%s.png" % comp
+                weightobj.plot_global_map(figname=figname, lon0=180.0)
 
         wsum = 0
         for point in points:
@@ -140,8 +126,7 @@ def determine_receiver_weighting(asdf_file, window_file, flag=True,
 
     _receiver_validator(weights, rec_wcounts, src_wcounts)
 
-    del asdf_fh
-    return weights, rec_wcounts, src_wcounts, src
+    return weights, rec_wcounts, src_wcounts
 
 
 def _source_validator(weights, src_wcounts, cat_counts):
@@ -153,8 +138,9 @@ def _source_validator(weights, src_wcounts, cat_counts):
             raise ValueError("Source validator fails!")
 
 
-def determine_source_weighting(src_info, src_wcounts, flag=True,
-                               outputdir=".", tag=""):
+def determine_source_weighting(src_info, src_wcounts, max_ratio=0.35,
+                               flag=True, plot=False,
+                               figname_prefix=None):
     """
     Determine the source weighting based on source distribution
     Attention here, there is still 3 components and each category
@@ -167,15 +153,18 @@ def determine_source_weighting(src_info, src_wcounts, flag=True,
     # determine the weightins based on location
     points = []
     for eventname, event_info in src_info.iteritems():
-        point = SpherePoint(event_info[0], event_info[1], tag=eventname,
+        point = SpherePoint(event_info["latitude"],
+                            event_info["longitude"],
+                            tag=eventname,
                             weight=1.0)
         points.append(point)
+
     if flag:
         weightobj = SphereDistRel(points)
-        weightobj.smart_scan(max_ratio=0.35)
-        figbase = "source.%s.png" % tag
-        figname = os.path.join(outputdir, figbase)
-        weightobj.plot_global_map(figname=figname, lon0=180.0)
+        weightobj.smart_scan(max_ratio=max_ratio)
+        if plot:
+            figname = figname_prefix + ".png"
+            weightobj.plot_global_map(figname=figname, lon0=180.0)
 
     # stats window counts in category level
     cat_wcounts = {}
@@ -228,6 +217,7 @@ def determine_category_weighting(cat_wcounts):
     """
     determine the category weighting based on window counts in each category
     """
+    print("="*30 + "\nCalculating category weighting")
     weights = {}
 
     ncat = 0
@@ -268,6 +258,8 @@ class WindowWeight(object):
         """
         Combine weights
         """
+        print("="*30 + "\nCombine weighting")
+        # combine weights
         print("source weights:", self.src_weights)
         print("category weights:", self.cat_weights)
         weights = {}
@@ -289,6 +281,7 @@ class WindowWeight(object):
         self.weights = weights
 
     def analysis(self):
+        print("="*30 + "\nSummary")
         weights = []
         nwins = []
         for _p, _pw in self.weights.iteritems():
@@ -324,82 +317,85 @@ class WindowWeight(object):
                     outputdir, "%s.%s.weight.json" % (event, period))
                 dump_json(event_info, outputfn)
 
-    def run(self):
-        input_info = self.path["input"]
-
-        # calculate receiver weights for each asdf file
+    def calculate_receiver_weights(self):
+        """
+        calculate receiver weights for each asdf file
+        detertmine source weightings based on source infor and window
+        count and info
+        """
         print("="*30 + "\nCalculating receiver weighting")
+        input_info = self.path["input"]
+        outputdir = self.path["outputdir"]
+        receiver_weighting = self.param["receiver_weighting"]
+        plot = self.param["plot"]
+
         rec_weights = defaultdict(dict)
         rec_wcounts = defaultdict(dict)
         src_wcounts = defaultdict(dict)
-        src_info = defaultdict(dict)
         # determine receiver weightings for each file
         for period, period_info in input_info.iteritems():
             print("-"*15 + "\nPeriod band: %s" % period)
             for event, event_info in period_info.iteritems():
                 print("*"*8 + "\nEvent %s" % event)
-                print("asdf file: %s" % event_info["asdf"])
-                print("window file: %s" % event_info["window"])
-                _weights, _rec_wcounts, _src_wcounts, _src = \
+                print("station file: %s" % event_info["station_file"])
+                print("window file: %s" % event_info["window_file"])
+                src = self.src_info[period][event]
+                station_info = load_json(event_info["station_file"])
+                window_info = load_json(event_info["window_file"])
+                figname_prefix = os.path.join(
+                    outputdir, "%s.%s." % (event, period))
+                _weights, _rec_wcounts, _src_wcounts = \
                     determine_receiver_weighting(
-                        event_info["asdf"], event_info["window"],
-                        flag=self.param["receiver_weighting"],
-                        outputdir=self.path["outputdir"])
+                        src, station_info, window_info,
+                        flag=receiver_weighting,
+                        plot=plot, figname_prefix=figname_prefix)
+
                 rec_weights[period][event] = _weights
                 rec_wcounts[period][event] = _rec_wcounts
                 src_wcounts[period][event] = _src_wcounts
-                src_info[period][event] = _src
 
         self.rec_weights = rec_weights
         self.rec_wcounts = rec_wcounts
         self.src_wcounts = src_wcounts
-        self.src_info = src_info
 
-        # detertmine source weightings based on source infor and window
-        # count and info
+    def calculate_source_weights(self):
+        input_info = self.path["input"]
+        outputdir = self.path["outputdir"]
+        source_weighting = self.param["source_weighting"]
+        plot = self.param["plot"]
+
         src_weights = {}
         cat_wcounts = {}
         print("="*30 + "\nCalculating source weighting")
         for period, period_info in input_info.iteritems():
             print("-"*15 + "\nperiod: %s" % period)
+            figname_prefix = os.path.join(
+                outputdir, "source.%s." % period)
             _weights, _windows = determine_source_weighting(
-                src_info[period], src_wcounts[period],
-                flag=self.param["source_weighting"],
-                outputdir=self.path["outputdir"],
-                tag=period)
+                self.src_info[period], self.src_wcounts[period],
+                flag=source_weighting,
+                plot=plot, figname_prefix=figname_prefix)
             src_weights[period] = _weights
             cat_wcounts[period] = _windows
+
         self.src_weights = src_weights
         self.cat_wcounts = cat_wcounts
 
-        # determine category weighting
-        print("="*30 + "\nCalculating category weighting")
-        cat_weights = determine_category_weighting(cat_wcounts)
-        self.cat_weights = cat_weights
+    def run(self):
 
-        print("="*30 + "\nCombine weighting")
-        # combine weights
+        input_info = self.path["input"]
+        self.src_info = extract_source_location(input_info)
+
+        self.calculate_receiver_weights()
+
+        self.calculate_source_weights()
+
+        self.cat_weights = determine_category_weighting(self.cat_wcounts)
+
         self.combine_weights()
 
         # statistical analysis
-        print("="*30 + "\nSummary")
         self.analysis()
 
         # dump the results out
         self.dump_weights()
-
-
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-f', action='store', dest='path_file', required=True,
-                        help="path file")
-    parser.add_argument('-p', action='store', dest='param_file', required=True,
-                        help="param file")
-    args = parser.parse_args()
-
-    weightobj = WindowWeight(args.path_file, args.param_file)
-    weightobj.run()
-
-
-if __name__ == "__main__":
-    main()

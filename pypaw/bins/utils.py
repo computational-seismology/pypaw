@@ -11,6 +11,7 @@ Class that calculate adjoint source using asdf
 """
 from __future__ import (absolute_import, division, print_function)
 import json
+import yaml
 
 
 def load_json(filename):
@@ -21,3 +22,8 @@ def load_json(filename):
 def dump_json(content, filename):
     with open(filename, 'w') as fh:
         json.dump(content, fh, indent=2, sort_keys=True)
+
+
+def load_yaml(filename):
+    with open(filename, 'r') as fh:
+        return yaml.load(fh)

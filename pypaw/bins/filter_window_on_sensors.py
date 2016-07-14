@@ -20,7 +20,7 @@ import argparse
 from .utils import load_json, dump_json
 
 
-def filter_windows(windows, sensors, sensor_types, verbose=False):
+def filter_windows(windows, stations, sensor_types, verbose=False):
     nchans_old = 0
     nchans_new = 0
     new_wins = {}
@@ -28,13 +28,13 @@ def filter_windows(windows, sensors, sensor_types, verbose=False):
         sta_wins = {}
         for chan, chan_info in sta_info.iteritems():
             nchans_old += len(chan_info)
-            print(chan, nchans_old)
             if len(chan_info) == 0:
                 continue
             try:
-                _st = sensors[chan]
+                _st = stations[chan]["sensor"]
             except:
                 continue
+            print(_st)
             for stype in sensor_types:
                 if stype in _st:
                     nchans_new += len(chan_info)
@@ -58,18 +58,18 @@ def main():
 
     paths = load_json(args.path_file)
     window_file = paths["window_file"]
-    sensor_file = paths["sensor_file"]
+    station_file = paths["station_file"]
     sensor_types = paths["sensor_types"]
 
     print("window file: %s" % window_file)
-    print("sensor_file: %s" % sensor_file)
+    print("station_file: %s" % station_file)
     print("sensor types: %s" % sensor_types)
 
     windows = load_json(window_file)
-    sensors = load_json(sensor_file)
+    stations = load_json(station_file)
 
     # filter the window based on given sensor types
-    windows_new = filter_windows(windows, sensors, sensor_types,
+    windows_new = filter_windows(windows, stations, sensor_types,
                                  verbose=args.verbose)
 
     # dump the new windows file to replace the original one

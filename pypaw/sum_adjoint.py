@@ -13,7 +13,6 @@ on certain weights provided by the user
 from __future__ import print_function, division, absolute_import
 import os
 import numpy as np
-import argparse
 import copy
 from pyasdf import ASDFDataSet
 from pytomo3d.signal.rotate import rotate_one_station_stream
@@ -22,8 +21,29 @@ from pytomo3d.adjoint.process_adjsrc import convert_adjs_to_stream
 from pytomo3d.adjoint.process_adjsrc import add_missing_components
 from pprint import pprint
 from pyadjoint import AdjointSource
-from pypaw.scripts.sum_adjoint_source.utils \
-    import load_json, dump_json, check_adj_consistency
+from pypaw.bins import load_json, dump_json
+
+
+def check_adj_consistency(adj_base, adj):
+    """
+    Check the consistency of adj_base and adj
+    If passed, return, then adj could be added into adj_base
+    If not, raise ValueError
+    """
+    if len(adj_base.adjoint_source) != len(adj.adjoint_source):
+        raise ValueError("Dimension of current adjoint_source(%d)"
+                         "and new added adj(%d) not the same" %
+                         (len(adj_base.adjoint_source),
+                          len(adj.adjoint_source)))
+    if not np.isclose(adj_base.dt, adj.dt):
+        raise ValueError("DeltaT of current adjoint source(%f)"
+                         "and new added adj(%f) not the same"
+                         % (adj_base.dt, adj.dt))
+
+    if np.abs(adj_base.starttime - adj.starttime) > 0.5 * adj.dt:
+        raise ValueError("Start time of current adjoint source(%s)"
+                         "and new added adj(%s) not the same"
+                         % (adj_base.dt, adj.dt))
 
 
 def _rotate_one_station(sta_adjs, slat, slon, elat, elon):
@@ -342,6 +362,8 @@ class PostAdjASDF(object):
 
         if isinstance(self.path, str):
             self.path = load_json(self.path)
+        elif not isinstance(self.path, str):
+            raise TypeError("self.path must be filename or dict")
 
         print_info(self.path, title="Input Parameter")
 
@@ -357,21 +379,5 @@ class PostAdjASDF(object):
         self.dump_to_asdf(outputfile)
 
         # write out the misfit summary
-        misfit_file = outputfile.rstrip("h5") + "misfit.json"
+        misfit_file = outputfile.rstrip("h5") + "adjoint.misfit.json"
         dump_json(self.misfits, misfit_file)
-
-
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-f', action='store', dest='path_file', required=True,
-                        help="path file")
-    parser.add_argument('-v', action='store_true', dest='verbose',
-                        help="verbose flag")
-    args = parser.parse_args()
-
-    job = PostAdjASDF(args.path_file, args.verbose)
-    job.smart_run()
-
-
-if __name__ == '__main__':
-    main()

@@ -35,7 +35,7 @@ def generate_json_paths(event):
 
     parlist['window_file'] = \
         os.path.join(window_base, "%s.%s" % (event, tag), "windows.json")
-    parlist["sensor_file"] = \
+    parlist["station_file"] = \
         os.path.join(sensor_base, "%s.sensors.json" % event)
 
     outputfn = os.path.join(output_json_dir, "%s.sensors.path.json" % event)

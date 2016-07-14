@@ -11,6 +11,37 @@ asdf file.
 """
 from __future__ import (print_function, division, absolute_import)
 import pyasdf
+from pytomo3d.station import extract_staxml_info
+
+
+def extract_station_info_from_asdf(asdf, verbose=False):
+    """ extract the sensor type from stationxml in asdf file """
+    if isinstance(asdf, str) or isinstance(asdf, unicode):
+        ds = pyasdf.ASDFDataSet(asdf)
+    elif isinstance(asdf, pyasdf.ASDFDataSet):
+        ds = asdf
+    else:
+        raise TypeError("Input asdf either be a filename or "
+                        "pyasdf.ASDFDataSet")
+
+    asdf_sensors = dict()
+    ntotal = len(ds.waveforms)
+    for idx, st_group in enumerate(ds.waveforms):
+        if verbose:
+            print("[%4d/%d]Station: %s"
+                  % (idx, ntotal, st_group._station_name))
+        try:
+            inv = st_group.StationXML
+            info = extract_staxml_info(inv)
+            asdf_sensors.update(info)
+        except Exception as msg:
+            print("Failed to extract due to: %s" % msg)
+            continue
+
+    print("Number of stations and channels: %d, %d"
+          % (ntotal, len(asdf_sensors)))
+
+    return asdf_sensors
 
 
 def extract_waveform_stations(asdf, stations=None):
@@ -36,6 +67,7 @@ def extract_waveform_stations(asdf, stations=None):
         sta_dict[st_id] = [staxml[0][0].latitude, staxml[0][0].longitude,
                            staxml[0][0].elevation,
                            staxml[0][0][0].depth]
+
     return sta_dict
 
 
