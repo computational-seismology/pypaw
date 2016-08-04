@@ -10,13 +10,13 @@ import argparse
 from pyasdf import ASDFDataSet
 
 
-def extract_adjoint_misfit(asdf_file, outputdir, verbose):
+def extract_adjoint_misfit(asdf_file, verbose):
 
     print("Input asdf file: %s" % asdf_file)
 
     if not os.path.exists(asdf_file):
         raise ValueError("ASDF file not exists: %s" % asdf_file)
-    ds = ASDFDataSet(asdf_file)
+    ds = ASDFDataSet(asdf_file, mode='r')
     try:
         adjsrc_group = ds.auxiliary_data.AdjointSources
     except Exception as err:
@@ -49,26 +49,27 @@ def extract_adjoint_misfit(asdf_file, outputdir, verbose):
                "misfit_category": misfit_cat,
                "nadj_total": nadj, "nadj_category": nadj_cat}
 
-    outputfn = os.path.join(outputdir, "%s.misfit_summary.json"
-                            % asdf_file[:-3])
-
-    print("Output file: %s" % outputfn)
-    with open(outputfn, 'w') as fh:
-        json.dump(content, fh, indent=2)
-
     if verbose:
         print("Number of adjoint sources:", nadj)
+
+    return content
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-o', action='store', dest='outputdir', default='.',
-                        help='output directory')
+    parser.add_argument('-o', action='store', dest='output_fn',
+                        default='adjoint.misfit.json',
+                        help='output misfit filename')
     parser.add_argument('filename', help='Input ASDF filename')
     parser.add_argument('-v', action='store_true', dest='verbose')
     args = parser.parse_args()
 
-    extract_adjoint_misfit(args.filename, args.outputdir, args.verbose)
+    content = extract_adjoint_misfit(args.filename, args.verbose)
+
+    output_fn = args.output_fn
+    print("Output file: %s" % output_fn)
+    with open(output_fn, 'w') as fh:
+        json.dump(content, fh, indent=2)
 
 
 if __name__ == '__main__':

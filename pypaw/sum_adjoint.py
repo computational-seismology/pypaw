@@ -61,11 +61,31 @@ def _rotate_one_station(sta_adjs, slat, slon, elat, elon):
     return adj_dict
 
 
-def print_info(content, title=""):
-    print("="*20 + title + "="*20)
-    if not isinstance(content, dict):
-        raise TypeError("Type of content(%s) must by dict" % type(content))
-    pprint(content)
+def validate_path(path):
+    print("="*20 + " Path information " + "="*20)
+    pprint(path)
+
+    err = 0
+    keys = ["input_file", "output_file", "rotate_flag"]
+    for _key in keys:
+        if _key not in path:
+            print("Missing key(%s) in path" % _key)
+            err = 1
+
+    if len(path["input_file"]) == 0:
+        print("No input information provided in path")
+    for finfo in path["input_file"].itervalues():
+        asdf_file = finfo["asdf_file"]
+        weight_file = finfo["weight_file"]
+        if not os.path.exists(asdf_file):
+            print("No asdf file: %s" % asdf_file)
+            err = 1
+        if not os.path.exists(weight_file):
+            print("No weight file: %s" % weight_file)
+            err = 1
+
+    if err != 0:
+        raise ValueError("Error in path file")
 
 
 def load_to_adjsrc(adj, event_time):
@@ -231,11 +251,10 @@ class PostAdjASDF(object):
 
         return misfits
 
-    def add_adjoint_dataset_on_channel_weight(self, ds, weight_file):
+    def add_adjoint_dataset_on_channel_weight(self, ds, weights):
         """
         Add adjoint source based on channel window weight
         """
-        weights = load_json(weight_file)
         misfits = {}
         adjsrc_group = ds.auxiliary_data.AdjointSources
         for channel in weights:
@@ -266,7 +285,7 @@ class PostAdjASDF(object):
         error_list = []
         for _file_info in self.path["input_file"].itervalues():
             asdf_fn = _file_info["asdf_file"]
-            ds = ASDFDataSet(asdf_fn)
+            ds = ASDFDataSet(asdf_fn, mode='r')
             if self.events is None:
                 self.events = ds.events
             elif self.events != ds.events:
@@ -288,21 +307,20 @@ class PostAdjASDF(object):
         print("="*15 + "\nSumming asdf files...")
         for period, _file_info in self.path["input_file"].iteritems():
             filename = _file_info["asdf_file"]
-            ds = ASDFDataSet(filename)
+            ds = ASDFDataSet(filename, mode='r')
 
-            if "weight" in _file_info:
-                _weight = _file_info["weight"]
-                misfits = self.add_adjoint_dataset_on_category_weight(
-                    ds, _weight)
-            elif "weight_file" in _file_info:
-                _weight = _file_info["weight_file"]
-                misfits = self.add_adjoint_dataset_on_channel_weight(
-                    ds, _weight)
-            else:
-                raise NotImplementedError("Not implemented")
+            # if "category_weight" in _file_info:
+            #    _weight = _file_info["weight"]
+            #    misfits = self.add_adjoint_dataset_on_category_weight(
+            #        ds, _weight)
+            # elif "weight_file" in _file_info:
+            weight_file = _file_info["weight_file"]
+            weights = load_json(weight_file)
+            misfits = self.add_adjoint_dataset_on_channel_weight(
+                ds, weights)
 
-            print("Adding asdf file(%s) using assigned weight(%s)"
-                  % (filename, _weight))
+            print("Adding asdf file(%s) using assigned weight_file(%s)"
+                  % (filename, weight_file))
 
             self.misfits[period] = misfits
 
@@ -343,7 +361,7 @@ class PostAdjASDF(object):
             print("Output file exists and removed:%s" % outputfile)
             os.remove(outputfile)
 
-        ds = ASDFDataSet(outputfile, compression=None)
+        ds = ASDFDataSet(outputfile, mode='a', compression=None)
         ds.add_quakeml(self.events)
         event = self.events[0]
         origin = event.preferred_origin()
@@ -365,7 +383,7 @@ class PostAdjASDF(object):
         elif not isinstance(self.path, str):
             raise TypeError("self.path must be filename or dict")
 
-        print_info(self.path, title="Input Parameter")
+        validate_path(self.path)
 
         self.check_all_event_info()
 

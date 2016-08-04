@@ -7,9 +7,9 @@ import argparse
 superbase = "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_EBRU"
 
 window_base = os.path.join(superbase, "window")
-sensor_base = os.path.join(superbase, "sensors")
+sensor_base = os.path.join(superbase, "stations")
 
-tag = "60_100"
+tag = "90_250"
 
 output_json_dir = "./output_json"
 # ###############
@@ -36,9 +36,13 @@ def generate_json_paths(event):
     parlist['window_file'] = \
         os.path.join(window_base, "%s.%s" % (event, tag), "windows.json")
     parlist["station_file"] = \
-        os.path.join(sensor_base, "%s.sensors.json" % event)
+        os.path.join(sensor_base, "%s.stations.json" % event)
+    parlist["output_file"] = \
+        os.path.join(window_base, "%s.%s" % (event, tag),
+                     "windows.filter.json")
 
     outputfn = os.path.join(output_json_dir, "%s.sensors.path.json" % event)
+    print("output file: %s" % outputfn)
     dump_json(parlist, outputfn)
 
 
