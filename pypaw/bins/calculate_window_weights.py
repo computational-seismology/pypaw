@@ -22,6 +22,8 @@ def main():
                         help="path file")
     parser.add_argument('-p', action='store', dest='param_file', required=True,
                         help="param file")
+    parser.add_argument('-v', action='store_true', dest='verbose',
+                        help="verbose flag")
     args = parser.parse_args()
 
     weightobj = WindowWeight(args.path_file, args.param_file)
