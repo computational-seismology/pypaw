@@ -394,6 +394,9 @@ class PostAdjASDF(object):
             self.rotate_asdf()
 
         outputfile = self.path["output_file"]
+        outputdir = os.path.dirname(outputfile)
+        if not os.path.exists(outputdir):
+            os.makedirs(outputdir)
         self.dump_to_asdf(outputfile)
 
         # write out the misfit summary
