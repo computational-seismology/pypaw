@@ -15,7 +15,7 @@ import os
 from pyasdf import ASDFDataSet
 from mpi4py import MPI
 from .utils import smart_read_yaml, smart_read_json, is_mpi_env
-from .utils import smart_check_path, smart_remove_file
+from .utils import smart_check_path, smart_remove_file, smart_mkdir
 
 
 class ProcASDFBase(object):
@@ -141,7 +141,9 @@ class ProcASDFBase(object):
         dirname = os.path.dirname(filename)
         if not smart_check_path(dirname, mpi_mode=self.mpi_mode,
                                 comm=self.comm):
-            raise ValueError("Output dir not exists: %s" % dirname)
+            print("Output dir not exists and created: %s" % dirname)
+            smart_mkdir(dirname, mpi_mode=self.mpi_mode,
+                        comm=self.comm)
 
         if smart_check_path(filename, mpi_mode=self.mpi_mode,
                             comm=self.comm):

@@ -11,6 +11,7 @@ Class that calculate adjoint source using asdf
 """
 from __future__ import (absolute_import, division, print_function)
 from functools import partial
+import json
 import pyadjoint
 from pyasdf import ASDFDataSet
 from pytomo3d.adjoint.adjsrc import calculate_adjsrc_on_stream
@@ -18,6 +19,22 @@ from pytomo3d.adjoint.process_adjsrc import process_adjoint
 from .procbase import ProcASDFBase
 from .adjoint_util import reshape_adj, calculate_chan_weight
 from .utils import smart_read_json
+
+
+def dump_json(content, filename):
+    content_filter = dict(
+        (k, v) for k, v in content.iteritems() if v is not None)
+    with open(filename, "w") as fh:
+        json.dump(content_filter, fh, sort_keys=True, indent=2)
+
+
+def load_adjoint_config(config):
+    """
+    Load config into pyadjoint.Config
+    :param param:
+    :return:
+    """
+    return pyadjoint.Config(**config)
 
 
 def adjoint_wrapper(obsd_station_group, synt_station_group, config=None,
@@ -72,9 +89,9 @@ def adjoint_wrapper(obsd_station_group, synt_station_group, config=None,
         print("Missing tag '%s' from synt_station_group %s. Skipped." %
               (synt_tag, synt_station_group._station_name))
         return
-    if not hasattr(synt_station_group, "StationXML"):
-        print("Missing tag 'STATIONXML' from synt_station_group %s. Skipped" %
-              (synt_tag, synt_station_group._station_name))
+    if not hasattr(obsd_station_group, "StationXML"):
+        print("Missing tag 'STATIONXML' from obsd_station_group %s. Skipped" %
+              (obsd_tag, obsd_station_group._station_name))
 
     try:
         window_sta = windows[obsd_station_group._station_name]
@@ -155,15 +172,6 @@ class AdjointASDF(ProcASDFBase):
                              "than max_period(%5.1f)" % (param["min_period"],
                                                          param["max_period"]))
 
-    @staticmethod
-    def load_adjoint_config(config):
-        """
-        Load config into pyadjoint.Config
-        :param param:
-        :return:
-        """
-        return pyadjoint.Config(**config)
-
     def load_windows(self, winfile):
         """
         load window json file
@@ -221,7 +229,7 @@ class AdjointASDF(ProcASDFBase):
         adj_src_type = adjoint_param["adj_src_type"]
         adjoint_param.pop("adj_src_type", None)
 
-        config = self.load_adjoint_config(adjoint_param)
+        config = load_adjoint_config(adjoint_param)
 
         if self.mpi_mode and self.rank == 0:
             output_ds = ASDFDataSet(output_filename, mpi=False)
@@ -242,3 +250,122 @@ class AdjointASDF(ProcASDFBase):
         results = obsd_ds.process_two_files(synt_ds, adjsrc_func,
                                             output_filename)
         return results
+
+
+def measure_adjoint_wrapper(
+        obsd_station_group, synt_station_group, config=None,
+        obsd_tag=None, synt_tag=None, windows=None, event=None,
+        adj_src_type="multitaper_misfit"):
+
+    # Make sure everything thats required is there.
+    if not hasattr(obsd_station_group, obsd_tag):
+        print("Missing tag '%s' from obsd_station_group %s. Skipped." %
+              (obsd_tag, obsd_station_group._station_name))
+        return
+    if not hasattr(synt_station_group, synt_tag):
+        print("Missing tag '%s' from synt_station_group %s. Skipped." %
+              (synt_tag, synt_station_group._station_name))
+        return
+    if not hasattr(obsd_station_group, "StationXML"):
+        print("Missing tag 'STATIONXML' from obsd_station_group %s. Skipped" %
+              (obsd_tag, obsd_station_group._station_name))
+
+    try:
+        window_sta = windows[obsd_station_group._station_name]
+    except:
+        return
+    # check total number of windows. If total number of
+    # window is 0, return None
+    nwin_total = 0
+    for value in window_sta.itervalues():
+        nwin_total += len(value)
+    if nwin_total == 0:
+        return
+
+    observed = getattr(obsd_station_group, obsd_tag)
+    synthetic = getattr(synt_station_group, synt_tag)
+
+    adjsrcs = calculate_adjsrc_on_stream(
+        observed, synthetic, window_sta, config, adj_src_type,
+        figure_mode=False, figure_dir=None,
+        adjoint_src_flag=False)
+
+    results = {}
+    for adj in adjsrcs:
+        results[adj.id] = adj.measurement
+
+    return results
+
+
+class MeasureAdjointASDF(AdjointASDF):
+    """
+    Make measurements on ASDF file. The output file is the json
+    file which contains measurements for all the windows in
+    the window file
+    """
+    def _core(self, path, param):
+        """
+        Core function that handles one pair of asdf file(observed and
+        synthetic), windows and configuration for adjoint source
+
+        :param path: path information, path of observed asdf, synthetic
+            asdf, windows files, observed tag, synthetic tag, output adjoint
+            file, figure mode and figure directory
+        :type path: dict
+        :param param: parameter information for constructing adjoint source
+        :type param: dict
+        :return:
+        """
+        adjoint_param = param[0]
+        postproc_param = param[1]
+        self._validate_path(path)
+        self._validate_param(adjoint_param)
+
+        self.print_info(path, extra_info="Path information")
+        self.print_info(adjoint_param,
+                        extra_info="Adjoint parameter information")
+        self.print_info(postproc_param,
+                        extra_info="Postprocess parameter information")
+
+        obsd_file = path["obsd_asdf"]
+        synt_file = path["synt_asdf"]
+        obsd_tag = path["obsd_tag"]
+        synt_tag = path["synt_tag"]
+        window_file = path["window_file"]
+        output_filename = path["output_file"]
+
+        self.check_input_file(obsd_file)
+        self.check_input_file(synt_file)
+        self.check_input_file(window_file)
+        self.check_output_file(output_filename)
+
+        obsd_ds = self.load_asdf(obsd_file, mode="r")
+        synt_ds = self.load_asdf(synt_file, mode="r")
+
+        event = obsd_ds.events[0]
+        windows = self.load_windows(window_file)
+
+        adj_src_type = adjoint_param["adj_src_type"]
+        adjoint_param.pop("adj_src_type", None)
+
+        config = load_adjoint_config(adjoint_param)
+
+        if self.mpi_mode and self.rank == 0:
+            output_ds = ASDFDataSet(output_filename, mpi=False)
+            if output_ds.events:
+                output_ds.events = obsd_ds.events
+            del output_ds
+        if self.mpi_mode:
+            self.comm.barrier()
+
+        measure_adj_func = \
+            partial(measure_adjoint_wrapper, config=config,
+                    obsd_tag=obsd_tag, synt_tag=synt_tag,
+                    windows=windows, event=event,
+                    adj_src_type=adj_src_type)
+
+        results = obsd_ds.process_two_files(synt_ds, measure_adj_func)
+
+        if self.rank == 0:
+            print("output filename: %s" % output_filename)
+            dump_json(results, output_filename)
