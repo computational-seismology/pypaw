@@ -11,9 +11,24 @@ handles parallel I/O so they are invisible to users.
     (http://www.gnu.org/licenses/lgpl-3.0.en.html)
 """
 from __future__ import (print_function, division, absolute_import)
+import inspect
 from functools import partial
 from pytomo3d.signal.process import process_stream
 from .procbase import ProcASDFBase
+
+
+def check_final_param(param):
+    """
+    Check the param keywords are the same with the keywords list of
+    the function of process_stream
+    """
+    default_param = inspect.getargspec(process_stream).args
+    default_param.remove("st")
+    default_param.remove("inventory")
+    if set(default_param) != set(param.keys()):
+        print("Missing: %s" % (set(default_param) - set(param.keys())))
+        print("Redundant: %s" % (set(param.keys()) - set(default_param)))
+        raise ValueError("Param is not consistent with function argument list")
 
 
 def process_wrapper(stream, inv, param=None):
@@ -25,7 +40,8 @@ def process_wrapper(stream, inv, param=None):
     :param param:
     :return:
     """
-    return process_stream(stream, inventory=inv, **param)
+    param["inventory"] = inv
+    return process_stream(stream, **param)
 
 
 class ProcASDF(ProcASDFBase):
@@ -41,9 +57,10 @@ class ProcASDF(ProcASDFBase):
         self._missing_keys(necessary_keys, path)
 
     def _validate_param(self, param):
-        necessary_keys = ["remove_response_flag", "filter_flag", "pre_filt",
+        necessary_keys = ("remove_response_flag", "filter_flag", "pre_filt",
                           "relative_starttime", "relative_endtime",
-                          "resample_flag", "sampling_rate", "rotate_flag"]
+                          "resample_flag", "sampling_rate", "rotate_flag",
+                          "sanity_check")
 
         self._missing_keys(necessary_keys, param)
 
@@ -75,13 +92,19 @@ class ProcASDF(ProcASDFBase):
 
         # figure out interpolation parameter
         param["starttime"] = event_time + param["relative_starttime"]
+        param.pop("relative_starttime")
         param["endtime"] = event_time + param["relative_endtime"]
+        param.pop("relative_endtime")
         param["event_latitude"] = event_latitude
         param["event_longitude"] = event_longitude
+
+        # check final param to see if the keys are right
+        check_final_param(param)
 
         process_function = \
             partial(process_wrapper, param=param)
 
         tag_map = {input_tag: output_tag}
         ds.process(process_function, output_asdf, tag_map=tag_map)
+
         del ds

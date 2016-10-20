@@ -13,6 +13,7 @@ so they are invisible to users.
 from __future__ import (absolute_import, division, print_function)
 from functools import partial
 import os
+import inspect
 import json
 import numpy as np
 from .procbase import ProcASDFBase
@@ -20,6 +21,22 @@ from pytomo3d.window.window import window_on_stream
 import pyflex
 from .utils import smart_read_yaml, smart_mkdir
 from .write_window import write_window_json
+
+
+def check_param_with_function_args(config):
+    deletes = ["self", "noise_start_index", "noise_end_index",
+               "signal_start_index", "signal_end_index",
+               "window_weight_fct"]
+
+    default_keywords = inspect.getargspec(pyflex.Config.__init__).args
+    for d in deletes:
+        default_keywords.remove(d)
+
+    if set(default_keywords) != set(config.keys()):
+        print("Missing: %s" % (set(default_keywords) - set(config.keys())))
+        print("Redundant: %s" % (set(config.keys()) - set(default_keywords)))
+        raise ValueError("config file is missing values compared to "
+                         "pyflex.Config")
 
 
 def window_wrapper(obsd_station_group, synt_station_group, config_dict=None,
@@ -228,11 +245,13 @@ class WindowASDF(ProcASDFBase):
     def load_window_config(param):
         config_dict = {}
         flag_list = []
+
         for key, value in param.iteritems():
             # pop the "instrument_merge_flag" value out
             flag_list.append(value["instrument_merge_flag"])
             value.pop("instrument_merge_flag")
 
+            check_param_with_function_args(value)
             config_dict[key] = pyflex.Config(**value)
 
         if not all(_e == flag_list[0] for _e in flag_list):

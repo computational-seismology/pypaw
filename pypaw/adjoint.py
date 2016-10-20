@@ -11,6 +11,7 @@ Class that calculate adjoint source using asdf
 """
 from __future__ import (absolute_import, division, print_function)
 from functools import partial
+import inspect
 import json
 import pyadjoint
 from pyasdf import ASDFDataSet
@@ -28,12 +29,25 @@ def dump_json(content, filename):
         json.dump(content_filter, fh, sort_keys=True, indent=2)
 
 
+def check_config_keywords(config):
+    default_keywords = inspect.getargspec(pyadjoint.Config.__init__).args
+    deletes = ["self"]
+    for d in deletes:
+        default_keywords.remove(d)
+
+    if set(default_keywords) != set(config.keys()):
+        print("Missing: %s" % (set(default_keywords) - set(config.keys())))
+        print("Redundant: %s" % (set(config.keys()) - set(default_keywords)))
+        raise ValueError("Config Error")
+
+
 def load_adjoint_config(config):
     """
     Load config into pyadjoint.Config
     :param param:
     :return:
     """
+    check_config_keywords(config)
     return pyadjoint.Config(**config)
 
 
