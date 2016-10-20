@@ -121,7 +121,7 @@ def adjoint_wrapper(obsd_station_group, synt_station_group, config=None,
 
     origin = event.preferred_origin() or event.origins[0]
     focal = event.preferred_focal_mechanism()
-    hdr = focal.moment_tensor.source_time_function.duration
+    hdr = focal.moment_tensor.source_time_function.duration / 2.0
     # according to SPECFEM starttime convention
     time_offset = -1.5 * hdr
     starttime = origin.time + time_offset
