@@ -1,0 +1,8 @@
+{
+  "obsd_asdf": "../../tests/data/asdf/proc/C200912240023A.proc_obsd_50_100.h5",
+  "obsd_tag": "proc_obsd_50_100",
+  "synt_asdf": "../../tests/data/asdf/proc/C200912240023A.proc_synt_50_100.h5",
+  "synt_tag": "proc_synt_50_100",
+  "output_dir": "../../tests/data/asdf/window/C200912240023A.50_100",
+  "figure_mode": true
+} 
