@@ -27,7 +27,7 @@ def main():
     args = parser.parse_args()
 
     weightobj = WindowWeight(args.path_file, args.param_file)
-    weightobj.run()
+    weightobj.smart_run()
 
 
 if __name__ == "__main__":

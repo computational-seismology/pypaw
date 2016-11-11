@@ -19,14 +19,15 @@ import logging
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')  # NOQA
 
+from pyasdf import ASDFDataSet
 from spaceweight import SpherePoint
 from spaceweight import SphereDistRel
-from pyasdf import ASDFDataSet
+from pytomo3d.adjoint.sum_adjoint import check_events_consistent
 from pypaw.bins.utils import load_json, dump_json, load_yaml
 
 
 # Setup the logger.
-logger = logging.getLogger(" window-weight")
+logger = logging.getLogger("window-weight")
 logger.setLevel(logging.INFO)
 # Prevent propagating to higher loggers.
 logger.propagate = 0
@@ -55,34 +56,29 @@ def safe_mkdir(dirname):
         os.makedirs(dirname)
 
 
+def _file_not_exists(fn):
+    if not os.path.exists(fn):
+        print("Missing file: %s" % fn)
+        return 1
+    else:
+        return 0
+
+
 def validate_path(path):
     err = 0
-    logger.info("Validate inputp path")
+    logger.info("Validate input path")
     input_info = path["input"]
     for period, period_info in input_info.iteritems():
-        for event, event_info in period_info.iteritems():
-            asdf_file = event_info["asdf_file"]
-            window_file = event_info["window_file"]
-            station_file = event_info["station_file"]
-            if not os.path.exists(asdf_file):
-                print("Missing asdf file: %s" % asdf_file)
-                err = 1
-            if not os.path.exists(window_file):
-                print("Missing window file: %s" % window_file)
-                err = 1
-            if not os.path.exists(station_file):
-                print("Missing station file: %s" % station_file)
-                err = 1
-            if "output_file" not in event_info:
-                print("Missing key 'output_file' in %s.%s"
-                      % (event, period))
-                err = 1
-    try:
-        logdir = path["log_dir"]
-        safe_mkdir(logdir)
-    except KeyError:
-        print("Missing key 'log_dir' in path")
-        err = 1
+        asdf_file = period_info["asdf_file"]
+        window_file = period_info["window_file"]
+        station_file = period_info["station_file"]
+        err += _file_not_exists(asdf_file)
+        err += _file_not_exists(window_file)
+        err += _file_not_exists(station_file)
+
+    logfile = path["logfile"]
+    logdir = os.path.dirname(logfile)
+    safe_mkdir(logdir)
 
     if err != 0:
         raise ValueError("Error in path file. Please "
@@ -92,12 +88,22 @@ def validate_path(path):
 def validate_param(param):
     err = 0
     logger.info("Validate input param")
-    keys = ["source_weighting", "source_search_ratio",
-            "receiver_weighting", "receiver_search_ratio",
-            "plot"]
+    keys = ["receiver_weighting", "category_weighting"]
     for key in keys:
         if key not in param:
-            print("Key(%s) not in param file")
+            print("Key(%s) not in param file" % key)
+            err = 1
+
+    keys = ["flag", "ratio"]
+    for key in keys:
+        if key not in param["category_weighting"]:
+            print("Key(%s) not in param['category_weighting']" % key)
+            err = 1
+
+    keys = ["flag", "search_ratio", "plot"]
+    for key in keys:
+        if key not in param['receiver_weighting']:
+            print("Key(%s) not in param['receiver_weighting']" % key)
             err = 1
 
     if err != 0:
@@ -117,26 +123,31 @@ def extract_source_location(input_info):
     Extract source location information from asdf file
     """
     logger_block("Extracting source location information")
-    src_info = defaultdict(dict)
+    asdf_events = {}
     for period, period_info in input_info.iteritems():
-        logger.info("Period band: %s -- Number of files: %s"
-                    % (period, len(period_info)))
-        for eventname, event_info in period_info.iteritems():
-            asdf_fn = event_info["asdf_file"]
-            ds = ASDFDataSet(asdf_fn, mode='r')
-            event = ds.events[0]
-            origin = event.preferred_origin()
-            latitude = origin.latitude
-            longitude = origin.longitude
-            depth = origin.depth
-            src_info[period][eventname] = {
-                "latitude": latitude, "longitude": longitude,
-                "depth:": depth}
+        asdf_fn = period_info["asdf_file"]
+        logger.info("Period band: %s -- asdf file: %s"
+                    % (period, asdf_fn))
+        ds = ASDFDataSet(asdf_fn, mode='r')
+        asdf_events[period] = ds.events[0]
+        del ds
+
+    # check event information all the same across period bands
+    diffs = check_events_consistent(asdf_events)
+    if len(diffs) != 0:
+        raise ValueError("Event information in %s not the same as others %s"
+                         % (diffs, asdf_events.keys()))
+
+    event_base = asdf_events[asdf_events.keys()[0]]
+    origin = event_base.preferred_origin()
+    src_info = {
+         "latitude": origin.latitude, "longitude": origin.longitude,
+         "depth:": origin.depth}
 
     return src_info
 
 
-def _receiver_validator(weights, rec_wcounts, src_wcounts):
+def _receiver_validator(weights, rec_wcounts, cat_wcounts):
 
     for comp in weights:
         wsum = 0
@@ -144,9 +155,9 @@ def _receiver_validator(weights, rec_wcounts, src_wcounts):
             nwin = rec_wcounts[trace_id]
             wsum += trace_weight * nwin
 
-        if not np.isclose(wsum, src_wcounts[comp]):
+        if not np.isclose(wsum, cat_wcounts[comp]):
             raise ValueError("receiver validator fails: %f, %f" %
-                             (wsum, src_wcounts[comp]))
+                             (wsum, cat_wcounts[comp]))
 
 
 def determine_receiver_weighting(src, stations, windows, max_ratio=0.35,
@@ -168,7 +179,7 @@ def determine_receiver_weighting(src, stations, windows, max_ratio=0.35,
     # extract window information
     weights = {}
     rec_wcounts = {}
-    src_wcounts = defaultdict(lambda: 0)
+    cat_wcounts = defaultdict(lambda: 0)
     for sta, sta_window in windows.iteritems():
         for chan, chan_win in sta_window.iteritems():
             comp = chan.split(".")[-1]
@@ -177,7 +188,7 @@ def determine_receiver_weighting(src, stations, windows, max_ratio=0.35,
                 continue
             weights.setdefault(comp, {}).update({chan: 0.0})
             rec_wcounts[chan] = _nwin
-            src_wcounts[comp] += _nwin
+            cat_wcounts[comp] += _nwin
 
     # in each components, calculate weight
     ref_dists = {}
@@ -214,13 +225,13 @@ def determine_receiver_weighting(src, stations, windows, max_ratio=0.35,
         if flag:
             # calculate weight; otherwise, leave it as default value(1)
             weightobj = SphereDistRel(points, center=center)
-            scan_figname = figname_prefix + "%s.smart_scan.png" % comp
+            scan_figname = figname_prefix + ".%s.smart_scan.png" % comp
             ref_dists[comp], cond_nums[comp] = weightobj.smart_scan(
                 max_ratio=max_ratio, start=0.5, gap=0.5,
                 drop_ratio=0.95, plot=plot,
                 figname=scan_figname)
             if plot:
-                figname = figname_prefix + "%s.weight.png" % comp
+                figname = figname_prefix + ".%s.weight.png" % comp
                 weightobj.plot_global_map(figname=figname, lon0=180.0)
         else:
             ref_dists[comp] = None
@@ -230,144 +241,152 @@ def determine_receiver_weighting(src, stations, windows, max_ratio=0.35,
         for point in points:
             nwin = rec_wcounts[point.tag]
             wsum += point.weight * nwin
-        norm_factor = src_wcounts[comp] / wsum
+        norm_factor = cat_wcounts[comp] / wsum
 
         for point in points:
             weights[comp][point.tag] = point.weight * norm_factor
 
-    _receiver_validator(weights, rec_wcounts, src_wcounts)
+    _receiver_validator(weights, rec_wcounts, cat_wcounts)
 
     return {"rec_weights": weights, "rec_wcounts": rec_wcounts,
-            "src_wcounts": src_wcounts, "rec_ref_dists": ref_dists,
+            "cat_wcounts": cat_wcounts, "rec_ref_dists": ref_dists,
             "rec_cond_nums": cond_nums}
-
-
-def _source_validator(weights, src_wcounts, cat_counts):
-    for comp, comp_weights in weights.iteritems():
-        wsum = 0
-        for event, event_weights in comp_weights.iteritems():
-            wsum += event_weights * src_wcounts[event][comp]
-        if not np.isclose(wsum, cat_counts[comp]):
-            raise ValueError("Source validator fails!")
-
-
-def determine_source_weighting(src_info, src_wcounts, max_ratio=0.35,
-                               flag=True, plot=False,
-                               figname_prefix=None):
-    """
-    Determine the source weighting based on source distribution and
-    window counts.
-    Attention here, there is still 3 components and each category
-    should be weighting independently with the window count information
-    in this components.
-    """
-    logger.info("Number of sources: %s" % len(src_info))
-    logger.info("Window counts information: %s" % src_wcounts)
-
-    # determine the weightins based on location
-    points = []
-    for eventname, event_info in src_info.iteritems():
-        point = SpherePoint(event_info["latitude"],
-                            event_info["longitude"],
-                            tag=eventname,
-                            weight=1.0)
-        points.append(point)
-
-    if flag:
-        weightobj = SphereDistRel(points)
-        scan_figname = figname_prefix + ".smart_scan.png"
-        _ref_dist, _cond_num = weightobj.smart_scan(
-            max_ratio=max_ratio, start=0.5, gap=0.5,
-            drop_ratio=0.80, plot=plot,
-            figname=scan_figname)
-        if plot:
-            figname = figname_prefix + ".weight.png"
-            weightobj.plot_global_map(figname=figname, lon0=180.0)
-
-    # stats window counts in category level
-    cat_wcounts = {}
-    for event, event_info in src_wcounts.iteritems():
-        for comp, comp_info in event_info.iteritems():
-            cat_wcounts.setdefault(comp, 0)
-            cat_wcounts[comp] += comp_info
-
-    weights = {}
-    ref_dists = {}
-    cond_nums = {}
-    # nomalization
-    for comp in cat_wcounts:
-        # ref dist and condition number are the same for different components
-        # because the source distribution is exactly the same
-        ref_dists[comp] = _ref_dist
-        cond_nums[comp] = _cond_num
-        wsum = 0
-        for point in points:
-            nwin = src_wcounts[point.tag][comp]
-            wsum += point.weight * nwin
-        norm_factor = cat_wcounts[comp] / wsum
-        weights[comp] = {}
-        for point in points:
-            eventname = point.tag
-            weights[comp][eventname] = point.weight * norm_factor
-
-    _source_validator(weights, src_wcounts, cat_wcounts)
-    return {"src_weights": weights, "cat_wcounts": cat_wcounts,
-            "src_ref_dists": ref_dists, "src_cond_nums": cond_nums}
 
 
 def _category_validator(weights, counts):
     wsum = 0.0
-    ncat = 0
-    for pw in weights.itervalues():
-        wsum += sum(pw.values())
-        ncat += len(pw)
+    nwins = 0
+    for p, pinfo in weights.iteritems():
+        for c in pinfo:
+            wsum += weights[p][c] * counts[p][c]
+            nwins += counts[p][c]
 
-    wsum_true = 0.0
-    ncat_true = 0
-    for pw in counts.itervalues():
-        for cw in pw.itervalues():
-            wsum_true += 1.0 / cw
-            ncat_true += 1
-    wsum_true /= ncat
-
-    if ncat_true != ncat:
-        raise ValueError("Category validator fails on number of category!")
-
-    if not np.isclose(wsum, wsum_true):
+    if not np.isclose(wsum, nwins):
         raise ValueError("Category validator fails: %f, %f" %
-                         (wsum, wsum_true))
+                         (wsum, nwins))
 
 
-def determine_category_weighting(cat_wcounts):
+def check_cat_consistency(cat_ratio, cat_wcounts):
+    err = 0
+    # check consistency
+    for p, pinfo in cat_ratio:
+        for c in pinfo:
+            try:
+                cat_wcounts[p][c]
+            except KeyError:
+                err = 1
+                print("Missing %s.%s" % (p, c))
+    if err:
+        raise ValueError("category weighting ratio information is not "
+                         "consistent with window information")
+
+
+def determine_category_weighting(weight_param, cat_wcounts):
     """
     determine the category weighting based on window counts in each category
     """
     logger_block("Category Weighting")
     weights = {}
 
-    ncat = 0
-    for period_info in cat_wcounts.itervalues():
-        for comp in period_info:
-            ncat += 1
+    cat_ratio = weight_param["ratio"]
 
-    for period, period_info in cat_wcounts.iteritems():
-        weights[period] = {}
-        for comp in period_info:
-            weights[period][comp] = 1.0 / (ncat * period_info[comp])
+    print("cat_ratio: %s" % cat_ratio)
+    print("cat_wcounts: %s" % cat_wcounts)
+    sumv = 0
+    nwins = 0
+    for p, pinfo in cat_wcounts.iteritems():
+        for c in pinfo:
+            sumv += cat_wcounts[p][c] / cat_ratio[p][c]
+            nwins += cat_wcounts[p][c]
 
-    logger.info("Category window counts: %s" % cat_wcounts)
+    normc = nwins / sumv
+    logger.info("Total number of windows: %d" % nwins)
+
+    weights = {}
+    for p, pinfo in cat_wcounts.iteritems():
+        weights[p] = {}
+        for c in pinfo:
+            weights[p][c] = normc / cat_ratio[p][c]
+
     logger.info("Category weights: %s" % weights)
     _category_validator(weights, cat_wcounts)
     return weights
 
 
-class WindowWeight(object):
+def plot_histogram(figname, array, nbins=50):
+    # plot histogram of weights
+    plt.hist(array, nbins)
+    plt.savefig(figname)
 
+
+def combine_weights(rec_weights, cat_weights):
+    """
+    Combine weights for receiver weighting and category weighting
+    """
+    logger_block("Combine Weighting")
+    # combine weights
+    weights = {}
+    for period, period_info in rec_weights.iteritems():
+        weights[period] = {}
+        for comp, comp_info in period_info.iteritems():
+            for chan_id in comp_info:
+                rec_weight = comp_info[chan_id]
+                cat_weight = cat_weights[period][comp]
+                _weight = {"receiver": rec_weight,
+                           "category": cat_weight}
+                _weight["weight"] = \
+                    rec_weight * cat_weight
+                weights[period][chan_id] = _weight
+    return weights
+
+
+def validate_overall_weights(weights_array, nwins_array):
+    wsum = np.dot(nwins_array, weights_array)
+    if not np.isclose(wsum, 1.0):
+        raise ValueError("The sum of all weights(%f) does not add "
+                         "up to 1.0" % wsum)
+
+
+def analyze_overall_weights(weights, rec_wcounts, logdir):
+    nwins_array = []
+    weights_array = []
+    # validate the sum of all weights is 1
+    for _p, _pw in weights.iteritems():
+        for _chan, _chanw in _pw.iteritems():
+            nwins_array.append(rec_wcounts[_p][_chan])
+            weights_array.append(_chanw["weight"])
+
+    validate_overall_weights(weights)
+
+    figname = os.path.join(logdir, "weights.hist.png")
+    plot_histogram(figname, weights_array)
+    figname = os.path.join(logdir, "weights.hist.png")
+    plot_histogram(figname, nwins_array)
+
+    maxw = max(weights_array)
+    minw = min(weights_array)
+    logger.info("Total number of receivers: %d" % len(weights_array))
+    logger.info("Total number of windows: %d" % np.sum(nwins_array))
+    logger.info("Weight max, min, max/min: %f, %f, %f"
+                % (maxw, minw, maxw/minw))
+
+    return {"max_weights": maxw, "min_weights": minw,
+            "total_nwindows": np.sum(nwins_array)}
+
+
+class WindowWeight(object):
+    """
+    Determine the weighting for one event, including several period bands
+    and component. So each `period_band + component` is defined as a
+    category.
+    """
     def __init__(self, path, param):
         self.path = load_json(path)
         self.param = load_yaml(param)
 
+        # source information is only used in plotting
         self.src_info = None
+
         self.weights = None
 
         self.rec_weights = None
@@ -375,95 +394,27 @@ class WindowWeight(object):
         self.rec_ref_dists = None
         self.rec_cond_nums = None
 
-        self.src_wcounts = None
-        self.src_ref_dists = None
-        self.src_cond_nums = None
-        self.src_weights = None
-
         self.cat_wcounts = None
         self.cat_weights = None
-
-    def combine_weights(self):
-        """
-        Combine weights for receiver weighting, source weighting and
-        category weighting
-        """
-        logger_block("Combine Weighting")
-        # combine weights
-        # print("source weights:", self.src_weights)
-        weights = {}
-        for period, period_info in self.rec_weights.iteritems():
-            weights[period] = {}
-            for event, event_info in period_info.iteritems():
-                weights[period][event] = {}
-                for comp, comp_info in event_info.iteritems():
-                    for chan_id in comp_info:
-                        rec_weight = comp_info[chan_id]
-                        src_weight = self.src_weights[period][comp][event]
-                        cat_weight = self.cat_weights[period][comp]
-                        _weight = {"receiver": rec_weight,
-                                   "source": src_weight,
-                                   "category": cat_weight}
-                        _weight["weight"] = \
-                            rec_weight * src_weight * cat_weight
-                        weights[period][event][chan_id] = _weight
-
-        nwins_array = []
-        weights_array = []
-        # validate the sum of all weights is 1
-        for _p, _pw in weights.iteritems():
-            for _e, _ew in _pw.iteritems():
-                for _chan, _chanw in _ew.iteritems():
-                    nwins_array.append(self.rec_wcounts[_p][_e][_chan])
-                    weights_array.append(_chanw["weight"])
-
-        wsum = np.dot(nwins_array, weights_array)
-        if not np.isclose(wsum, 1.0):
-            raise ValueError("The sum of all weights(%f) does not add "
-                             "up to 1.0" % wsum)
-
-        # plot histogram of weights
-        logdir = self.path["log_dir"]
-
-        figname = os.path.join(logdir, "weights.hist.png")
-        plt.hist(weights_array, 50)
-        plt.savefig(figname)
-
-        figname = os.path.join(logdir, "number_of_windows.hist.png")
-        plt.hist(nwins_array, 50)
-        plt.savefig(figname)
-
-        maxw = max(weights_array)
-        minw = min(weights_array)
-        logger.info("Total number of receivers: %d" % len(weights_array))
-        logger.info("Total number of windows: %d" % np.sum(nwins_array))
-        logger.info("Weight max, min, max/min: %f, %f, %f"
-                    % (maxw, minw, maxw/minw))
-
-        self.weights = weights
-        return {"max_weights": maxw, "min_weights": minw,
-                "total_nwindows": np.sum(nwins_array)}
 
     def analysis_receiver(self, logfile):
         log = {}
         for _p, _pw in self.weights.iteritems():
             log[_p] = {}
-            for _e, _ew in _pw.iteritems():
-                log[_p][_e] = {}
-                maxw = defaultdict(lambda: 0)
-                minw = defaultdict(lambda: 10**9)
-                for _chan, _chanw in _ew.iteritems():
-                    comp = _chan.split(".")[-1]
-                    if _chanw["weight"] > maxw[comp]:
-                        maxw[comp] = _chanw["weight"]
-                    if _chanw["weight"] < minw[comp]:
-                        minw[comp] = _chanw["weight"]
-                for comp in maxw:
-                    log[_p][_e][comp] = \
-                        {"maxw": maxw[comp], "minw": minw[comp],
-                         "nwindows": self.src_wcounts[_p][_e][comp],
-                         "ref_dist": self.rec_ref_dists[_p][_e][comp],
-                         "cond_num": self.rec_cond_nums[_p][_e][comp]}
+            maxw = defaultdict(lambda: 0)
+            minw = defaultdict(lambda: 10**9)
+            for _chan, _chanw in _pw.iteritems():
+                comp = _chan.split(".")[-1]
+                if _chanw["weight"] > maxw[comp]:
+                    maxw[comp] = _chanw["weight"]
+                if _chanw["weight"] < minw[comp]:
+                    minw[comp] = _chanw["weight"]
+            for comp in maxw:
+                log[_p][comp] = \
+                    {"maxw": maxw[comp], "minw": minw[comp],
+                     "nwindows": self.cat_wcounts[_p][comp],
+                     "ref_dist": self.rec_ref_dists[_p][comp],
+                     "cond_num": self.rec_cond_nums[_p][comp]}
 
         dump_json(log, logfile)
 
@@ -512,14 +463,10 @@ class WindowWeight(object):
         Analyze the final weight and generate log file
         """
         logger_block("Summary")
-        logdir = self.path["log_dir"]
+        logdir = os.path.dirname(self.path["logfile"])
         logfile = os.path.join(logdir, "log.receiver_weights.json")
         logger.info("receiver log file: %s" % logfile)
         self.analysis_receiver(logfile)
-
-        logfile = os.path.join(logdir, "log.source_weights.json")
-        logger.info("source log file: %s" % logfile)
-        self.analysis_source(logfile)
 
         logfile = os.path.join(logdir, "log.category_weights.json")
         logger.info("category log file: %s" % logfile)
@@ -528,9 +475,8 @@ class WindowWeight(object):
     def dump_weights(self):
         """ dump weights to files """
         for period, period_info in self.weights.iteritems():
-            for event, event_info in period_info.iteritems():
-                outputfn = self.path['input'][period][event]["output_file"]
-                dump_json(event_info, outputfn)
+            outputfn = self.path['input'][period]["output_file"]
+            dump_json(period_info, outputfn)
 
     def calculate_receiver_weights(self):
         """
@@ -540,15 +486,14 @@ class WindowWeight(object):
         """
         logger_block("Receiver Weighting")
         input_info = self.path["input"]
-        receiver_weighting = self.param["receiver_weighting"]
-        plot = self.param["plot"]
-        search_ratio = self.param["receiver_search_ratio"]
+
+        weighting_param = self.param["receiver_weighting"]
 
         self.rec_weights = defaultdict(dict)
         self.rec_wcounts = defaultdict(dict)
         self.rec_ref_dists = defaultdict(dict)
         self.rec_cond_nums = defaultdict(dict)
-        self.src_wcounts = defaultdict(dict)
+        self.cat_wcounts = defaultdict(dict)
 
         nperiods = len(input_info)
         period_idx = 0
@@ -557,79 +502,53 @@ class WindowWeight(object):
             period_idx += 1
             logger.info("-" * 15 + "[%d/%d]Period band: %s"
                         % (period_idx, nperiods, period) + "-" * 15)
-            nevents = len(period_info)
-            event_idx = 0
-            for event, event_info in period_info.iteritems():
-                event_idx += 1
-                logger.info("*" * 6 + " [%d/%d]Event: %s "
-                            % (event_idx, nevents, event) + "*" * 6)
-                # each file still contains 3-component
-                logger.info("station file: %s" % event_info["station_file"])
-                logger.info("window file: %s" % event_info["window_file"])
-                logger.info("output file: %s" % event_info["output_file"])
-                src = self.src_info[period][event]
-                station_info = load_json(event_info["station_file"])
-                window_info = load_json(event_info["window_file"])
-                outputdir = os.path.dirname(event_info["output_file"])
-                safe_mkdir(outputdir)
-                figname_prefix = os.path.join(
-                    outputdir, "%s.%s" % (event, period))
-                _results = determine_receiver_weighting(
-                    src, station_info, window_info,
-                    max_ratio=search_ratio,
-                    flag=receiver_weighting,
-                    plot=plot, figname_prefix=figname_prefix)
 
-                self.rec_weights[period][event] = _results["rec_weights"]
-                self.rec_wcounts[period][event] = _results["rec_wcounts"]
-                self.rec_ref_dists[period][event] = _results["rec_ref_dists"]
-                self.rec_cond_nums[period][event] = _results["rec_cond_nums"]
-                self.src_wcounts[period][event] = _results["src_wcounts"]
+            _results = self.calculate_receiver_weights_asdf(
+                period_info, weighting_param)
 
-    def calculate_source_weights(self):
-        input_info = self.path["input"]
-        logdir = self.path["log_dir"]
-        source_weighting = self.param["source_weighting"]
-        plot = self.param["plot"]
-        search_ratio = self.param["source_search_ratio"]
-
-        self.src_weights = {}
-        self.cat_wcounts = {}
-        self.src_ref_dists = {}
-        self.src_cond_nums = {}
-        logger_block("Source Weighting")
-        for period, period_info in input_info.iteritems():
-            logger.info("-" * 30)
-            logger.info("period: %s" % period)
-            figname_prefix = os.path.join(
-                logdir, "source.%s" % period)
-            _results = determine_source_weighting(
-                self.src_info[period], self.src_wcounts[period],
-                max_ratio=search_ratio,
-                flag=source_weighting,
-                plot=plot, figname_prefix=figname_prefix)
-
-            self.src_weights[period] = _results["src_weights"]
+            self.rec_weights[period] = _results["rec_weights"]
+            self.rec_wcounts[period] = _results["rec_wcounts"]
+            self.rec_ref_dists[period] = _results["rec_ref_dists"]
+            self.rec_cond_nums[period] = _results["rec_cond_nums"]
             self.cat_wcounts[period] = _results["cat_wcounts"]
-            self.src_ref_dists[period] = _results["src_ref_dists"]
-            self.src_cond_nums[period] = _results["src_cond_nums"]
 
-    def run(self):
+    def calculate_receiver_weights_asdf(self, period_info, weighting_param):
+        search_ratio = weighting_param["search_ratio"]
+        plot_flag = weighting_param["plot"]
+        weight_flag = weighting_param["flag"]
+        # each file still contains 3-component
+        logger.info("station file: %s" % period_info["station_file"])
+        logger.info("window file: %s" % period_info["window_file"])
+        logger.info("output file: %s" % period_info["output_file"])
+        station_info = load_json(period_info["station_file"])
+        window_info = load_json(period_info["window_file"])
+
+        outputdir = os.path.dirname(period_info["output_file"])
+        safe_mkdir(outputdir)
+        figname_prefix = os.path.join(outputdir, "weights")
+
+        _results = determine_receiver_weighting(
+            self.src_info, station_info, window_info,
+            max_ratio=search_ratio,
+            flag=weight_flag,
+            plot=plot_flag, figname_prefix=figname_prefix)
+
+        return _results
+
+    def smart_run(self):
 
         validate_path(self.path)
         validate_param(self.param)
-
-        input_info = self.path["input"]
-
-        self.src_info = extract_source_location(input_info)
-
+        # extract source location information
+        self.src_info = extract_source_location(self.path["input"])
+        # calculate receiver weights
         self.calculate_receiver_weights()
-        self.calculate_source_weights()
-        self.cat_weights = determine_category_weighting(self.cat_wcounts)
-
-        self.combine_weights()
+        # calculate category weights
+        self.cat_weights = determine_category_weighting(
+            self.param["category_weighting"], self.cat_wcounts)
+        # combine the receiver weights with category weights
+        self.weights = combine_weights(self.rec_weights, self.cat_weights)
         # statistical analysis
         self.analysis()
-
         # dump the results out
         self.dump_weights()

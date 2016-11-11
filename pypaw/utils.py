@@ -42,6 +42,11 @@ def _get_mpi_comm():
     return MPI.COMM_WORLD
 
 
+def dump_json(content, filename):
+    with open(filename, 'w') as fh:
+        json.dump(content, fh, indent=2, sort_keys=True)
+
+
 class JSONObject(object):
     def __init__(self, d):
         self.__dict__ = d

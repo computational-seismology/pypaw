@@ -17,7 +17,7 @@ from pytomo3d.signal.process import process_stream
 from .procbase import ProcASDFBase
 
 
-def check_final_param(param):
+def check_param_keywords(param):
     """
     Check the param keywords are the same with the keywords list of
     the function of process_stream
@@ -99,7 +99,7 @@ class ProcASDF(ProcASDFBase):
         param["event_longitude"] = event_longitude
 
         # check final param to see if the keys are right
-        check_final_param(param)
+        check_param_keywords(param)
 
         process_function = \
             partial(process_wrapper, param=param)

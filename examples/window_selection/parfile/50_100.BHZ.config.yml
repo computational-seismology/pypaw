@@ -35,6 +35,7 @@
 "max_surface_wave_velocity": 4.10
 "earth_model": "ak135"
 "max_time_before_first_arrival": 50.0
+"max_time_after_last_arrival": 100.0
 
 # check global data quality
 "check_global_data_quality": True

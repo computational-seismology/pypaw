@@ -3,8 +3,8 @@
 # Example user module
 
 import numpy as np
-
 from obspy.geodetics import calcVincentyInverse
+
 
 def get_dist_in_km(station, event, obsd):
     """
@@ -21,10 +21,12 @@ def get_dist_in_km(station, event, obsd):
     evlat = event.origins[0].latitude
     evlon = event.origins[0].longitude
 
-    dist = calcVincentyInverse(station_coor["latitude"], station_coor["longitude"],
-                               evlat, evlon)[0] / 1000
+    dist = calcVincentyInverse(
+        station_coor["latitude"], station_coor["longitude"],
+        evlat, evlon)[0] / 1000
 
     return dist
+
 
 def get_time_array(obsd, event):
     stats = obsd.stats

@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Class that sums the several adjoint source files together based
-on certain weights provided by the user
+Class that sums the several adjoint source files from different period
+bands together based on certain weights provided by the user. So each
+adjoint asdf file should has one weight files, with weightings for
+each channel
 
 :copyright:
     Wenjie Lei (lei@princeton.edu), 2016
@@ -12,53 +14,19 @@ on certain weights provided by the user
 """
 from __future__ import print_function, division, absolute_import
 import os
-import numpy as np
-import copy
-from pyasdf import ASDFDataSet
-from pytomo3d.signal.rotate import rotate_one_station_stream
-from pytomo3d.adjoint.process_adjsrc import convert_stream_to_adjs
-from pytomo3d.adjoint.process_adjsrc import convert_adjs_to_stream
-from pytomo3d.adjoint.process_adjsrc import add_missing_components
 from pprint import pprint
-from pyadjoint import AdjointSource
+import yaml
+from pyasdf import ASDFDataSet
 from pypaw.bins import load_json, dump_json
+from pytomo3d.adjoint.sum_adjoint import load_to_adjsrc, dump_adjsrc, \
+    check_events_consistent, \
+    create_weighted_adj, sum_adj_to_base, check_station_consistent, \
+    rotate_adjoint_sources
 
 
-def check_adj_consistency(adj_base, adj):
-    """
-    Check the consistency of adj_base and adj
-    If passed, return, then adj could be added into adj_base
-    If not, raise ValueError
-    """
-    if len(adj_base.adjoint_source) != len(adj.adjoint_source):
-        raise ValueError("Dimension of current adjoint_source(%d)"
-                         "and new added adj(%d) not the same" %
-                         (len(adj_base.adjoint_source),
-                          len(adj.adjoint_source)))
-    if not np.isclose(adj_base.dt, adj.dt):
-        raise ValueError("DeltaT of current adjoint source(%f)"
-                         "and new added adj(%f) not the same"
-                         % (adj_base.dt, adj.dt))
-
-    if np.abs(adj_base.starttime - adj.starttime) > 0.5 * adj.dt:
-        raise ValueError("Start time of current adjoint source(%s)"
-                         "and new added adj(%s) not the same"
-                         % (adj_base.dt, adj.dt))
-
-
-def _rotate_one_station(sta_adjs, slat, slon, elat, elon):
-    adj_stream, meta_info = convert_adjs_to_stream(sta_adjs)
-    add_missing_components(adj_stream)
-    rotate_one_station_stream(adj_stream, elat, elon,
-                              station_latitude=slat,
-                              station_longitude=slon,
-                              mode="RT->NE")
-    new_adjs = convert_stream_to_adjs(adj_stream, meta_info)
-    adj_dict = {}
-    for _adj in new_adjs:
-        adj_id = "%s_%s_%s" % (_adj.network, _adj.station, _adj.component)
-        adj_dict[adj_id] = _adj
-    return adj_dict
+def load_yaml(fn):
+    with open(fn) as fh:
+        return yaml.load(fh)
 
 
 def validate_path(path):
@@ -66,7 +34,7 @@ def validate_path(path):
     pprint(path)
 
     err = 0
-    keys = ["input_file", "output_file", "rotate_flag"]
+    keys = ["input_file", "output_file"]
     for _key in keys:
         if _key not in path:
             print("Missing key(%s) in path" % _key)
@@ -88,82 +56,68 @@ def validate_path(path):
         raise ValueError("Error in path file")
 
 
-def load_to_adjsrc(adj, event_time):
-    """
-    Load from asdf file adjoint source to pyadjoint.AdjointSources
-    """
-    starttime = event_time + adj.parameters["time_offset"]
-    _id = adj.parameters["station_id"]
-    nw, sta = _id.split(".")
-    comp = adj.parameters["component"]
-    loc = adj.parameters["location"]
+def validate_param(param):
+    print("=" * 20 + " Param information " + "=" * 20)
+    pprint(param)
 
-    new_adj = AdjointSource(adj.parameters["adjoint_source_type"],
-                            adj.parameters["misfit"],
-                            adj.parameters["dt"],
-                            adj.parameters["min_period"],
-                            adj.parameters["max_period"],
-                            comp,
-                            adjoint_source=np.array(adj.data),
-                            network=nw, station=sta,
-                            location=loc,
-                            starttime=starttime)
+    err = 0
+    keys = ["rotate_flag"]
+    for k in keys:
+        if k not in param:
+            print("Missing key(%s) in param" % k)
+            err = 1
 
-    station_info = {"latitude": adj.parameters["latitude"],
-                    "longitude": adj.parameters["longitude"],
-                    "elevation_in_m": adj.parameters["elevation_in_m"],
-                    "depth_in_m": adj.parameters["depth_in_m"],
-                    "station": sta, "network": nw,
-                    "location": loc}
-    return new_adj, station_info
+    if err:
+        raise ValueError("Error in param file")
 
 
-def dump_adjsrc(adj, station_info, event_time):
-    adj_array = np.asarray(adj.adjoint_source, dtype=np.float32)
-    station_id = "%s.%s" % (adj.network, adj.station)
+def save_adjoint_to_asdf(outputfile, events, adjoint_sources, stations):
+    print("="*15 + "\nWrite to file: %s" % outputfile)
+    outputdir = os.path.dirname(outputfile)
+    if not os.path.exists(outputdir):
+        os.makedirs(outputdir)
 
-    time_offset = adj.starttime - event_time
-    parameters = \
-        {"dt": adj.dt, "time_offset": time_offset,
-         "misfit": adj.misfit,
-         "adjoint_source_type": adj.adj_src_type,
-         "min_period": adj.min_period,
-         "max_period": adj.max_period,
-         "location": adj.location,
-         "latitude": station_info["latitude"],
-         "longitude": station_info["longitude"],
-         "elevation_in_m": station_info["elevation_in_m"],
-         "depth_in_m": station_info["depth_in_m"],
-         "station_id": station_id, "component": adj.component,
-         "units": "m"}
+    if os.path.exists(outputfile):
+        print("Output file exists and removed:%s" % outputfile)
+        os.remove(outputfile)
 
-    adj_path = "%s_%s_%s" % (adj.network, adj.station, adj.component)
-
-    return adj_array, adj_path, parameters
+    ds = ASDFDataSet(outputfile, mode='a', compression=None)
+    ds.add_quakeml(events)
+    for adj_id in sorted(adjoint_sources):
+        adj = adjoint_sources[adj_id]
+        sta_tag = "%s_%s" % (adj.network, adj.station)
+        sta_info = stations[sta_tag]
+        adj_array, adj_path, parameters = \
+            dump_adjsrc(adj, sta_info)
+        ds.add_auxiliary_data(adj_array, data_type="AdjointSources",
+                              path=adj_path, parameters=parameters)
 
 
-def _get_station_adjsrcs(adjsrcs, sta_tag):
-    """
-    Extract three components for a specific sta_tag
-    """
-    comp_list = ["MXZ", "MXR", "MXT"]
-    adj_list = []
-    for comp in comp_list:
-        adj_name = "%s_%s" % (sta_tag, comp)
-        if adj_name in adjsrcs:
-            adj_list.append(adjsrcs[adj_name])
-    return adj_list
+def check_event_information_in_asdf_files(asdf_files):
+    if len(asdf_files) == 0:
+        raise ValueError("Number of input asdf files is 0")
 
+    asdf_events = {}
+    # extract event information from asdf file
+    for asdf_fn in asdf_files:
+        ds = ASDFDataSet(asdf_fn, mode='r')
+        asdf_events[asdf_fn] = ds.events
 
-def extract_event_info(event):
-    origin = event.preferred_origin()
-    return origin.latitude, origin.longitude, origin.time
+    diffs = check_events_consistent(asdf_events)
+    if len(diffs) != 0:
+        raise ValueError("Event information in %s not the same as others: %s"
+                         % (diffs, asdf_events.keys()))
+
+    event_base = asdf_events[asdf_events.keys()[0]]
+    origin = event_base[0].preferred_origin()
+    return event_base, origin
 
 
 class PostAdjASDF(object):
 
-    def __init__(self, path, verbose=False):
+    def __init__(self, path, param, verbose=False):
         self.path = path
+        self.param = param
         self.verbose = verbose
 
         # event information
@@ -179,77 +133,33 @@ class PostAdjASDF(object):
         self.adjoint_sources = {}
         self.misfits = {}
 
-    def _attach_adj(self, station_id, adj, weight):
+    def attach_adj_to_db(self, channel_id, adj, weight):
         """
         Attach adj to self.adjoint_sources based on weight information
         """
-        if station_id not in self.adjoint_sources:
-            adj_base = copy.deepcopy(adj)
-            adj_base.adjoint_source *= weight
-            adj_base.misfit *= weight
-            adj_base.location = ""
-            self.adjoint_sources[station_id] = adj_base
+        if channel_id not in self.adjoint_sources:
+            self.adjoint_sources[channel_id] = \
+                create_weighted_adj(adj, weight)
         else:
-            adj_base = self.adjoint_sources[station_id]
-            check_adj_consistency(adj_base, adj)
-            adj_base.adjoint_source += weight * adj.adjoint_source
-            adj_base.misfit += weight * adj.misfit
-            adj_base.min_period = min(adj.min_period, adj_base.min_period)
-            adj_base.max_period = max(adj.max_period, adj_base.max_period)
+            adj_base = self.adjoint_sources[channel_id]
+            sum_adj_to_base(adj_base, adj, weight)
 
-    def _attach_station(self, station_info):
+    def attach_station_to_db(self, station_info):
         """
         Attach station information to self.stations
         """
 
-        def __same_location(loc1, loc2):
-            for key in loc1:
-                if key not in loc2:
-                    return False
-                if isinstance(loc1[key], float):
-                    if not np.isclose(loc1[key], loc2[key]):
-                        return False
-                else:
-                    if loc1[key] != loc2[key]:
-                        return False
-            return True
-
         station_id = "%s_%s" % (station_info["network"],
                                 station_info["station"])
+
         if station_id not in self.stations:
             self.stations[station_id] = station_info
         else:
             # check consistency
-            loc_base = self.stations[station_id]
-            if not __same_location(loc_base, station_info):
+            sta_base = self.stations[station_id]
+            if not check_station_consistent(sta_base, station_info):
                 raise ValueError("Station(%s) location inconsitent: %s, %s"
-                                 % (station_id, station_info, loc_base))
-
-    def add_adjoint_dataset_on_category_weight(self, ds, weight):
-        """
-        Add adjoint source based on category weight
-        """
-        misfits = {}
-        adjsrc_group = ds.auxiliary_data.AdjointSources
-        for adj in adjsrc_group:
-            new_adj, station_info = load_to_adjsrc(adj, self.event_time)
-
-            nw = new_adj.network
-            sta = new_adj.station
-            comp = new_adj.component
-            comp_weight = weight["BH%s" % comp[-1]]
-
-            chan_id = "%s_%s_%s" % (nw, sta, comp)
-            self._attach_adj(chan_id, new_adj, comp_weight)
-
-            self._attach_station(station_info)
-
-            if comp not in misfits:
-                misfits[comp] = {"misfit": 0, "raw_misfit": 0}
-            misfits[comp]["misfit"] += comp_weight * new_adj.misfit
-            misfits[comp]["raw_misfit"] += new_adj.misfit
-
-        return misfits
+                                 % (station_id, station_info, sta_base))
 
     def add_adjoint_dataset_on_channel_weight(self, ds, weights):
         """
@@ -261,18 +171,21 @@ class PostAdjASDF(object):
             _nw, _sta, _, _comp = channel.split(".")
             adj_id = "%s_%s_MX%s" % (_nw, _sta, _comp[-1])
             adj = adjsrc_group[adj_id]
-            new_adj, station_info = load_to_adjsrc(adj, self.event_time)
+            new_adj, station_info = load_to_adjsrc(adj)
 
             channel_weight = weights[channel]["weight"]
-            self._attach_adj(adj_id, new_adj, channel_weight)
+            self.attach_adj_to_db(adj_id, new_adj, channel_weight)
 
-            self._attach_station(station_info)
+            self.attach_station_to_db(station_info)
 
+            # get the component misfit values
             if _comp not in misfits:
                 misfits[_comp] = {"misfit": 0, "raw_misfit": 0}
             misfits[_comp]["misfit"] += channel_weight * new_adj.misfit
             misfits[_comp]["raw_misfit"] += new_adj.misfit
 
+        print("Misfit:")
+        pprint(misfits)
         return misfits
 
     def check_all_event_info(self):
@@ -281,124 +194,90 @@ class PostAdjASDF(object):
         has the same event information, then add operation
         is allowed
         """
-        error_code = 0
-        error_list = []
-        for _file_info in self.path["input_file"].itervalues():
-            asdf_fn = _file_info["asdf_file"]
-            ds = ASDFDataSet(asdf_fn, mode='r')
-            if self.events is None:
-                self.events = ds.events
-            elif self.events != ds.events:
-                error_list.append(asdf_fn)
-                error_code = 1
-            del ds
-        if error_code == 1:
-            raise ValueError("Event information in %s not the same as others"
-                             % (error_list))
+        asdf_files = []
+        for file_info in self.path["input_file"].itervalues():
+            asdf_files.append(file_info["asdf_file"])
 
+        self.events, self.origin = \
+            check_event_information_in_asdf_files(asdf_files)
         # extract event information
         self.event_latitude, self.event_longitude, self.event_time = \
-            extract_event_info(self.events[0])
+            self.origin.latitude, self.origin.longitude, self.origin.time
 
     def sum_asdf(self):
         """
         Sum different asdf files
         """
-        print("="*15 + "\nSumming asdf files...")
+        print("="*30 + "\nSumming asdf files...")
         for period, _file_info in self.path["input_file"].iteritems():
             filename = _file_info["asdf_file"]
             ds = ASDFDataSet(filename, mode='r')
-
-            # if "category_weight" in _file_info:
-            #    _weight = _file_info["weight"]
-            #    misfits = self.add_adjoint_dataset_on_category_weight(
-            #        ds, _weight)
-            # elif "weight_file" in _file_info:
             weight_file = _file_info["weight_file"]
             weights = load_json(weight_file)
-            misfits = self.add_adjoint_dataset_on_channel_weight(
-                ds, weights)
-
+            print("-" * 20)
             print("Adding asdf file(%s) using assigned weight_file(%s)"
                   % (filename, weight_file))
+            print("Number of channel weights(adjoint sources): %d"
+                  % len(weights))
 
-            self.misfits[period] = misfits
+            _misfit = self.add_adjoint_dataset_on_channel_weight(
+                ds, weights)
+            self.misfits[period] = _misfit
 
     def rotate_asdf(self):
         """
         Rotate self.adjoint_sources
         """
-        print("="*15 + "\nRotate adjoint sources from RT to EN")
-        done_sta_list = []
-        old_adjs = self.adjoint_sources
-        new_adjs = {}
-        station_locations = {}
-
-        for adj_id, adj in old_adjs.iteritems():
-            network = adj.network
-            station = adj.station
-            sta_tag = "%s_%s" % (network, station)
-
-            if sta_tag not in done_sta_list:
-                slat = self.stations[sta_tag]["latitude"]
-                slon = self.stations[sta_tag]["longitude"]
-
-                sta_adjs = _get_station_adjsrcs(old_adjs, sta_tag)
-                adj_dict = _rotate_one_station(sta_adjs, slat, slon,
-                                               self.event_latitude,
-                                               self.event_longitude)
-                new_adjs.update(adj_dict)
-
-        self.station_locations = station_locations
-        self.adjoint_sources = new_adjs
+        self.adjoint_sources = rotate_adjoint_sources(
+            self.adjoint_sources, self.stations, self.event_latitude,
+            self.event_longitude)
 
     def dump_to_asdf(self, outputfile):
         """
         Dump self.adjoin_sources into adjoint file
         """
-        print("="*15 + "\nWrite to file: %s" % outputfile)
-        if os.path.exists(outputfile):
-            print("Output file exists and removed:%s" % outputfile)
-            os.remove(outputfile)
+        save_adjoint_to_asdf(outputfile, self.events, self.adjoint_sources,
+                             self.stations)
 
-        ds = ASDFDataSet(outputfile, mode='a', compression=None)
-        ds.add_quakeml(self.events)
-        event = self.events[0]
-        origin = event.preferred_origin()
-        event_time = origin.time
+    def _parse_path(self):
+        if isinstance(self.path, str):
+            path = load_json(self.path)
+        elif isinstance(self.path, dict):
+            path = self.path
+        else:
+            raise TypeError("Not recognized path: %s" % path)
+        return path
 
-        for adj_id in sorted(self.adjoint_sources):
-            adj = self.adjoint_sources[adj_id]
-            sta_tag = "%s_%s" % (adj.network, adj.station)
-            sta_info = self.stations[sta_tag]
-            adj_array, adj_path, parameters = \
-                dump_adjsrc(adj, sta_info, event_time)
-            ds.add_auxiliary_data(adj_array, data_type="AdjointSources",
-                                  path=adj_path, parameters=parameters)
+    def _parse_param(self):
+        if isinstance(self.param, str):
+            param = load_yaml(self.param)
+        elif isinstance(self.param, dict):
+            param = self.param
+        else:
+            raise TypeError("Not recognized param: %s" % param)
+        return param
 
     def smart_run(self):
 
-        if isinstance(self.path, str):
-            self.path = load_json(self.path)
-        elif not isinstance(self.path, str):
-            raise TypeError("self.path must be filename or dict")
+        self.path = self._parse_path()
+        self.param = self._parse_param()
 
         validate_path(self.path)
+        validate_param(self.param)
 
         self.check_all_event_info()
 
         # sum asdf files
         self.sum_asdf()
 
-        if self.path["rotate_flag"]:
+        # rotate if needed
+        if self.param["rotate_flag"]:
             self.rotate_asdf()
 
         outputfile = self.path["output_file"]
-        outputdir = os.path.dirname(outputfile)
-        if not os.path.exists(outputdir):
-            os.makedirs(outputdir)
         self.dump_to_asdf(outputfile)
 
         # write out the misfit summary
         misfit_file = outputfile.rstrip("h5") + "adjoint.misfit.json"
+        print("Misfit log file: %s" % misfit_file)
         dump_json(self.misfits, misfit_file)

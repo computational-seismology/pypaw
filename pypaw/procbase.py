@@ -196,10 +196,9 @@ class ProcASDFBase(object):
         path = self._parse_path()
         param = self._parse_param()
 
-        if isinstance(path, list):
-            for _path in path:
-                self._core(_path, param)
-        elif isinstance(path, dict):
-            self._core(path, param)
-        else:
-            raise ValueError("Problem in input path...Check")
+        if not isinstance(path, dict):
+            raise TypeError("path must be type of dict")
+        if not isinstance(param, dict):
+            raise TypeError("param must be type of dict")
+
+        self._core(path, param)
