@@ -13,6 +13,7 @@ so they are invisible to users.
 from __future__ import (absolute_import, division, print_function)
 from functools import partial
 import os
+import importlib
 import inspect
 import json
 import numpy as np
@@ -40,7 +41,7 @@ def check_param_with_function_args(config):
 
 
 def window_wrapper(obsd_station_group, synt_station_group, config_dict=None,
-                   obsd_tag=None, synt_tag=None,
+                   obsd_tag=None, synt_tag=None, user_modules=None,
                    event=None, figure_mode=False, figure_dir=None,
                    _verbose=False):
     """
@@ -62,7 +63,7 @@ def window_wrapper(obsd_station_group, synt_station_group, config_dict=None,
     synthetic = getattr(synt_station_group, synt_tag)
 
     return window_on_stream(observed, synthetic, config_dict,
-                            station=inv, event=event,
+                            station=inv, event=event, user_modules=user_modules,
                             figure_mode=figure_mode, figure_dir=figure_dir,
                             _verbose=_verbose)
 
@@ -288,10 +289,18 @@ class WindowASDF(ProcASDFBase):
 
         event = obsd_ds.events[0]
 
+        # Ridvan Orsvuran, 2016
+        # take out the user module values
+        user_modules = {}
+        for key, value in param.iteritems():
+            user_modules[key] = value.pop("user_module", None)
+
         config_dict, instrument_merge_flag = self.load_window_config(param)
+
 
         winfunc = partial(window_wrapper, config_dict=config_dict,
                           obsd_tag=obsd_tag, synt_tag=synt_tag,
+                          user_modules=user_modules,
                           event=event, figure_mode=figure_mode,
                           figure_dir=figure_dir, _verbose=self._verbose)
 
