@@ -12,7 +12,7 @@ from __future__ import (absolute_import, division, print_function)
 __version__ = "0.0.1"
 from .process import ProcASDF       # NOQA
 from .window import WindowASDF      # NOQA
-from .adjoint import AdjointASDF, MeasureAdjointASDF    # NOQA
+from .adjoint import AdjointASDF    # NOQA
+from .measure_adjoint import MeasureAdjointASDF       # NOQA
 from .convert import ConvertASDF, convert_from_asdf   # NOQA
-from .convert import convert_adjsrcs_from_asdf         # NOQA
-from .adjoint_prepro import AdjPreASDF  # NOQA
+from .convert import convert_adjsrcs_from_asdf        # NOQA

@@ -5,6 +5,8 @@ Class that handles the whole preprocessing workflow, including:
     1) signal processing
     2) window selection
     3) adjoint sources
+!!! Attention !!!
+Obselete right now. Need bug fix if used.
 
 :copyright:
     Wenjie Lei (lei@princeton.edu), 2016
@@ -14,17 +16,38 @@ Class that handles the whole preprocessing workflow, including:
 """
 from __future__ import (absolute_import, division, print_function)
 from functools import partial
+import copy
 
-from .procbase import ProcASDFBase
-from pytomo3d.signal.process import process_stream
-from pytomo3d.adjoint.adjsrc import calculate_adjsrc_on_stream
-from pytomo3d.adjoint.process_adjsrc import process_adjoint
-from pytomo3d.window.window import window_on_stream
-from .adjoint_util import calculate_chan_weight, reshape_adj
-from .adjoint_util import smart_transform_window
 import pyflex
 import pyadjoint
-import copy
+from pytomo3d.signal.process import process_stream
+from pytomo3d.window.window import window_on_stream
+from pytomo3d.window.io import get_json_content
+from pytomo3d.adjoint.adjsrc import calculate_adjsrc_on_stream
+from pytomo3d.adjoint.process_adjsrc import process_adjoint
+from pytomo3d.adjoint.utils import calculate_chan_weight, reshape_adj
+from .procbase import ProcASDFBase
+
+
+def smart_transform_window(windows):
+    """
+    Smart tranfer window object to dict if it is type of pyflex.Window
+    (Not really needed for most cases)
+
+    :param windows:
+    :return:
+    """
+    if isinstance(windows[0][0], dict):
+        all_windows = windows
+    elif isinstance(windows[0][0], pyflex.Window):
+        all_windows = []
+        for chan_win in windows:
+            _chan_win_list = [get_json_content(i) for i in chan_win]
+            all_windows.append(_chan_win_list)
+    else:
+        raise ValueError("Not recgonized type of window")
+
+    return all_windows
 
 
 def load_window_config(param):

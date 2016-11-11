@@ -14,7 +14,6 @@ then a file `STATIONS_ADJOINT` will be generated.
 from __future__ import (print_function, division)
 
 import argparse
-import collections
 import os
 
 import pyasdf
