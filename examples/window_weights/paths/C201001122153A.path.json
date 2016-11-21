@@ -1,0 +1,23 @@
+{
+  "input": {
+    "17_40": {
+      "asdf_file": "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_test_3/proc_synt/C201001122153A.proc_synt_17_40.h5", 
+      "output_file": "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_test_3/weight/C201001122153A.17_40/C201001122153A.17_40.weight.json", 
+      "station_file": "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_test_3/stations/C201001122153A.stations.json", 
+      "window_file": "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_test_3/windows/C201001122153A.17_40/windows.filter.json"
+    }, 
+    "40_100": {
+      "asdf_file": "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_test_3/proc_synt/C201001122153A.proc_synt_40_100.h5", 
+      "output_file": "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_test_3/weight/C201001122153A.40_100/C201001122153A.40_100.weight.json", 
+      "station_file": "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_test_3/stations/C201001122153A.stations.json", 
+      "window_file": "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_test_3/windows/C201001122153A.40_100/windows.filter.json"
+    }, 
+    "90_250": {
+      "asdf_file": "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_test_3/proc_synt/C201001122153A.proc_synt_90_250.h5", 
+      "output_file": "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_test_3/weight/C201001122153A.90_250/C201001122153A.90_250.weight.json", 
+      "station_file": "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_test_3/stations/C201001122153A.stations.json", 
+      "window_file": "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_test_3/windows/C201001122153A.90_250/windows.filter.json"
+    }
+  }, 
+  "logfile": "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_test_3/weight/C201001122153A.weight.log"
+}

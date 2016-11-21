@@ -1,0 +1,31 @@
+# the sensors listed will be the sensor kept in
+# the windows. Others will be deleted
+sensor:
+  # if set to false, then this step will be skipped
+  flag: False
+  # the sensor types to be kept
+  sensor_types: ["STS1", "STS-1", "KS54000"]
+
+
+measurement:
+  # If set to false, then this step will be skipped
+  flag: True
+
+  # based on flexwin, we set a hard criteria to reject windows
+  # for each component. If exceed, windows will be rejected
+  # we also calculate the standard deviation for each component.
+  # If the tshift is larger than (std_ratio * std), windows will
+  # be rejected.
+  Z:
+    tshift_acceptance_level: 8.0
+    tshift_reference: 0.0
+    std_ratio: 4.0
+  R:
+    tshift_acceptance_level: 8.0
+    tshift_reference: 0.0
+    std_ratio: 4.0
+  T:
+    tshift_acceptance_level: 8.0
+    tshift_reference: 0.0
+    std_ratio: 4.0
+

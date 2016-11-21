@@ -1,0 +1,2 @@
+# rotate from ZRT to ZNE when summing the adjoint sources
+rotate_flag: True

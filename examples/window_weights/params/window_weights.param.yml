@@ -1,0 +1,23 @@
+# configuration yaml file for window weighting strategy
+
+# receiver weighting
+# If True, then the receiver weighting will be turned on
+# If False, then the source weighting will be turned off
+receiver_weighting:
+  flag: True
+  plot: True
+  search_ratio: 0.30
+
+# category weighting
+category_weighting:
+  flag: True
+  # remember, we define the ratio as number of windows
+  # in one category. So for shorter period bands, it is
+  # supposed to have larger values because of more
+  # windows. However, in weightin, it means samller
+  # weights since the weight ~ 1/N_{windows}
+  ratio: {
+    "17_40":  {"BHZ": 100, "BHR": 50, "BHT": 50},
+    "40_100": {"BHZ": 80,  "BHR": 40, "BHT": 40},
+    "90_250": {"BHZ": 10,  "BHR": 5,  "BHT": 5}
+  }

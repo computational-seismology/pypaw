@@ -1,0 +1,6 @@
+{
+  "measurement_file": "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_test_3/measure/C201001122153A.17_40.measure_adj.json", 
+  "output_file": "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_test_3/windows/C201001122153A.17_40/windows.filter.json", 
+  "station_file": "/lustre/atlas1/geo111/proj-shared/Wenjie/DATA_test/stations/C201001122153A.stations.json", 
+  "window_file": "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_test_3/windows/C201001122153A.17_40/windows.json"
+}
