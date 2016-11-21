@@ -16,8 +16,42 @@ and keep a copy of original windows as "***.origin.json"
 from __future__ import (absolute_import, division, print_function)
 import os
 import argparse
-from pytomo3d.window import filter_windows
+from pytomo3d.window.filter_windows import filter_windows, count_windows
 from .utils import load_json, dump_json, load_yaml
+
+
+def run_window_filter(paths, params, verbose=False):
+    window_file = paths["window_file"]
+    station_file = paths["station_file"]
+    output_file = paths["output_file"]
+    measurement_file = paths["measurement_file"]
+
+    print("window file: %s" % window_file)
+    print("station_file: %s" % station_file)
+    print("measurement_file: %s" % measurement_file)
+    print("output filtered window file: %s" % output_file)
+
+    windows = load_json(window_file)
+    nchans_old, nwins_old = count_windows(windows)
+    stations = load_json(station_file)
+    measurements = load_json(measurement_file)
+
+    # filter the window based on given sensor types
+    windows_new, log = filter_windows(
+        windows, stations, measurements, params, verbose=verbose)
+
+    nchans_new, nwins_new = count_windows(windows_new)
+    # dump the new windows file to replace the original one
+    dump_json(windows_new, output_file)
+
+    # dump the log file
+    logfile = os.path.join(os.path.dirname(output_file), "filter.log")
+    print("Log file located at: %s" % logfile)
+    dump_json(log, logfile)
+
+    print("=" * 10 + " Summary " + "=" * 10)
+    print("channels: %d --> %d" % (nchans_old, nchans_new))
+    print("windows: %d -- > %d" % (nwins_old, nwins_new))
 
 
 def main():
@@ -34,30 +68,7 @@ def main():
     paths = load_json(args.path_file)
     params = load_yaml(args.param_file)
 
-    window_file = paths["window_file"]
-    station_file = paths["station_file"]
-    output_file = paths["output_file"]
-    measurement_file = paths["measurement_file"]
-
-    print("window file: %s" % window_file)
-    print("station_file: %s" % station_file)
-    print("measurement_file: %s" % measurement_file)
-    print("output filtered window file: %s" % output_file)
-
-    windows = load_json(window_file)
-    stations = load_json(station_file)
-    measurements = load_json(measurement_file)
-
-    # filter the window based on given sensor types
-    windows_new, log = filter_windows(
-        windows, stations, measurements, params, verbose=args.verbose)
-    # dump the new windows file to replace the original one
-    dump_json(windows_new, output_file)
-
-    # dump the log file
-    logfile = os.path.join(os.path.dirname(output_file), "filter.log")
-    print("Log file located at: %s" % logfile)
-    dump_json(log, logfile)
+    run_window_filter(paths, params, verbose=args.verbose)
 
 
 if __name__ == "__main__":

@@ -20,9 +20,9 @@ import matplotlib.pyplot as plt
 plt.switch_backend('agg')  # NOQA
 
 from pyasdf import ASDFDataSet
-from spaceweight import SpherePoint
-from spaceweight import SphereDistRel
 from pytomo3d.adjoint.sum_adjoint import check_events_consistent
+from pytomo3d.window.window_weights import determine_receiver_weighting, \
+    determine_category_weighting
 from pypaw.bins.utils import load_json, dump_json, load_yaml
 
 
@@ -147,125 +147,6 @@ def extract_source_location(input_info):
     return src_info
 
 
-def _receiver_validator(weights, rec_wcounts, cat_wcounts):
-
-    for comp in weights:
-        wsum = 0
-        for trace_id, trace_weight in weights[comp].iteritems():
-            nwin = rec_wcounts[trace_id]
-            wsum += trace_weight * nwin
-
-        if not np.isclose(wsum, cat_wcounts[comp]):
-            raise ValueError("receiver validator fails: %f, %f" %
-                             (wsum, cat_wcounts[comp]))
-
-
-def determine_receiver_weighting(src, stations, windows, max_ratio=0.35,
-                                 flag=True, plot=False,
-                                 figname_prefix=None):
-    """
-    Given one station and window information, determine the receiver
-    weighting
-    In one asdf file, there are still 3 components, for example,
-    ["BHR", "BHT", "BHZ"]. These three components should be treated
-    indepandently and weights will be calculated independantly.
-
-    :return: dict of weights which contains 3 components. Each components
-        contains weights values
-    """
-    center = SpherePoint(src["latitude"], src["longitude"],
-                         tag="source")
-
-    # extract window information
-    weights = {}
-    rec_wcounts = {}
-    cat_wcounts = defaultdict(lambda: 0)
-    for sta, sta_window in windows.iteritems():
-        for chan, chan_win in sta_window.iteritems():
-            comp = chan.split(".")[-1]
-            _nwin = len(chan_win)
-            if _nwin == 0:
-                continue
-            weights.setdefault(comp, {}).update({chan: 0.0})
-            rec_wcounts[chan] = _nwin
-            cat_wcounts[comp] += _nwin
-
-    # in each components, calculate weight
-    ref_dists = {}
-    cond_nums = {}
-    for comp, comp_info in weights.iteritems():
-        points = []
-        logger.info("Components:%s" % comp)
-        for chan in comp_info:
-            _comp = chan[-1]
-            if _comp == "Z":
-                point = SpherePoint(stations[chan]["latitude"],
-                                    stations[chan]["longitude"],
-                                    tag=chan, weight=1.0)
-            else:
-                # for R and T component. In station file, there
-                # are only E and N component. So we need transfer
-                echan = chan[:-1] + "E"
-                chan1 = chan[:-1] + "1"
-                zchan = chan[:-1] + "Z"
-                if echan in stations:
-                    point = SpherePoint(stations[echan]["latitude"],
-                                        stations[echan]["longitude"],
-                                        tag=chan, weight=1.0)
-                elif chan1 in stations:
-                    point = SpherePoint(stations[chan1]["latitude"],
-                                        stations[chan1]["longitude"],
-                                        tag=chan, weight=1.0)
-                elif zchan in stations:
-                    point = SpherePoint(stations[zchan]["latitude"],
-                                        stations[zchan]["longitude"],
-                                        tag=chan, weight=1.0)
-            points.append(point)
-
-        if flag:
-            # calculate weight; otherwise, leave it as default value(1)
-            weightobj = SphereDistRel(points, center=center)
-            scan_figname = figname_prefix + ".%s.smart_scan.png" % comp
-            ref_dists[comp], cond_nums[comp] = weightobj.smart_scan(
-                max_ratio=max_ratio, start=0.5, gap=0.5,
-                drop_ratio=0.95, plot=plot,
-                figname=scan_figname)
-            if plot:
-                figname = figname_prefix + ".%s.weight.png" % comp
-                weightobj.plot_global_map(figname=figname, lon0=180.0)
-        else:
-            ref_dists[comp] = None
-            cond_nums[comp] = None
-
-        wsum = 0
-        for point in points:
-            nwin = rec_wcounts[point.tag]
-            wsum += point.weight * nwin
-        norm_factor = cat_wcounts[comp] / wsum
-
-        for point in points:
-            weights[comp][point.tag] = point.weight * norm_factor
-
-    _receiver_validator(weights, rec_wcounts, cat_wcounts)
-
-    return {"rec_weights": weights, "rec_wcounts": rec_wcounts,
-            "cat_wcounts": cat_wcounts, "rec_ref_dists": ref_dists,
-            "rec_cond_nums": cond_nums}
-
-
-def _category_validator(weights, counts):
-    wsum = 0.0
-    nwins = 0
-    for p, pinfo in weights.iteritems():
-        for c in pinfo:
-            wsum += weights[p][c] * counts[p][c]
-            nwins += counts[p][c]
-
-    if not np.isclose(wsum, nwins):
-        raise ValueError("Category validator fails: %f, %f" %
-                         (wsum, nwins))
-
-
 def check_cat_consistency(cat_ratio, cat_wcounts):
     err = 0
     # check consistency
@@ -279,38 +160,6 @@ def check_cat_consistency(cat_ratio, cat_wcounts):
     if err:
         raise ValueError("category weighting ratio information is not "
                          "consistent with window information")
-
-
-def determine_category_weighting(weight_param, cat_wcounts):
-    """
-    determine the category weighting based on window counts in each category
-    """
-    logger_block("Category Weighting")
-    weights = {}
-
-    cat_ratio = weight_param["ratio"]
-
-    print("cat_ratio: %s" % cat_ratio)
-    print("cat_wcounts: %s" % cat_wcounts)
-    sumv = 0
-    nwins = 0
-    for p, pinfo in cat_wcounts.iteritems():
-        for c in pinfo:
-            sumv += cat_wcounts[p][c] / cat_ratio[p][c]
-            nwins += cat_wcounts[p][c]
-
-    normc = nwins / sumv
-    logger.info("Total number of windows: %d" % nwins)
-
-    weights = {}
-    for p, pinfo in cat_wcounts.iteritems():
-        weights[p] = {}
-        for c in pinfo:
-            weights[p][c] = normc / cat_ratio[p][c]
-
-    logger.info("Category weights: %s" % weights)
-    _category_validator(weights, cat_wcounts)
-    return weights
 
 
 def plot_histogram(figname, array, nbins=50):
@@ -529,9 +378,9 @@ class WindowWeight(object):
 
         _results = determine_receiver_weighting(
             self.src_info, station_info, window_info,
-            max_ratio=search_ratio,
-            flag=weight_flag,
-            plot=plot_flag, figname_prefix=figname_prefix)
+            search_ratio=search_ratio,
+            weight_flag=weight_flag,
+            plot_flag=plot_flag, figname_prefix=figname_prefix)
 
         return _results
 

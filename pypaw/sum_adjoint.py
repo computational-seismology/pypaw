@@ -103,10 +103,7 @@ def check_event_information_in_asdf_files(asdf_files):
         ds = ASDFDataSet(asdf_fn, mode='r')
         asdf_events[asdf_fn] = ds.events
 
-    diffs = check_events_consistent(asdf_events)
-    if len(diffs) != 0:
-        raise ValueError("Event information in %s not the same as others: %s"
-                         % (diffs, asdf_events.keys()))
+    check_events_consistent(asdf_events)
 
     event_base = asdf_events[asdf_events.keys()[0]]
     origin = event_base[0].preferred_origin()
@@ -164,6 +161,7 @@ class PostAdjASDF(object):
     def add_adjoint_dataset_on_channel_weight(self, ds, weights):
         """
         Add adjoint source based on channel window weight
+        The adjoint source's channel should be renamed to "MX"
         """
         misfits = {}
         adjsrc_group = ds.auxiliary_data.AdjointSources
