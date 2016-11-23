@@ -37,7 +37,8 @@ class ProcASDFBase(object):
         :param content:
         :return:
         """
-        if isinstance(content, dict) or isinstance(content, list):
+        if isinstance(content, dict):
+            # already in the memory
             return content
         elif isinstance(content, str):
             return smart_read_yaml(content, mpi_mode=self.mpi_mode,
@@ -52,7 +53,8 @@ class ProcASDFBase(object):
         :param content:
         :return:
         """
-        if isinstance(content, dict) or isinstance(content, list):
+        if isinstance(content, dict):
+            # already in the memory
             return content
         elif isinstance(content, str):
             return smart_read_json(content, mpi_mode=self.mpi_mode,
@@ -86,17 +88,17 @@ class ProcASDFBase(object):
         self.comm = MPI.COMM_WORLD
         self.rank = self.comm.Get_rank()
 
-    def print_info(self, dict_obj, extra_info=""):
+    def print_info(self, dict_obj, title=""):
         """
         Print dict. You can use it to print out information
         for path and param
 
         :param dict_obj:
-        :param extra_info:
+        :param title:
         :return:
         """
-        def _print_subs(_dict, extra_info=""):
-            print("-"*10 + extra_info + "-"*10)
+        def _print_subs(_dict, title):
+            print("-"*10 + title + "-"*10)
             sorted_dict = sorted(((v, k) for v, k in _dict.iteritems()))
             for key, value in sorted_dict:
                 print("%s:  %s" % (key, value))
@@ -105,11 +107,11 @@ class ProcASDFBase(object):
             raise ValueError("Input dict_obj should be type of dict")
 
         if not self.mpi_mode:
-            _print_subs(dict_obj, extra_info)
+            _print_subs(dict_obj, title)
         else:
             if self.rank != 0:
                 return
-            _print_subs(dict_obj, extra_info)
+            _print_subs(dict_obj, title)
 
     def load_asdf(self, filename, mode="a"):
         """
@@ -181,8 +183,15 @@ class ProcASDFBase(object):
 
     def _core(self, par_obj, file_obj):
         """
-        Dummy here. Core function to fit different purpose.
+        Pure virtual function. Needs to be implemented in the
+        child class.
         """
+        raise NotImplementedError()
+
+    def _validate_path(self, path):
+        pass
+
+    def _validate_param(self, param):
         pass
 
     def smart_run(self):
@@ -194,11 +203,11 @@ class ProcASDFBase(object):
         self.detect_env()
 
         path = self._parse_path()
-        param = self._parse_param()
+        self.print_info(path, title="Path Info")
+        self._validate_path(path)
 
-        if not isinstance(path, dict):
-            raise TypeError("path must be type of dict")
-        if not isinstance(param, dict):
-            raise TypeError("param must be type of dict")
+        param = self._parse_param()
+        self.print_info(param, title="Param Info")
+        self._validate_param(param)
 
         self._core(path, param)

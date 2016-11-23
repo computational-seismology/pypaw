@@ -15,12 +15,31 @@ import inspect
 import pyadjoint
 from pyasdf import ASDFDataSet
 from pytomo3d.adjoint import calculate_and_process_adjsrc_on_stream
+from pytomo3d.adjoint.process_adjsrc import process_adjoint
 from pytomo3d.adjoint.utils import reshape_adj
 from .procbase import ProcASDFBase
 from .utils import smart_read_json
 
 
-def check_config_keywords(config, ConfigClass):
+def check_process_config_keywords(config):
+    """ check process_config contains all necessary keywords """
+    default_keywords = inspect.getargspec(process_adjoint).args
+    deletes = ["adjsrcs", "interp_starttime", "weight_dict", "inventory",
+               "event"]
+    for d in deletes:
+        default_keywords.remove(d)
+
+    if set(default_keywords) != set(config.keys()):
+        print("Missing: %s" % (set(default_keywords) - set(config.keys())))
+        print("Redundant: %s" % (set(config.keys()) - set(default_keywords)))
+        raise ValueError("Process Config Error")
+
+
+def check_adjoint_config_keywords(config, ConfigClass):
+    """
+    check adjoint_config contains all necessary keywords when
+    loading the keyworkds
+    """
     default_keywords = inspect.getargspec(ConfigClass.__init__).args
     deletes = ["self"]
     for d in deletes:
@@ -29,7 +48,7 @@ def check_config_keywords(config, ConfigClass):
     if set(default_keywords) != set(config.keys()):
         print("Missing: %s" % (set(default_keywords) - set(config.keys())))
         print("Redundant: %s" % (set(config.keys()) - set(default_keywords)))
-        raise ValueError("Config Error")
+        raise ValueError("Adjoint Config Error")
 
 
 def load_adjoint_config(config, adjsrc_type):
@@ -49,7 +68,7 @@ def load_adjoint_config(config, adjsrc_type):
     else:
         raise ValueError("Unrecoginsed adj_src_type(%s)" % adjsrc_type)
 
-    check_config_keywords(config, ConfigClass)
+    check_adjoint_config_keywords(config, ConfigClass)
     return ConfigClass(**config)
 
 
@@ -145,6 +164,20 @@ class AdjointASDF(ProcASDFBase):
                           "window_file", "output_file"]
         self._missing_keys(necessary_keys, path)
 
+    def _validate_adjoint_param(adjoint_param):
+        """
+        Check the adjoint parameters. Since we don't know which type
+        of adjoint it will be, so we just do a simple check. More
+        detailed check will be done later on in function
+        `check_config_keywords`.
+        """
+        necessary_keys = ["min_period", "max_period", "taper"]
+        if param["min_period"] > param["max_period"]:
+            raise ValueError(
+                "Error in param file, min_period(%5.1f) is larger"
+                "than max_period(%5.1f)" % (param["min_period"],
+                                            param["max_period"]))
+
     def _validate_param(self, param):
         """
         Valicate path information
@@ -153,12 +186,11 @@ class AdjointASDF(ProcASDFBase):
         :type path: dict
         :return:
         """
-        necessary_keys = ["adj_src_type", "min_period", "max_period"]
+        necessary_keys = ["adjoint_config", "process_config"]
         self._missing_keys(necessary_keys, param)
-        if param["min_period"] > param["max_period"]:
-            raise ValueError("Error in param file, min_period(%5.1f) is larger"
-                             "than max_period(%5.1f)" % (param["min_period"],
-                                                         param["max_period"]))
+
+        process_config = param["process_config"]
+        check_process_config_keywords(process_config)
 
     def load_windows(self, winfile):
         """
@@ -185,14 +217,6 @@ class AdjointASDF(ProcASDFBase):
         """
         adjoint_param = param["adjoint_config"]
         postproc_param = param["process_config"]
-        self._validate_path(path)
-        self._validate_param(adjoint_param)
-
-        self.print_info(path, extra_info="Path information")
-        self.print_info(adjoint_param,
-                        extra_info="Adjoint parameter information")
-        self.print_info(postproc_param,
-                        extra_info="Postprocess parameter information")
 
         obsd_file = path["obsd_asdf"]
         synt_file = path["synt_asdf"]

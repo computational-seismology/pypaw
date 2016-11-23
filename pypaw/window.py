@@ -17,7 +17,7 @@ import inspect
 import json
 import pyflex
 from pytomo3d.window.window import window_on_stream
-from pytomo3d.window.utils import merge_station_windows, stats_all_windows
+from pytomo3d.window.utils import merge_windows, stats_all_windows
 from pytomo3d.window.io import get_json_content, WindowEncoder
 from .utils import smart_read_yaml, smart_mkdir
 from .procbase import ProcASDFBase
@@ -156,31 +156,8 @@ class WindowASDF(ProcASDFBase):
                 raise ValueError("min_period(%6.2f) is larger than max_period"
                                  "(%6.2f)" % (minp, maxp))
 
-    def merge_multiple_instruments(self, windows):
-        """
-        Merge windows from multiple instruments by picking the one
-        with most number of windows(thus keep only one), for example,
-        II.AAK.00.BHZ has 10 windows while II.AAK.10.BHZ has 5 windows.
-        Then only II.AAK.00.BHZ will be kept.
-        Attention, this flag also merges different channel, for example,
-        BH and LH.
-        """
-        new_windows = {}
-
-        for sta, sta_win in windows.iteritems():
-            if sta_win is None:
-                continue
-            new_windows[sta] = merge_station_windows(sta_win)
-
-        return new_windows
 
     def _core(self, path, param):
-
-        self._validate_path(path)
-        self._validate_param(param)
-
-        self.print_info(path, "Path Info")
-        self.print_info(param, "Param Info")
 
         obsd_file = path["obsd_asdf"]
         synt_file = path["synt_asdf"]
@@ -216,13 +193,13 @@ class WindowASDF(ProcASDFBase):
                           event=event, figure_mode=figure_mode,
                           figure_dir=figure_dir, _verbose=self._verbose)
 
-        results = \
+        windows = \
             obsd_ds.process_two_files(synt_ds, winfunc)
 
         if self.rank == 0:
             if instrument_merge_flag:
                 # merge multiple instruments
-                results = self.merge_multiple_instruments(results)
+                results = merge_windows(windows)
 
             stats_logfile = os.path.join(output_dir, "windows.stats.json")
             # stats windows on rand 0
@@ -230,5 +207,4 @@ class WindowASDF(ProcASDFBase):
                               instrument_merge_flag,
                               stats_logfile)
 
-        if self.rank == 0:
             write_window_json(results, output_file)

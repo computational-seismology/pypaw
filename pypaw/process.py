@@ -44,6 +44,23 @@ def process_wrapper(stream, inv, param=None):
     return process_stream(stream, **param)
 
 
+def update_param(event, param):
+    """ update the param based on event information """
+    origin = event.preferred_origin()
+    origin = event.preferred_origin()
+    event_latitude = origin.latitude
+    event_longitude = origin.longitude
+    event_time = origin.time
+
+    # figure out interpolation parameter
+    param["starttime"] = event_time + param["relative_starttime"]
+    param.pop("relative_starttime")
+    param["endtime"] = event_time + param["relative_endtime"]
+    param.pop("relative_endtime")
+    param["event_latitude"] = event_latitude
+    param["event_longitude"] = event_longitude
+
+
 class ProcASDF(ProcASDFBase):
 
     def __init__(self, path, param, verbose=False, debug=False):
@@ -66,12 +83,6 @@ class ProcASDF(ProcASDFBase):
 
     def _core(self, path, param):
 
-        self._validate_path(path)
-        self._validate_param(param)
-
-        self.print_info(path, extra_info="Path Info")
-        self.print_info(param, extra_info="Param Info")
-
         input_asdf = path["input_asdf"]
         input_tag = path["input_tag"]
         output_asdf = path["output_asdf"]
@@ -80,24 +91,14 @@ class ProcASDF(ProcASDFBase):
         self.check_input_file(input_asdf)
         self.check_output_file(output_asdf, remove_flag=True)
 
-        # WJ: not sure why it needs 'w', if not, it will be wrong
+        # WJ: set to 'a' for now since SPECFEM output is
+        # a incomplete asdf file, missing the "auxiliary_data"
+        # part. So give it 'a' permission to add the part.
+        # otherwise, it there will be errors
         ds = self.load_asdf(input_asdf, mode='a')
 
-        # read in event
-        event = ds.events[0]
-        origin = event.preferred_origin()
-        event_latitude = origin.latitude
-        event_longitude = origin.longitude
-        event_time = origin.time
-
-        # figure out interpolation parameter
-        param["starttime"] = event_time + param["relative_starttime"]
-        param.pop("relative_starttime")
-        param["endtime"] = event_time + param["relative_endtime"]
-        param.pop("relative_endtime")
-        param["event_latitude"] = event_latitude
-        param["event_longitude"] = event_longitude
-
+        # update param based on event information
+        update_param(ds.events[0], param)
         # check final param to see if the keys are right
         check_param_keywords(param)
 

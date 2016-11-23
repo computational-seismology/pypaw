@@ -76,15 +76,6 @@ class MeasureAdjointASDF(AdjointASDF):
         :return:
         """
         adjoint_param = param["adjoint_config"]
-        postproc_param = param["process_config"]
-        self._validate_path(path)
-        self._validate_param(adjoint_param)
-
-        self.print_info(path, extra_info="Path information")
-        self.print_info(adjoint_param,
-                        extra_info="Adjoint parameter information")
-        self.print_info(postproc_param,
-                        extra_info="Postprocess parameter information")
 
         obsd_file = path["obsd_asdf"]
         synt_file = path["synt_asdf"]

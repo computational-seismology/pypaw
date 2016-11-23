@@ -43,6 +43,9 @@ process_config:
   filter_flag: True
   pre_filt: [0.0067, 0.01, 0.02, 0.025]
   
+  taper_type: "hann"
+  taper_percentage: 0.05
+
   # add missing components with zero trace(to prepare rotate)
   # If set to False, only rotate those with Both "R" and "T"
   # components. Set to True highly recommended unless you are
