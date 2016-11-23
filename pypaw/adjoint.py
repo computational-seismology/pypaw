@@ -164,6 +164,7 @@ class AdjointASDF(ProcASDFBase):
                           "window_file", "output_file"]
         self._missing_keys(necessary_keys, path)
 
+    @staticmethod
     def _validate_adjoint_param(adjoint_param):
         """
         Check the adjoint parameters. Since we don't know which type
@@ -171,12 +172,11 @@ class AdjointASDF(ProcASDFBase):
         detailed check will be done later on in function
         `check_config_keywords`.
         """
-        necessary_keys = ["min_period", "max_period", "taper"]
-        if param["min_period"] > param["max_period"]:
+        if adjoint_param["min_period"] > adjoint_param["max_period"]:
             raise ValueError(
                 "Error in param file, min_period(%5.1f) is larger"
-                "than max_period(%5.1f)" % (param["min_period"],
-                                            param["max_period"]))
+                "than max_period(%5.1f)" % (adjoint_param["min_period"],
+                                            adjoint_param["max_period"]))
 
     def _validate_param(self, param):
         """
@@ -188,6 +188,8 @@ class AdjointASDF(ProcASDFBase):
         """
         necessary_keys = ["adjoint_config", "process_config"]
         self._missing_keys(necessary_keys, param)
+
+        self._validate_adjoint_param(param["adjoint_config"])
 
         process_config = param["process_config"]
         check_process_config_keywords(process_config)

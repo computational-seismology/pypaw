@@ -156,7 +156,6 @@ class WindowASDF(ProcASDFBase):
                 raise ValueError("min_period(%6.2f) is larger than max_period"
                                  "(%6.2f)" % (minp, maxp))
 
-
     def _core(self, path, param):
 
         obsd_file = path["obsd_asdf"]
