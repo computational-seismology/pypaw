@@ -133,10 +133,7 @@ def extract_source_location(input_info):
         del ds
 
     # check event information all the same across period bands
-    diffs = check_events_consistent(asdf_events)
-    if len(diffs) != 0:
-        raise ValueError("Event information in %s not the same as others %s"
-                         % (diffs, asdf_events.keys()))
+    check_events_consistent(asdf_events)
 
     event_base = asdf_events[asdf_events.keys()[0]]
     origin = event_base.preferred_origin()
