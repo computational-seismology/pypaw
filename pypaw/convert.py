@@ -240,10 +240,16 @@ def convert_adjsrcs_from_asdf(asdf_fn, outputdir, _verbose=True):
     nadj = len(adjsrcs)
     print("Number of adjoint sources: %d" % nadj)
 
+    # get event time
+    origin = ds.events[0].preferred_origin()
+    eventtime = origin.time
+
     for idx, adj in enumerate(adjsrcs):
         if _verbose:
             print("Adjoint sources(%d/%d) from: %s" % (idx, nadj, adj.path))
-        time_offset = adj.parameters["time_offset"]
+        trace_starttime = UTCDateTime(adj.parameters["starttime"])
+        time_offset = trace_starttime - eventtime
+
         dt = adj.parameters['dt']
         npts = len(adj.data)
         times = np.array([time_offset + i * dt for i in range(npts)])
