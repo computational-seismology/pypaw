@@ -3,6 +3,7 @@
 # flag to True to get real gound displacement. For synthetic data,
 # please set this flag to False
 remove_response_flag: True
+water_level: 100.0
 
 # filtering the seismogram. If you set both remove_response_flag to True
 # and filter_flag to True, the filtering will happen at the same time

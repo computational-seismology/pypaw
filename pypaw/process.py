@@ -25,6 +25,9 @@ def check_param_keywords(param):
     default_param = inspect.getargspec(process_stream).args
     default_param.remove("st")
     default_param.remove("inventory")
+    if not param["remove_response_flag"]:
+        # water_level is only used in remove instrument response
+        default_param.remove("water_level")
     if set(default_param) != set(param.keys()):
         print("Missing: %s" % (set(default_param) - set(param.keys())))
         print("Redundant: %s" % (set(param.keys()) - set(default_param)))
