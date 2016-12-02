@@ -20,7 +20,40 @@ from pytomo3d.window.filter_windows import filter_windows, count_windows
 from .utils import load_json, dump_json, load_yaml
 
 
+def check_keys(dictv, keys):
+    set1 = set(dictv.keys())
+    set2 = set(keys)
+    if set1 != set2:
+        print("Missing keys: %s" % (set2 - set1))
+        print("Redundant keys: %s" % (set1 - set2))
+        return False
+    return True
+
+
+def check_path(paths):
+    keys = ["window_file", "station_file", "output_file", "measurement_file"]
+    if not check_keys(paths, keys):
+        raise ValueError("Path file is bad!")
+
+
+def check_param(params):
+    keys = ["sensor", "measurement"]
+    if not check_keys(params, keys):
+        raise ValueError("Param file is bad!")
+
+    keys = ["flag", "sensor_types"]
+    if not check_keys(params["sensor"], keys):
+        raise ValueError("Param['sensor'] is bad!")
+
+    keys = ["flag", "component"]
+    if not check_keys(params["measurement"], keys):
+        raise ValueError("Param['measurement'] is bad!")
+
+
 def run_window_filter(paths, params, verbose=False):
+    check_path(paths)
+    check_param(params)
+
     window_file = paths["window_file"]
     station_file = paths["station_file"]
     output_file = paths["output_file"]
@@ -55,7 +88,6 @@ def run_window_filter(paths, params, verbose=False):
 
 
 def main():
-
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', action='store', dest='path_file', required=True,
                         help="path file")
