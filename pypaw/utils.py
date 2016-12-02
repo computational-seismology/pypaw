@@ -52,7 +52,7 @@ class JSONObject(object):
         self.__dict__ = d
 
 
-def read_json_file(parfile, obj_hook=True):
+def read_json_file(parfile, obj_hook=False):
     """
     Hook json to an JSONObject instance
     """

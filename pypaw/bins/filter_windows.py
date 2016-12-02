@@ -16,6 +16,7 @@ and keep a copy of original windows as "***.origin.json"
 from __future__ import (absolute_import, division, print_function)
 import os
 import argparse
+from pprint import pprint
 from pytomo3d.window.filter_windows import filter_windows, count_windows
 from .utils import load_json, dump_json, load_yaml
 
@@ -35,6 +36,9 @@ def check_path(paths):
     if not check_keys(paths, keys):
         raise ValueError("Path file is bad!")
 
+    print("=" * 10 + " Path info " + "=" * 10)
+    pprint(paths)
+
 
 def check_param(params):
     keys = ["sensor", "measurement"]
@@ -49,6 +53,9 @@ def check_param(params):
     if not check_keys(params["measurement"], keys):
         raise ValueError("Param['measurement'] is bad!")
 
+    print("=" * 10 + " Path info " + "=" * 10)
+    pprint(params)
+
 
 def run_window_filter(paths, params, verbose=False):
     check_path(paths)
@@ -59,12 +66,8 @@ def run_window_filter(paths, params, verbose=False):
     output_file = paths["output_file"]
     measurement_file = paths["measurement_file"]
 
-    print("window file: %s" % window_file)
-    print("station_file: %s" % station_file)
-    print("measurement_file: %s" % measurement_file)
-    print("output filtered window file: %s" % output_file)
-
     windows = load_json(window_file)
+    # count the number of windows in the original window file
     nchans_old, nwins_old = count_windows(windows)
     stations = load_json(station_file)
     measurements = load_json(measurement_file)
@@ -74,17 +77,18 @@ def run_window_filter(paths, params, verbose=False):
         windows, stations, measurements, params, verbose=verbose)
 
     nchans_new, nwins_new = count_windows(windows_new)
+
     # dump the new windows file to replace the original one
     dump_json(windows_new, output_file)
 
     # dump the log file
     logfile = os.path.join(os.path.dirname(output_file), "filter.log")
-    print("Log file located at: %s" % logfile)
     dump_json(log, logfile)
 
     print("=" * 10 + " Summary " + "=" * 10)
     print("channels: %d --> %d" % (nchans_old, nchans_new))
     print("windows: %d -- > %d" % (nwins_old, nwins_new))
+    print("Log file located at: %s" % logfile)
 
 
 def main():

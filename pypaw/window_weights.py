@@ -147,25 +147,26 @@ def extract_source_location(input_info):
     return src_info
 
 
-def check_cat_consistency(cat_ratio, cat_wcounts):
-    err = 0
-    # check consistency
-    for p, pinfo in cat_ratio:
-        for c in pinfo:
-            try:
-                cat_wcounts[p][c]
-            except KeyError:
-                err = 1
-                print("Missing %s.%s" % (p, c))
-    if err:
-        raise ValueError("category weighting ratio information is not "
-                         "consistent with window information")
-
-
 def plot_histogram(figname, array, nbins=50):
     # plot histogram of weights
     plt.hist(array, nbins)
     plt.savefig(figname)
+
+
+def analyze_category_weights(cat_weights, logfile):
+    log = {"category_weights": cat_weights}
+    maxw = 0
+    minw = 10**9
+    for _p, _pw in cat_weights.iteritems():
+        for _comp, _compw in _pw.iteritems():
+            if _compw > maxw:
+                maxw = _compw
+            if _compw < minw:
+                minw = _compw
+    log["summary"] = {"maxw": maxw, "minw": minw,
+                      "cond_num": maxw/minw}
+
+    dump_json(log, logfile)
 
 
 def validate_overall_weights(weights_array, nwins_array):
@@ -238,7 +239,7 @@ class WindowWeight(object):
         self.cat_wcounts = {}
         self.cat_weights = None
 
-    def analyze_receiver(self, logfile):
+    def analyze_receiver_weights(self, logfile):
         log = {}
         for _p, _pw in self.weights.iteritems():
             log[_p] = {}
@@ -259,21 +260,6 @@ class WindowWeight(object):
 
         dump_json(log, logfile)
 
-    def analyze_category(self, logfile):
-        log = {"category_weights": self.cat_weights}
-        maxw = 0
-        minw = 10**9
-        for _p, _pw in self.cat_weights.iteritems():
-            for _comp, _compw in _pw.iteritems():
-                if _compw > maxw:
-                    maxw = _compw
-                if _compw < minw:
-                    minw = _compw
-        log["summary"] = {"maxw": maxw, "minw": minw,
-                          "cond_num": maxw/minw}
-
-        dump_json(log, logfile)
-
     def analyze(self):
         """
         Analyze the final weight and generate log file
@@ -282,11 +268,11 @@ class WindowWeight(object):
         logdir = os.path.dirname(self.path["logfile"])
         logfile = os.path.join(logdir, "log.receiver_weights.json")
         logger.info("receiver log file: %s" % logfile)
-        self.analyze_receiver(logfile)
+        self.analyze_receiver_weights(logfile)
 
         logfile = os.path.join(logdir, "log.category_weights.json")
         logger.info("category log file: %s" % logfile)
-        self.analyze_category(logfile)
+        analyze_category_weights(self.cat_weights, logfile)
 
         analyze_overall_weights(self.weights, self.rec_wcounts, logdir)
 
@@ -304,10 +290,10 @@ class WindowWeight(object):
         and normalized)separately.
         """
         logger_block("Receiver Weighting")
-        input_info = self.path["input"]
 
         weighting_param = self.param["receiver_weighting"]
 
+        input_info = self.path["input"]
         nperiods = len(input_info)
         period_idx = 0
         # determine receiver weightings for each asdf file
@@ -335,6 +321,7 @@ class WindowWeight(object):
         # calculate receiver weights
         self.calculate_receiver_weights_asdf()
         # calculate category weights
+        logger_block("Category Weighting")
         self.cat_weights = calculate_category_weights_interface(
             self.param["category_weighting"], self.cat_wcounts)
 

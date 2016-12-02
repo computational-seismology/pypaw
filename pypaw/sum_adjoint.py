@@ -15,18 +15,12 @@ each channel
 from __future__ import print_function, division, absolute_import
 import os
 from pprint import pprint
-import yaml
 from pyasdf import ASDFDataSet
-from pypaw.bins import load_json, dump_json
 from pytomo3d.adjoint.sum_adjoint import load_to_adjsrc, dump_adjsrc, \
     check_events_consistent, \
     create_weighted_adj, sum_adj_to_base, check_station_consistent, \
     rotate_adjoint_sources
-
-
-def load_yaml(fn):
-    with open(fn) as fh:
-        return yaml.load(fh)
+from .utils import read_json_file, dump_json, read_yaml_file
 
 
 def validate_path(path):
@@ -72,6 +66,10 @@ def validate_param(param):
 
 
 def save_adjoint_to_asdf(outputfile, events, adjoint_sources, stations):
+    """
+    Save events(obspy.Catalog) and adjoint sources, together with
+    staiton information, to asdf file on disk.
+    """
     print("="*15 + "\nWrite to file: %s" % outputfile)
     outputdir = os.path.dirname(outputfile)
     if not os.path.exists(outputdir):
@@ -211,7 +209,7 @@ class PostAdjASDF(object):
             filename = _file_info["asdf_file"]
             ds = ASDFDataSet(filename, mode='r')
             weight_file = _file_info["weight_file"]
-            weights = load_json(weight_file)
+            weights = read_json_file(weight_file)
             print("-" * 20)
             print("Adding asdf file(%s) using assigned weight_file(%s)"
                   % (filename, weight_file))
@@ -239,7 +237,7 @@ class PostAdjASDF(object):
 
     def _parse_path(self):
         if isinstance(self.path, str):
-            path = load_json(self.path)
+            path = read_json_file(self.path)
         elif isinstance(self.path, dict):
             path = self.path
         else:
@@ -248,7 +246,7 @@ class PostAdjASDF(object):
 
     def _parse_param(self):
         if isinstance(self.param, str):
-            param = load_yaml(self.param)
+            param = read_yaml_file(self.param)
         elif isinstance(self.param, dict):
             param = self.param
         else:
