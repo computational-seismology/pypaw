@@ -199,6 +199,9 @@ class WindowASDF(ProcASDFBase):
             if instrument_merge_flag:
                 # merge multiple instruments
                 results = merge_windows(windows)
+            else:
+                # nothing is done
+                results = windows
 
             stats_logfile = os.path.join(output_dir, "windows.stats.json")
             # stats windows on rand 0
