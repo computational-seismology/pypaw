@@ -15,6 +15,7 @@ each channel
 from __future__ import print_function, division, absolute_import
 import os
 from pprint import pprint
+from copy import deepcopy
 from pyasdf import ASDFDataSet
 from pytomo3d.adjoint.sum_adjoint import load_to_adjsrc, dump_adjsrc, \
     check_events_consistent, \
@@ -148,7 +149,8 @@ class PostAdjASDF(object):
                                 station_info["station"])
 
         if station_id not in self.stations:
-            self.stations[station_id] = station_info
+            self.stations[station_id] = deepcopy(station_info)
+            self.stations["location"] = ""
         else:
             # check consistency
             sta_base = self.stations[station_id]
@@ -170,10 +172,19 @@ class PostAdjASDF(object):
             new_adj, station_info = load_to_adjsrc(adj)
 
             channel_weight = weights[channel]["weight"]
-            self.attach_adj_to_db(adj_id, new_adj, channel_weight)
-
-            self.attach_station_to_db(station_info)
-
+            # add station information
+            try:
+                self.attach_station_to_db(station_info)
+            except Exception as err:
+                print("Failed to add station information(%s) to db due to: %s"
+                      % (channel, str(err)))
+                continue
+            # add adjoint source
+            try:
+                self.attach_adj_to_db(adj_id, new_adj, channel_weight)
+            except Exception as err:
+                print("Failed to add station adjsrc(%s) to db due to: %s"
+                      % (channel, str(err)))
             # get the component misfit values
             if _comp not in misfits:
                 misfits[_comp] = {"misfit": 0, "raw_misfit": 0}
