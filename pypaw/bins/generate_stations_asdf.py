@@ -58,7 +58,7 @@ def main():
     ds = pyasdf.ASDFDataSet(args.filename, mode='r')
     generate_waveform_stations(ds, args.outputfn)
 
-    adjoint_fn = args.outputfn + ".ADJOINT"
+    adjoint_fn = args.outputfn + "_ADJOINT"
     generate_adjoint_stations(ds, adjoint_fn)
 
 

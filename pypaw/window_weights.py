@@ -182,7 +182,7 @@ def validate_overall_weights(weights_array, nwins_array):
                          % (wsum, nwins_total))
 
 
-def analyze_overall_weights(weights, rec_wcounts, logdir):
+def analyze_overall_weights(weights, rec_wcounts, log_prefix):
     nwins_array = []
     weights_array = []
     # validate the sum of all weights is 1
@@ -194,9 +194,9 @@ def analyze_overall_weights(weights, rec_wcounts, logdir):
 
     validate_overall_weights(weights_array, nwins_array)
 
-    figname = os.path.join(logdir, "weights.hist.png")
+    figname = log_prefix + ".weights.hist.png"
     plot_histogram(figname, weights_array)
-    figname = os.path.join(logdir, "weights.hist.png")
+    figname = log_prefix + ".wcounts.hist.png"
     plot_histogram(figname, nwins_array)
 
     maxw = max(weights_array)
@@ -208,7 +208,7 @@ def analyze_overall_weights(weights, rec_wcounts, logdir):
     logger.info("Weight max, min, max/min: %f, %f, %f"
                 % (maxw, minw, maxw/minw))
 
-    logfile = os.path.join(logdir, "weights.summary.json")
+    logfile = log_prefix + ".weights.summary.json"
     content = {"max_weights": maxw, "min_weights": minw,
                "total_nwindows": np.sum(nwins_array),
                "windows": nwindows, "receivers": nreceivers}
@@ -265,16 +265,17 @@ class WindowWeight(object):
         Analyze the final weight and generate log file
         """
         logger_block("Summary")
-        logdir = os.path.dirname(self.path["logfile"])
-        logfile = os.path.join(logdir, "log.receiver_weights.json")
+        log_prefix = self.path["logfile"]
+        logfile = log_prefix + ".receiver_weights.json"
         logger.info("receiver log file: %s" % logfile)
         self.analyze_receiver_weights(logfile)
 
-        logfile = os.path.join(logdir, "log.category_weights.json")
+        logfile = log_prefix + ".category_weights.json"
         logger.info("category log file: %s" % logfile)
         analyze_category_weights(self.cat_weights, logfile)
 
-        analyze_overall_weights(self.weights, self.rec_wcounts, logdir)
+        analyze_overall_weights(self.weights, self.rec_wcounts,
+                                log_prefix)
 
     def dump_weights(self):
         """ dump weights to files """

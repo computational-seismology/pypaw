@@ -12,6 +12,7 @@ Class that calculate adjoint source using asdf
 from __future__ import (absolute_import, division, print_function)
 import json
 import yaml
+import matplotlib.pyplot as plt
 
 
 def load_json(filename):
@@ -27,3 +28,12 @@ def dump_json(content, filename):
 def load_yaml(filename):
     with open(filename, 'r') as fh:
         return yaml.load(fh)
+
+
+def dump_yaml(content, filename):
+    with open(filename, 'w') as fh:
+        yaml.dump(content, fh, indent=2)
+
+
+def reset_matplotlib():
+    plt.switch_backend('agg')

@@ -57,6 +57,19 @@ def check_param(params):
     pprint(params)
 
 
+def assert_windows_and_measurements_same_length(windows, measures):
+    if len(windows) != len(measures):
+        raise ValueError("Length of windows and measures are not the same!")
+    for sta in windows:
+        if len(windows[sta]) != len(measures[sta]):
+            raise ValueError("Length of windows and measures fails at "
+                             "station level: %s" % sta)
+        for chan in windows[sta]:
+            if len(windows[sta][chan]) != len(measures[sta][chan]):
+                raise ValueError("Length of windows and measures fails at: "
+                                 "channel level: %s" % chan)
+
+
 def run_window_filter(paths, params, verbose=False):
     check_path(paths)
     check_param(params)
@@ -73,19 +86,25 @@ def run_window_filter(paths, params, verbose=False):
     measurements = load_json(measurement_file)
 
     # filter the window based on given sensor types
-    windows_new, log = filter_windows(
+    windows_new, measures_new, log = filter_windows(
         windows, stations, measurements, params, verbose=verbose)
 
     nchans_new, nwins_new = count_windows(windows_new)
 
+    assert_windows_and_measurements_same_length(windows_new, measures_new)
+    print("=" * 10 + " Summary " + "=" * 10)
     # dump the new windows file to replace the original one
+    print("Filtered window files: %s" % output_file)
     dump_json(windows_new, output_file)
+
+    new_measure_file = measurement_file + ".filter"
+    print("Filtered measurement file: %s" % new_measure_file)
+    dump_json(measures_new, new_measure_file)
 
     # dump the log file
     logfile = os.path.join(os.path.dirname(output_file), "filter.log")
     dump_json(log, logfile)
 
-    print("=" * 10 + " Summary " + "=" * 10)
     print("channels: %d --> %d" % (nchans_old, nchans_new))
     print("windows: %d -- > %d" % (nwins_old, nwins_new))
     print("Log file located at: %s" % logfile)
