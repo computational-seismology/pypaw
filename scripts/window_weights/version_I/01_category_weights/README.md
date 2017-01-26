@@ -9,7 +9,7 @@
   Then, run the script to generate path file.
 
   ```
-    python generate_count_windows.py -f cmtlist.txt
+    python generate_count_windows.py
   ```
 
 2. Run the script:
