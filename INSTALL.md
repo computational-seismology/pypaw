@@ -12,11 +12,11 @@ Pypaw has dependancies on the following packages:
 
 ## Manual installation
 
-1. load your compiler modules. You can choose any version you like(intel, gnu or pgi).
+1. load your compiler modules. You can choose any version you like(intel, gnu or pgi). But we are using GNU compiler on RHEA at ORNL.
 
   ```
-  module load intel/13.0
-  module load openmpi/intel-13.0
+  module load gcc/4.8.2
+  module load openmpi/1.8.4
   ```
 
 2. downwnload Anaconda for Python 2.7 and 64 bit Linux and install it (http://continuum.io/downloads)(**optional**)
