@@ -1,8 +1,20 @@
 #!/usr/bin/env pythoiin
 # -*- coding: utf-8 -*-
 """
-Calculate the adjoint source weighting based on the station and source
-distribution.
+Porgram: Window weights version I
+
+Calculate the adjoint source weighting based on the window, station
+and category information(category info shoud be provided by user).
+
+This program evaluates the weightings given one source. For example,
+if one event has three period bands, then the inputs are three period
+bands windows. Then it will calculate the receiver weightings.
+Combined with category weighting(provide by user), it will generate
+the weightings.
+
+So this program is station weighting + category weighting combined.
+The source weighting could be determined later when the kernels
+are summed together.
 
 :copyright:
     Wenjie Lei (lei@princeton.edu), 2016

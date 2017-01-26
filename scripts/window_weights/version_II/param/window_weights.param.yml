@@ -1,0 +1,15 @@
+# Assign weights to receivers of one event in one category
+receiver_weighting:
+  flag: True
+  plot: False
+  search_ratio: 0.03
+
+# Assign weights to CMT sources based on their geographical locations
+source_weighting:
+  flag: True
+  plot: False
+  search_ratio: 0.20
+
+# Assign weights to categories, to balance them
+category_weighting:
+  flag: True

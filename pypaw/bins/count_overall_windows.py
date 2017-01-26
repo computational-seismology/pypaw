@@ -131,8 +131,6 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', action='store', dest='path_file',
                         required=True, help='path file')
-    parser.add_argument('-p', action='store', dest='param_file',
-                        help='path file')
     parser.add_argument('-v', action='store_true', dest='verbose',
                         help='verbose flag')
     args = parser.parse_args()

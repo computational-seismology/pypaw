@@ -1,8 +1,15 @@
 #!/usr/bin/env pythoiin
 # -*- coding: utf-8 -*-
 """
-Calculate the adjoint source weighting based on the station and source
+Calculate the adjoint source weighting based on the cmtsource
 distribution.
+
+This is the script working together with window weight
+version I since in that script, only receiver and category
+weightins are calculated.
+
+The source weightings are then used in summing kernels from
+different events.
 
 :copyright:
     Wenjie Lei (lei@princeton.edu), 2016

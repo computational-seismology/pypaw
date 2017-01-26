@@ -24,6 +24,7 @@ consoles = [
     'pypaw-extract_station_info=pypaw.bins.extract_station_info:main',
     'pypaw-filter_windows=pypaw.bins.filter_windows:main',
     'pypaw-window_weights=pypaw.bins.calculate_window_weights:main',  # NOQA
+    'pypaw-window_weights_version_ii=pypaw.bins.calculate_window_weights_version_ii:main',  # NOQA
     'pypaw-source_weights=pypaw.bins.calculate_source_weights:main',  # NOQA
     'pypaw-sum_adjoint_asdf=pypaw.bins.sum_adjoint_asdf:main',  # NOQA
     'pypaw-adjoint_misfit_from_asdf=pypaw.bins.adjoint_misfit_from_asdf:main',     # NOQA
