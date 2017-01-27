@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 """
-Scripts that generate stations file from asdf file. If
-there are stations in waveforms, then a file `STATIONS_waveform`
-will be generated. Or if there are stations in AuxlilaryData,
+Scripts that generate stations file from asdf file.
+1) If there are stations in waveforms, then a file `STATIONS`
+will be generated.
+2) if there are stations in AuxlilaryData.AdjointSource,
 then a file `STATIONS_ADJOINT` will be generated.
+
+The output STATIONS file follows the format in SPECFEM3D_GLOBE.
 
 :copyright:
     Wenjie Lei (lei@princeton.edu), 2016
@@ -20,7 +23,7 @@ import pyasdf
 
 from pypaw.stations import extract_adjoint_stations
 from pypaw.stations import extract_waveform_stations
-from pypaw.stations import write_stations_file
+from pytomo3d.station.utils import write_stations_file
 
 
 def generate_waveform_stations(asdf, outputfn):

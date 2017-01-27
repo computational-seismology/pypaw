@@ -12,19 +12,6 @@ asdf file.
 from __future__ import (print_function, division, absolute_import)
 import pyasdf
 from pytomo3d.station import extract_staxml_info
-import collections
-
-
-def write_stations_file(sta_dict, filename="STATIONS"):
-    """
-    Write station information out to a txt file(in SPECFEM FORMAT)
-    """
-    with open(filename, 'w') as fh:
-        od = collections.OrderedDict(sorted(sta_dict.items()))
-        for _sta_id, _sta in od.iteritems():
-            network, station = _sta_id.split(".")
-            fh.write("%-9s %5s %15.4f %12.4f %10.1f %6.1f\n"
-                     % (station, network, _sta[0], _sta[1], _sta[2], _sta[3]))
 
 
 def extract_station_info_from_asdf(asdf, verbose=False):

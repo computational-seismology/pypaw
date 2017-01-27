@@ -32,7 +32,8 @@ consoles = [
     'pypaw-convert_adjsrcs_from_asdf=pypaw.bins.convert_adjsrcs_from_asdf:main',   # NOQA
     'pypaw-convert_to_asdf=pypaw.bins.convert_to_asdf:main',
     'pypaw-convert_to_sac=pypaw.bins.convert_to_sac:main',
-    'pypaw-generate_stations_asdf=pypaw.bins.generate_stations_asdf:main'
+    'pypaw-generate_stations_asdf=pypaw.bins.generate_stations_asdf:main',
+    'pypaw-generate_adjoint_stations=pypaw.bins.generate_adjoint_stations:main'
 ]
 
 
