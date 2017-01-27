@@ -1,0 +1,9 @@
+{
+  "measure_files": {
+    "17_40": "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_M16/measure/C201411021717A.17_40.measure_adj.json", 
+    "40_100": "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_M16/measure/C201411021717A.40_100.measure_adj.json", 
+    "90_250": "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_M16/measure/C201411021717A.90_250.measure_adj.json"
+  }, 
+  "output_file": "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_M16/stations_adjoint/STATIONS_ADJOINT.C201411021717A", 
+  "station_file": "/lustre/atlas/proj-shared/geo111/Wenjie/DATA_M16/stations/C201411021717A.stations.json"
+}
