@@ -1,3 +1,6 @@
+"""
+Generate path file for convert adjoint stations
+"""
 import os
 import json
 
@@ -25,8 +28,9 @@ def generate_adjoint_station_paths(
 
     measure_files = {}
     for pb in period_bands:
+        # use filtered measurements file
         fn = os.path.join(
-            measure_dir, "%s.%s.measure_adj.json" % (eventname, pb))
+            measure_dir, "%s.%s.measure_adj.json.filter" % (eventname, pb))
         file_exists(fn)
         measure_files[pb] = fn
 
