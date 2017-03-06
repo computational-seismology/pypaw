@@ -163,6 +163,12 @@ class PostAdjASDF(object):
         Add adjoint source based on channel window weight
         The adjoint source's channel should be renamed to "MX"
         """
+        if len(weights) == 0:
+            # if not weights, then just return. For some events,
+            # we found that there might not be no windows selected
+            # for one period, for example, 90_250 period bands.
+            return {}
+
         misfits = {}
         adjsrc_group = ds.auxiliary_data.AdjointSources
         for channel in weights:

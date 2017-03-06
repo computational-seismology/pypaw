@@ -211,14 +211,21 @@ def analyze_overall_weights(weights, rec_wcounts, log_prefix):
     figname = log_prefix + ".wcounts.hist.png"
     plot_histogram(figname, nwins_array)
 
-    maxw = max(weights_array)
-    minw = min(weights_array)
     nreceivers = len(weights_array)
     nwindows = np.sum(nwins_array)
+    if len(weights_array) > 0:
+        maxw = max(weights_array)
+        minw = min(weights_array)
+        max_over_min = maxw / minw
+    else:
+        maxw = 0.0
+        minw = 0.0
+        max_over_min = 0.0
+
     logger.info("Total number of receivers: %d" % nreceivers)
     logger.info("Total number of windows: %d" % nwindows)
     logger.info("Weight max, min, max/min: %f, %f, %f"
-                % (maxw, minw, maxw/minw))
+                % (maxw, minw, max_over_min))
 
     logfile = log_prefix + ".weights.summary.json"
     content = {"max_weights": maxw, "min_weights": minw,

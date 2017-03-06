@@ -39,7 +39,7 @@ def src_weights(path, param, _verbose=False):
     # load the source information and window counts into memory
     info = {}
     for event in eventlist:
-        cmt = read_events(inputs[event]["cmtfile"])
+        cmt = read_events(inputs[event]["cmtfile"], format="CMTSOLUTION")
         window_counts = \
             load_json(inputs[event]["window_counts_file"])["windows"]
         info[event] = {"source": cmt, "window_counts": window_counts}
