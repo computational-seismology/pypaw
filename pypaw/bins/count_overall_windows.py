@@ -7,7 +7,7 @@ files will be about 3,000. Next, you want to know how many windows do
 each category have and the number will then be used in the weighting
 stage.
 If "weight_output_file" is in the path file, then a default weight param
-file will also be genrated. Be sure to modify some values and then it can
+file will also be generated. Be sure to modify some values and then it can
 be used in the weighting stage.
 """
 from __future__ import print_function, division, absolute_import

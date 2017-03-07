@@ -66,3 +66,6 @@ target/
 
 # temp files
 *.sw*
+
+# hdf5 file
+*.h5

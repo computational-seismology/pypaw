@@ -73,8 +73,8 @@ def add_stationxml_to_asdf(ds, staxml_filelist, event=None,
         for tag, value in sta_dict.iteritems():
             count += 1
             inv = create_simple_inventory(
-                    value[0], value[1], latitude=value[2], longitude=value[3],
-                    elevation=value[4], depth=value[5], start_date=start_date)
+                value[0], value[1], latitude=value[2], longitude=value[3],
+                elevation=value[4], depth=value[5], start_date=start_date)
             ds.add_stationxml(inv)
             if status_bar > 0:
                 drawProgressBar((count)/nstaxml,

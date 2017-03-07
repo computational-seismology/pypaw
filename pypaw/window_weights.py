@@ -153,8 +153,8 @@ def extract_source_location(input_info):
     event_base = asdf_events[asdf_events.keys()[0]]
     origin = event_base.preferred_origin()
     src_info = {
-         "latitude": origin.latitude, "longitude": origin.longitude,
-         "depth_in_m": origin.depth}
+        "latitude": origin.latitude, "longitude": origin.longitude,
+        "depth_in_m": origin.depth}
 
     return src_info
 
