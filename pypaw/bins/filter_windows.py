@@ -81,7 +81,7 @@ def run_window_filter(paths, params, verbose=False):
 
     windows = load_json(window_file)
     # count the number of windows in the original window file
-    nchans_old, nwins_old = count_windows(windows)
+    nchans_old, nwins_old, nwins_comp_old = count_windows(windows)
     stations = load_json(station_file)
     measurements = load_json(measurement_file)
 
@@ -89,10 +89,15 @@ def run_window_filter(paths, params, verbose=False):
     windows_new, measures_new, log = filter_windows(
         windows, stations, measurements, params, verbose=verbose)
 
-    nchans_new, nwins_new = count_windows(windows_new)
+    nchans_new, nwins_new, nwins_comp_new = count_windows(windows_new)
 
     assert_windows_and_measurements_same_length(windows_new, measures_new)
     print("=" * 10 + " Summary " + "=" * 10)
+    print("channels: %d --> %d" % (nchans_old, nchans_new))
+    print("windows: %d -- > %d" % (nwins_old, nwins_new))
+    print("Old component windows: %s" % (nwins_comp_old))
+    print("New component windows: %s" % (nwins_comp_new))
+
     # dump the new windows file to replace the original one
     print("Filtered window files: %s" % output_file)
     dump_json(windows_new, output_file)
@@ -103,11 +108,8 @@ def run_window_filter(paths, params, verbose=False):
 
     # dump the log file
     logfile = os.path.join(os.path.dirname(output_file), "filter.log")
-    dump_json(log, logfile)
-
-    print("channels: %d --> %d" % (nchans_old, nchans_new))
-    print("windows: %d -- > %d" % (nwins_old, nwins_new))
     print("Log file located at: %s" % logfile)
+    dump_json(log, logfile)
 
 
 def main():
