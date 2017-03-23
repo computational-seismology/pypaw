@@ -21,7 +21,8 @@ from pytomo3d.adjoint.sum_adjoint import load_to_adjsrc, dump_adjsrc, \
     check_events_consistent, \
     create_weighted_adj, sum_adj_to_base, check_station_consistent, \
     rotate_adjoint_sources
-from .utils import read_json_file, dump_json, read_yaml_file
+from .utils import read_json_file, dump_json, read_yaml_file, \
+    smart_remove_file
 
 
 def validate_path(path):
@@ -144,7 +145,6 @@ class PostAdjASDF(object):
         """
         Attach station information to self.stations
         """
-
         station_id = "%s_%s" % (station_info["network"],
                                 station_info["station"])
 
@@ -249,6 +249,12 @@ class PostAdjASDF(object):
         """
         Dump self.adjoin_sources into adjoint file
         """
+        nadjsrc = len(self.adjoint_sources)
+        print("Number of adjoint sources: %d" % nadjsrc)
+        if nadjsrc == 0:
+            print("Exit without generate adjoint asdf file since "
+                  "number of adjoint source is 0")
+            return
         save_adjoint_to_asdf(outputfile, self.events, self.adjoint_sources,
                              self.stations)
 
@@ -288,9 +294,11 @@ class PostAdjASDF(object):
             self.rotate_asdf()
 
         outputfile = self.path["output_file"]
+        smart_remove_file(outputfile, mpi_mode=False)
         self.dump_to_asdf(outputfile)
 
         # write out the misfit summary
         misfit_file = outputfile.rstrip("h5") + "adjoint.misfit.json"
+        smart_remove_file(misfit_file, mpi_mode=False)
         print("Misfit log file: %s" % misfit_file)
         dump_json(self.misfits, misfit_file)
