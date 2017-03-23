@@ -69,7 +69,7 @@ setup(
     ],
     install_requires=[
         "numpy", "obspy>=1.0.0", "flake8>=3.0", "pytest", "nose",
-        "future>=0.14.1", "pytomo3d", "pyasdf"
+        "future>=0.14.1", "pytomo3d", "pyasdf", "pyyaml"
     ],
     entry_points={
         'console_scripts': consoles
