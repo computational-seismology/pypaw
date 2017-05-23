@@ -19,6 +19,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', action='store', dest='path_file', required=True,
                         help="path file")
+    # parameter file are not used here. It is written here to follow
+    # the pattern of normal job submission(simpy) with:
+    # pypaw-****** -p param.yml -f path.yml -f
+    parser.add_argument('-p', action='store', dest='param_file',
+                        required=False,
+                        help="param file(redundant, not used)")
     parser.add_argument('-v', action='store_true', dest='verbose',
                         help="verbose flag")
     args = parser.parse_args()

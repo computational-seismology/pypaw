@@ -15,7 +15,7 @@ import numpy as np
 import argparse
 from pprint import pprint
 from pytomo3d.window.utils import generate_log_content
-from .utils import load_json, dump_json, dump_yaml
+from .utils import load_json, load_yaml, dump_json, dump_yaml
 
 
 def stats_one_window_file(filename):
@@ -57,9 +57,10 @@ def _validate_ratio(overall_wcounts, ratio):
         print("Failed wcounts and ratio validator!")
 
 
-def ensemble_default_weight_param_file(overall_wcounts, outputfile):
+def ensemble_default_weight_param_file(overall_wcounts, param, outputfile):
     """
     Ensemble a default weight file based on overall window counts
+    and weight ratio provided by the user
     """
     maxv = 0
     # find max first
@@ -68,13 +69,24 @@ def ensemble_default_weight_param_file(overall_wcounts, outputfile):
             if cinfo > maxv:
                 maxv = cinfo
 
+    raw_ratio = {}
     ratio = {}
     for p, pinfo in overall_wcounts.iteritems():
         ratio[str(p)] = {}
+        raw_ratio[str(p)] = {}
         for c, cinfo in pinfo.iteritems():
-            ratio[str(p)][str(c)] = maxv / cinfo
+            _user_weight = param["user_weight_ratio"][p][c]
+            # the raw ratio without user-definded weight
+            # this is essentially window counts ratio
+            raw_ratio[str(p)][str(c)] = maxv / cinfo
+            # the true weight ratio used
+            ratio[str(p)][str(c)] = _user_weight * (maxv / cinfo)
 
-    _validate_ratio(overall_wcounts, ratio)
+    _validate_ratio(overall_wcounts, raw_ratio)
+    print("===> Raw window counts ratio:")
+    pprint(raw_ratio)
+    print("===> Modified weight ratio:")
+    pprint(ratio)
 
     default_content = {
         "receiver_weighting": {
@@ -121,16 +133,15 @@ def stats_all_window_file(path, _verbose):
     print("outputfile: %s" % outputfile)
     dump_json(content, outputfile)
 
-    if "weight_output_file" in path:
-        print("weight default param file: %s" % path["weight_output_file"])
-        ensemble_default_weight_param_file(
-            overall_wcounts, path["weight_output_file"])
+    return overall_wcounts
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', action='store', dest='path_file',
                         required=True, help='path file')
+    parser.add_argument('-p', action='store', dest='param_file',
+                        required=True, help='param file')
     parser.add_argument('-v', action='store_true', dest='verbose',
                         help='verbose flag')
     args = parser.parse_args()
@@ -139,7 +150,16 @@ def main():
     print("=" * 10 + " Path information " + "=" * 10)
     pprint(path)
 
-    stats_all_window_file(path, args.verbose)
+    param = load_yaml(args.param_file)
+    print("=" * 10 + " Param information " + "=" * 10)
+    pprint(param)
+
+    overall_wcounts = stats_all_window_file(path, args.verbose)
+
+    if "weight_output_file" in path:
+        print("weight default param file: %s" % path["weight_output_file"])
+        ensemble_default_weight_param_file(
+            overall_wcounts, param, path["weight_output_file"])
 
 
 if __name__ == "__main__":

@@ -33,7 +33,8 @@ consoles = [
     'pypaw-convert_to_asdf=pypaw.bins.convert_to_asdf:main',
     'pypaw-convert_to_sac=pypaw.bins.convert_to_sac:main',
     'pypaw-generate_stations_asdf=pypaw.bins.generate_stations_asdf:main',
-    'pypaw-generate_adjoint_stations=pypaw.bins.generate_adjoint_stations:main'
+    'pypaw-generate_adjoint_stations=pypaw.bins.generate_adjoint_stations:main',  # NOQA
+    'pypaw-plot_event_windows=pypaw.bins.plot_event_windows:main'
 ]
 
 
@@ -69,7 +70,7 @@ setup(
     ],
     install_requires=[
         "numpy", "obspy>=1.0.0", "flake8>=3.0", "pytest", "nose",
-        "future>=0.14.1", "pytomo3d", "pyasdf", "pyyaml"
+        "future>=0.14.1", "pytomo3d", "pyasdf", "pyyaml", "spaceweight"
     ],
     entry_points={
         'console_scripts': consoles
