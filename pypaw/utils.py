@@ -82,7 +82,7 @@ def smart_read_json(json_file, mpi_mode=True, comm=None, object_hook=False):
             try:
                 json_obj = read_json_file(json_file, obj_hook=object_hook)
             except Exception as err:
-                print("Error in %s:%s" % (json_file, err))
+                print("Error in %s | error: %s" % (json_file, err))
                 comm.Abort()
         else:
             json_obj = None

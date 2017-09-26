@@ -247,8 +247,9 @@ class AdjointASDF(ProcASDFBase):
 
         if self.mpi_mode and self.rank == 0:
             output_ds = ASDFDataSet(output_filename, mpi=False)
-            if output_ds.events:
+            if obsd_ds.events:
                 output_ds.events = obsd_ds.events
+            output_ds.flush()
             del output_ds
         if self.mpi_mode:
             self.comm.barrier()
