@@ -14,12 +14,13 @@ from __future__ import (absolute_import, division, print_function)
 from functools import partial
 import os
 import inspect
+from copy import deepcopy
 import json
 import pyflex
 from pytomo3d.window.window import window_on_stream
 from pytomo3d.window.utils import merge_windows, stats_all_windows
 from pytomo3d.window.io import get_json_content, WindowEncoder
-from .utils import smart_read_yaml, smart_mkdir
+from .utils import smart_mkdir
 from .procbase import ProcASDFBase
 
 
@@ -119,27 +120,26 @@ class WindowASDF(ProcASDFBase):
                               debug=debug)
 
     def _parse_param(self):
-        """
-        Load param into memory if it is a file. Need a special treatment
-        for WindowASDF because we need 3-components parameter file
-        """
-        param = self.param
-        if isinstance(param, str):
-            # should be a file
-            param = smart_read_yaml(param, mpi_mode=self.mpi_mode)
-        if not isinstance(param, dict):
-            raise ValueError(
-                "param must be dictionary, for example, {'Z': '/path/Z/file',"
-                "'R':'/path/R/config', 'T': '/path/T/config'} or "
-                "{'Z': pyflex.Config, 'R': pyflex.Config, 'T': pyflex.Config}")
+        myrank = self.comm.Get_rank()
+        param = self._parse_yaml(self.param)
 
-        print("param:", param)
+        # reform the param from default
+        default = param["default"]
+        comp_settings = param["components"]
+        results = {}
+        for _comp, _settings in comp_settings.iteritems():
+            if myrank == 0:
+                print("Preapring params for components: %s" % _comp)
+            results[_comp] = deepcopy(default)
+            if _settings is None:
+                continue
+            for k, v in _settings.iteritems():
+                if myrank == 0:
+                    print("--> Modify key[%s] to value: %s --> %s"
+                          % (k, results[_comp][k], v))
+                results[_comp][k] = v
 
-        param_dict = {}
-        for key, value in param.iteritems():
-            param_dict[key] = self._parse_yaml(value)
-
-        return param_dict
+        return results
 
     def _validate_path(self, path):
         necessary_keys = ["obsd_asdf", "obsd_tag", "synt_asdf", "synt_tag",
